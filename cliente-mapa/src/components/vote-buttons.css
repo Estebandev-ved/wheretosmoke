@@ -1,0 +1,289 @@
+/**
+ * 🗳️ VOTE BUTTONS STYLES
+ * 
+ * Estilos premium para los botones de votación
+ */
+
+.vote-buttons-container {
+    display: flex;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.vote-buttons-container.small {
+    gap: 0.5rem;
+}
+
+.vote-buttons-container.large {
+    gap: 1rem;
+}
+
+/* ===== VOTE BUTTON BASE ===== */
+.vote-btn {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    font-family: inherit;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vote-btn:hover:not(.disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
+}
+
+.vote-btn:active:not(.disabled) {
+    transform: translateY(-1px);
+}
+
+.vote-btn.disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* ===== TOMBO BUTTON ===== */
+.vote-btn.tombo {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+.vote-btn.tombo:hover:not(.disabled) {
+    background: linear-gradient(135deg, #f87171 0%, #ef4444 100%);
+    box-shadow: 0 6px 25px rgba(239, 68, 68, 0.5);
+}
+
+.vote-btn.tombo.disabled {
+    background: #9ca3af;
+}
+
+/* ===== RELAX BUTTON ===== */
+.vote-btn.relax {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    color: white;
+}
+
+.vote-btn.relax:hover:not(.disabled) {
+    background: linear-gradient(135deg, #34d399 0%, #10b981 100%);
+    box-shadow: 0 6px 25px rgba(16, 185, 129, 0.5);
+}
+
+.vote-btn.relax.disabled {
+    background: #9ca3af;
+}
+
+/* ===== VOTE ICON ===== */
+.vote-icon {
+    position: relative;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+}
+
+/* Siren light effect for TOMBO */
+.siren-light {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    width: 12px;
+    height: 12px;
+    background: #3b82f6;
+    border-radius: 50%;
+    animation: siren-pulse 0.6s infinite;
+    box-shadow: 0 0 10px #3b82f6;
+}
+
+@keyframes siren-pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 0.3;
+        transform: scale(1.2);
+    }
+}
+
+/* Glow effect for RELAX */
+.glow-effect {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle, rgba(167, 243, 208, 0.4), transparent);
+    border-radius: 50%;
+    animation: glow-pulse 2s ease-in-out infinite;
+}
+
+@keyframes glow-pulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(0.8);
+        opacity: 0.5;
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.2);
+        opacity: 0.8;
+    }
+}
+
+/* Sparkles for RELAX */
+.sparkle {
+    position: absolute;
+    font-size: 0.8rem;
+    animation: sparkle-float 2s ease-in-out infinite;
+}
+
+.sparkle-1 {
+    top: -5px;
+    right: -5px;
+    animation-delay: 0s;
+}
+
+.sparkle-2 {
+    bottom: -5px;
+    left: -5px;
+    animation-delay: 1s;
+}
+
+@keyframes sparkle-float {
+
+    0%,
+    100% {
+        opacity: 0;
+        transform: scale(0.5);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* ===== VOTE LABEL ===== */
+.vote-label {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    flex: 1;
+}
+
+.vote-text {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+.vote-count {
+    font-size: 0.75rem;
+    opacity: 0.9;
+    font-weight: 500;
+}
+
+/* ===== CHECKMARK ===== */
+.checkmark {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.3);
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: checkmark-pop 0.3s ease;
+}
+
+@keyframes checkmark-pop {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* ===== RIPPLE EFFECT ===== */
+.vote-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+}
+
+.vote-btn:active:not(.disabled)::before {
+    width: 300px;
+    height: 300px;
+}
+
+/* ===== RESPONSIVE ===== */
+.vote-buttons-container.small .vote-btn {
+    padding: 0.5rem 0.75rem;
+}
+
+.vote-buttons-container.small .vote-icon {
+    font-size: 1.5rem;
+    width: 30px;
+    height: 30px;
+}
+
+.vote-buttons-container.small .vote-text {
+    font-size: 0.85rem;
+}
+
+.vote-buttons-container.large .vote-btn {
+    padding: 1rem 1.5rem;
+}
+
+.vote-buttons-container.large .vote-icon {
+    font-size: 2.5rem;
+    width: 50px;
+    height: 50px;
+}
+
+.vote-buttons-container.large .vote-text {
+    font-size: 1.2rem;
+}
+
+@media (max-width: 480px) {
+    .vote-btn {
+        padding: 0.6rem 0.8rem;
+        font-size: 0.9rem;
+    }
+
+    .vote-icon {
+        font-size: 1.8rem;
+        width: 35px;
+        height: 35px;
+    }
+}

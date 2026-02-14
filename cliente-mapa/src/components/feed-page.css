@@ -1,0 +1,491 @@
+/* ═══════════════════════════════════════════════════════════
+   📸 FEED PAGE - Minimal Clean Design
+   ═══════════════════════════════════════════════════════════ */
+
+.feed-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 20px 16px 90px;
+    background: #0e0e0e;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 10;
+    -webkit-overflow-scrolling: touch;
+}
+
+.feed-page.light {
+    background: #f5f5f5;
+}
+
+/* ─── Header ─── */
+.feed-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 4px 24px;
+}
+
+.feed-title {
+    font-size: 26px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: -0.5px;
+}
+
+.feed-page.light .feed-title {
+    color: #1a1a1a;
+}
+
+/* Dark text for dark bg */
+.feed-page:not(.light) .feed-title {
+    color: #f0f0f0;
+}
+
+.feed-subtitle {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.4);
+    margin: 4px 0 0 0;
+}
+
+.feed-page:not(.light) .feed-subtitle {
+    color: rgba(255, 255, 255, 0.35);
+}
+
+/* ─── Feed Grid ─── */
+.feed-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+/* ─── Feed Card ─── */
+.feed-card {
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: all 0.25s ease;
+    animation: feedCardIn 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(12px);
+}
+
+.feed-page:not(.light) .feed-card {
+    background: rgba(20, 20, 20, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+@keyframes feedCardIn {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.feed-card:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.feed-card:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.feed-card:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.feed-card:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.feed-card:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+/* ─── Card Header ─── */
+.feed-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+}
+
+.feed-card-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    background: #1a1a1a;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    flex-shrink: 0;
+}
+
+.feed-page:not(.light) .feed-card-avatar {
+    background: #2a2a2a;
+}
+
+.feed-card-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.feed-card-username {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1a1a1a;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.feed-page:not(.light) .feed-card-username {
+    color: #f0f0f0;
+}
+
+.feed-card-spot {
+    font-size: 12px;
+    color: #555;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+}
+
+.feed-page:not(.light) .feed-card-spot {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+.feed-card-time {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.feed-page:not(.light) .feed-card-time {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+/* ─── Card Image ─── */
+.feed-card-image {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    background: #f0f0f0;
+    display: block;
+}
+
+.feed-page:not(.light) .feed-card-image {
+    background: #111;
+}
+
+/* ─── Card Footer ─── */
+.feed-card-footer {
+    padding: 14px 16px;
+}
+
+.feed-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 10px;
+}
+
+.feed-action-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    color: rgba(0, 0, 0, 0.45);
+    cursor: pointer;
+    font-size: 13px;
+    padding: 4px 0;
+    transition: all 0.2s ease;
+}
+
+.feed-page:not(.light) .feed-action-btn {
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.feed-action-btn:hover {
+    color: #1a1a1a;
+}
+
+.feed-page:not(.light) .feed-action-btn:hover {
+    color: #f0f0f0;
+}
+
+.feed-action-btn .icon {
+    font-size: 20px;
+    transition: transform 0.2s ease;
+}
+
+.feed-action-btn:active .icon {
+    transform: scale(1.15);
+}
+
+.feed-card-desc {
+    font-size: 13px;
+    color: rgba(0, 0, 0, 0.6);
+    line-height: 1.5;
+    margin: 0;
+}
+
+.feed-page:not(.light) .feed-card-desc {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+/* ─── Loading State ─── */
+.feed-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 80px 20px;
+    color: rgba(0, 0, 0, 0.3);
+    gap: 16px;
+}
+
+.feed-page:not(.light) .feed-loading {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.feed-spinner {
+    width: 32px;
+    height: 32px;
+    border: 2px solid rgba(0, 0, 0, 0.08);
+    border-top-color: #1a1a1a;
+    border-radius: 50%;
+    animation: feedSpin 0.7s linear infinite;
+}
+
+.feed-page:not(.light) .feed-spinner {
+    border-color: rgba(255, 255, 255, 0.08);
+    border-top-color: #f0f0f0;
+}
+
+@keyframes feedSpin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+/* ─── Empty State ─── */
+.feed-empty {
+    text-align: center;
+    padding: 60px 20px;
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.feed-page:not(.light) .feed-empty {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.feed-empty-icon {
+    font-size: 48px;
+    margin-bottom: 12px;
+    opacity: 0.4;
+}
+
+.feed-empty-text {
+    font-size: 15px;
+    font-weight: 500;
+}
+
+.feed-empty-hint {
+    font-size: 13px;
+    margin-top: 6px;
+    opacity: 0.6;
+}
+
+/* ─── Estado badge ─── */
+.feed-status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 8px;
+    border-radius: 20px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.feed-status-badge.relax {
+    background: rgba(0, 0, 0, 0.06);
+    color: #333;
+}
+
+.feed-page:not(.light) .feed-status-badge.relax {
+    background: rgba(255, 255, 255, 0.08);
+    color: #aaa;
+}
+
+.feed-status-badge.tombo {
+    background: rgba(200, 0, 0, 0.08);
+    color: #c00;
+}
+
+.feed-page:not(.light) .feed-status-badge.tombo {
+    background: rgba(255, 80, 80, 0.12);
+    color: #ff6666;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   💬 COMMENTS SECTION
+   ═══════════════════════════════════════════════════════════ */
+
+.feed-comments {
+    margin-top: 12px;
+    padding-top: 12px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
+    animation: feedCardIn 0.25s ease forwards;
+}
+
+.feed-page:not(.light) .feed-comments {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* ─── Comment Input ─── */
+.feed-comment-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+}
+
+.feed-comment-input {
+    flex: 1;
+    padding: 9px 14px;
+    background: rgba(0, 0, 0, 0.04);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 20px;
+    font-size: 13px;
+    color: #1a1a1a;
+    outline: none;
+    transition: all 0.2s ease;
+    font-family: inherit;
+}
+
+.feed-comment-input::placeholder {
+    color: rgba(0, 0, 0, 0.3);
+}
+
+.feed-comment-input:focus {
+    border-color: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+.feed-page:not(.light) .feed-comment-input {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: #f0f0f0;
+}
+
+.feed-page:not(.light) .feed-comment-input::placeholder {
+    color: rgba(255, 255, 255, 0.25);
+}
+
+.feed-page:not(.light) .feed-comment-input:focus {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.04);
+}
+
+.feed-comment-send {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: none;
+    background: #1a1a1a;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.feed-comment-send:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+}
+
+.feed-comment-send:not(:disabled):hover {
+    transform: scale(1.05);
+}
+
+.feed-comment-send:not(:disabled):active {
+    transform: scale(0.95);
+}
+
+.feed-page:not(.light) .feed-comment-send {
+    background: #f0f0f0;
+    color: #1a1a1a;
+}
+
+/* ─── Comment List ─── */
+.feed-comment-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.feed-comment {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 4px 6px;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.feed-comment-user {
+    font-weight: 600;
+    color: #1a1a1a;
+}
+
+.feed-page:not(.light) .feed-comment-user {
+    color: #f0f0f0;
+}
+
+.feed-comment-text {
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.feed-page:not(.light) .feed-comment-text {
+    color: rgba(255, 255, 255, 0.55);
+}
+
+.feed-comment-time {
+    font-size: 11px;
+    color: rgba(0, 0, 0, 0.25);
+}
+
+.feed-page:not(.light) .feed-comment-time {
+    color: rgba(255, 255, 255, 0.2);
+}
+
+.feed-comment-empty {
+    font-size: 12px;
+    color: rgba(0, 0, 0, 0.25);
+    text-align: center;
+    padding: 8px 0;
+}
+
+.feed-page:not(.light) .feed-comment-empty {
+    color: rgba(255, 255, 255, 0.2);
+}

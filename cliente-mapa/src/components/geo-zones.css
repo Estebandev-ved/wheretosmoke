@@ -1,0 +1,85 @@
+/* 🗺️ GEO ZONES - Styling for zone polygons */
+
+.geo-zone-polygon {
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.geo-zone-polygon:hover {
+    fill-opacity: 0.3 !important;
+}
+
+/* Popup personalizado */
+.geo-zone-popup .leaflet-popup-content-wrapper {
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    padding: 0;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.geo-zone-popup .leaflet-popup-content {
+    margin: 0;
+    min-width: 200px;
+}
+
+.geo-zone-popup .popup-content {
+    padding: 15px;
+}
+
+.geo-zone-popup h3 {
+    margin: 0 0 8px 0;
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+.geo-zone-popup .zona-tipo {
+    display: inline-block;
+    padding: 4px 10px;
+    background: rgba(0, 200, 81, 0.1);
+    border: 1px solid #00C851;
+    border-radius: 12px;
+    font-size: 11px;
+    font-weight: bold;
+    color: #00C851;
+    margin-bottom: 10px;
+}
+
+.geo-zone-popup p {
+    margin: 10px 0 0 0;
+    font-size: 13px;
+    color: #666;
+    line-height: 1.4;
+}
+
+.geo-zone-popup .zona-status {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+    font-size: 12px;
+    font-weight: bold;
+    color: #00C851;
+    text-align: center;
+}
+
+/* Dark mode */
+body.dark-mode .geo-zone-popup .leaflet-popup-content-wrapper {
+    background: rgba(28, 28, 28, 0.95);
+}
+
+body.dark-mode .geo-zone-popup h3 {
+    color: white;
+}
+
+body.dark-mode .geo-zone-popup p {
+    color: #ccc;
+}
+
+body.dark-mode .geo-zone-popup .zona-tipo {
+    background: rgba(0, 200, 81, 0.2);
+}
+
+body.dark-mode .geo-zone-popup .zona-status {
+    border-top-color: #444;
+}

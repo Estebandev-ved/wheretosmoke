@@ -1,0 +1,154 @@
+/**
+ * ✨ PAGE TRANSITIONS STYLES
+ * 
+ * Animaciones suaves para transiciones de página
+ */
+
+.page-transition {
+    animation: pageEnter 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Exit animation (can be triggered via class) */
+.page-transition.exiting {
+    animation: pageExit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes pageExit {
+    from {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+}
+
+/* Stagger children animation */
+.page-transition>* {
+    animation: childrenStagger 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    animation-fill-mode: both;
+}
+
+.page-transition>*:nth-child(1) {
+    animation-delay: 0.05s;
+}
+
+.page-transition>*:nth-child(2) {
+    animation-delay: 0.1s;
+}
+
+.page-transition>*:nth-child(3) {
+    animation-delay: 0.15s;
+}
+
+.page-transition>*:nth-child(4) {
+    animation-delay: 0.2s;
+}
+
+.page-transition>*:nth-child(5) {
+    animation-delay: 0.25s;
+}
+
+@keyframes childrenStagger {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Modal specific transitions */
+.modal-transition {
+    animation: modalEnter 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes modalEnter {
+    from {
+        opacity: 0;
+        transform: scale(0.7) translateY(-50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.modal-transition.exiting {
+    animation: modalExit 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+@keyframes modalExit {
+    from {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: scale(0.7) translateY(-50px);
+    }
+}
+
+/* Slide transitions for navigation */
+.slide-left {
+    animation: slideLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.slide-right {
+    animation: slideRight 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideLeft {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideRight {
+    from {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* Reduce motion for accessibility */
+@media (prefers-reduced-motion: reduce) {
+
+    .page-transition,
+    .page-transition>*,
+    .modal-transition,
+    .slide-left,
+    .slide-right {
+        animation: none !important;
+    }
+}

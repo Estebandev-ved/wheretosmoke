@@ -1,0 +1,209 @@
+/**
+ * 🥚 EASTER EGGS STYLES
+ * 
+ * Estilos para efectos especiales ocultos
+ */
+
+/* ===== PSYCHEDELIC MODE ===== */
+.psychedelic-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99999;
+    pointer-events: none;
+    background: linear-gradient(45deg,
+            #ff0080,
+            #ff8c00,
+            #40e0d0,
+            #ff0080,
+            #7fff00,
+            #ff1493,
+            #00bfff);
+    background-size: 400% 400%;
+    animation: psychedelicGradient 3s ease infinite;
+    mix-blend-mode: color;
+    opacity: 0.6;
+}
+
+@keyframes psychedelicGradient {
+    0% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+
+    100% {
+        background-position: 0% 50%;
+    }
+}
+
+.psychedelic-message {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 4rem;
+    font-weight: 900;
+    text-align: center;
+    background: linear-gradient(45deg,
+            #ff0080,
+            #ff8c00,
+            #40e0d0,
+            #7fff00,
+            #ff1493);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    animation: psychedelicText 1s ease infinite, psychedelicPulse 0.5s ease infinite;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+}
+
+@keyframes psychedelicText {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+@keyframes psychedelicPulse {
+
+    0%,
+    100% {
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Make everything spin during psychedelic mode */
+.psychedelic-overlay~* {
+    animation: psychedelicSpin 10s linear infinite !important;
+}
+
+@keyframes psychedelicSpin {
+    from {
+        filter: hue-rotate(0deg);
+    }
+
+    to {
+        filter: hue-rotate(360deg);
+    }
+}
+
+/* ===== LEAF RAIN ===== */
+.leaf-rain {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9998;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.rain-leaf {
+    position: absolute;
+    top: -50px;
+    font-size: 2rem;
+    opacity: 0.8;
+    animation: leafFall linear forwards;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+@keyframes leafFall {
+    0% {
+        transform: translateY(-50px) rotate(0deg);
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 0.8;
+    }
+
+    90% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(100vh) rotate(var(--rotation, 360deg));
+        opacity: 0;
+    }
+}
+
+/* Add slight horizontal sway to leaves */
+.rain-leaf:nth-child(odd) {
+    animation: leafFall linear forwards, leafSway 3s ease-in-out infinite;
+}
+
+.rain-leaf:nth-child(even) {
+    animation: leafFall linear forwards, leafSwayReverse 3s ease-in-out infinite;
+}
+
+@keyframes leafSway {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(30px);
+    }
+}
+
+@keyframes leafSwayReverse {
+
+    0%,
+    100% {
+        transform: translateX(0);
+    }
+
+    50% {
+        transform: translateX(-30px);
+    }
+}
+
+/* ===== 4/20 SPECIAL THEME (Optional) ===== */
+.special-420-theme {
+    --primary-green: #10b981;
+    --accent-gold: #fbbf24;
+}
+
+.special-420-theme .weed-toast {
+    border: 2px solid gold;
+    box-shadow: 0 0 20px rgba(251, 191, 36, 0.5);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .psychedelic-message {
+        font-size: 2.5rem;
+    }
+
+    .rain-leaf {
+        font-size: 1.5rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .psychedelic-message {
+        font-size: 2rem;
+    }
+
+    .rain-leaf {
+        font-size: 1.2rem;
+    }
+}

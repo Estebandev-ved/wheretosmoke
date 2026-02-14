@@ -1,0 +1,260 @@
+/**
+ * 🔔 WEED TOAST STYLES
+ * 
+ * Estilos premium para notificaciones custom
+ */
+
+.weed-toast-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 10001;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    pointer-events: none;
+}
+
+/* ===== TOAST BASE ===== */
+.weed-toast {
+    min-width: 320px;
+    max-width: 400px;
+    padding: 1rem 1.25rem;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    position: relative;
+    overflow: hidden;
+    pointer-events: all;
+    animation: toastSlideIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes toastSlideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+/* ===== TOAST TYPES ===== */
+.weed-toast-success {
+    border-left: 4px solid #10b981;
+}
+
+.weed-toast-error {
+    border-left: 4px solid #ef4444;
+}
+
+.weed-toast-info {
+    border-left: 4px solid #3b82f6;
+}
+
+.weed-toast-warning {
+    border-left: 4px solid #f59e0b;
+}
+
+/* ===== ICON WRAPPER ===== */
+.toast-icon-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+}
+
+.toast-leaf {
+    font-size: 2rem;
+    position: absolute;
+    animation: leafSpin 3s linear infinite;
+}
+
+@keyframes leafSpin {
+    from {
+        transform: rotate(0deg);
+    }
+
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.toast-symbol {
+    font-size: 1.2rem;
+    font-weight: bold;
+    position: relative;
+    z-index: 1;
+}
+
+.weed-toast-success .toast-symbol {
+    color: #10b981;
+}
+
+.weed-toast-error .toast-symbol {
+    color: #ef4444;
+}
+
+.weed-toast-info .toast-symbol {
+    color: #3b82f6;
+}
+
+.weed-toast-warning .toast-symbol {
+    color: #f59e0b;
+}
+
+/* ===== CONTENT ===== */
+.toast-content {
+    flex: 1;
+}
+
+.toast-message {
+    margin: 0;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: #1f2937;
+    line-height: 1.4;
+}
+
+/* ===== CLOSE BUTTON ===== */
+.toast-close {
+    background: none;
+    border: none;
+    color: #6b7280;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 0.25rem;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.toast-close:hover {
+    background: rgba(0, 0, 0, 0.1);
+    color: #1f2937;
+}
+
+/* ===== PROGRESS BAR ===== */
+.toast-progress-bar {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 3px;
+    width: 100%;
+    background: linear-gradient(90deg, transparent, currentColor);
+    animation: progressShrink 3s linear;
+}
+
+@keyframes progressShrink {
+    from {
+        width: 100%;
+    }
+
+    to {
+        width: 0%;
+    }
+}
+
+.weed-toast-success .toast-progress-bar {
+    color: #10b981;
+}
+
+.weed-toast-error .toast-progress-bar {
+    color: #ef4444;
+}
+
+.weed-toast-info .toast-progress-bar {
+    color: #3b82f6;
+}
+
+.weed-toast-warning .toast-progress-bar {
+    color: #f59e0b;
+}
+
+/* ===== SMOKE EFFECT ===== */
+.toast-smoke {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.6), transparent);
+    border-radius: 50%;
+    filter: blur(8px);
+    animation: smokeRise 2s ease-out infinite;
+    pointer-events: none;
+}
+
+.smoke-1 {
+    bottom: -10px;
+    left: 20%;
+    animation-delay: 0s;
+}
+
+.smoke-2 {
+    bottom: -10px;
+    left: 40%;
+    animation-delay: 0.5s;
+}
+
+@keyframes smokeRise {
+    0% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.6;
+    }
+
+    100% {
+        transform: translateY(-60px) scale(1.5);
+        opacity: 0;
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 480px) {
+    .weed-toast-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+    }
+
+    .weed-toast {
+        min-width: auto;
+        width: 100%;
+    }
+}
+
+/* ===== DARK MODE ===== */
+@media (prefers-color-scheme: dark) {
+    .weed-toast {
+        background: rgba(30, 30, 30, 0.95);
+    }
+
+    .toast-message {
+        color: #f3f4f6;
+    }
+
+    .toast-close {
+        color: #9ca3af;
+    }
+
+    .toast-close:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: #f3f4f6;
+    }
+}

@@ -1,0 +1,471 @@
+/**
+ * 🏆 ACHIEVEMENT UNLOCKED STYLES
+ * 
+ * Animaciones épicas para desbloqueo de logros
+ */
+
+/* ===== OVERLAY ===== */
+.achievement-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 100000;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: overlayFadeIn 0.5s ease-out;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.achievement-overlay.exit {
+    animation: overlayFadeOut 0.3s ease-out forwards;
+}
+
+@keyframes overlayFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+/* ===== MODAL ===== */
+.achievement-modal {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 90%;
+    max-width: 500px;
+    min-height: 400px;
+}
+
+/* ===== OLD BADGE - SHATTER EFFECT ===== */
+.achievement-old {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.badge-shatter {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: badgeShatter 0.8s ease-out forwards;
+}
+
+@keyframes badgeShatter {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    30% {
+        transform: scale(1.15);
+    }
+
+    50% {
+        filter: blur(2px);
+    }
+
+    100% {
+        transform: scale(0.7) rotate(20deg);
+        opacity: 0;
+        filter: blur(12px);
+    }
+}
+
+.badge-icon {
+    font-size: 6rem;
+    position: relative;
+    z-index: 2;
+}
+
+/* Shatter Fragments - SLOWER */
+.fragment {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.8), rgba(200, 200, 200, 0.6));
+    border-radius: 3px;
+    animation: fragmentFly 1.2s ease-out forwards;
+    /* Más lento: 0.8s → 1.2s */
+}
+
+@keyframes fragmentFly {
+    0% {
+        transform: translate(0, 0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translate(var(--x, 100px), var(--y, 100px)) rotate(var(--rotate, 360deg));
+        opacity: 0;
+    }
+}
+
+.fragment-0 {
+    --x: -80px;
+    --y: -80px;
+    --rotate: 120deg;
+}
+
+.fragment-1 {
+    --x: 80px;
+    --y: -80px;
+    --rotate: 240deg;
+}
+
+.fragment-2 {
+    --x: -80px;
+    --y: 80px;
+    --rotate: -120deg;
+}
+
+.fragment-3 {
+    --x: 80px;
+    --y: 80px;
+    --rotate: -240deg;
+}
+
+.fragment-4 {
+    --x: -120px;
+    --y: 0px;
+    --rotate: 180deg;
+}
+
+.fragment-5 {
+    --x: 120px;
+    --y: 0px;
+    --rotate: -180deg;
+}
+
+.fragment-6 {
+    --x: 0px;
+    --y: -120px;
+    --rotate: 90deg;
+}
+
+.fragment-7 {
+    --x: 0px;
+    --y: 120px;
+    --rotate: -90deg;
+}
+
+.fragment-8 {
+    --x: -100px;
+    --y: -60px;
+    --rotate: 150deg;
+}
+
+.fragment-9 {
+    --x: 100px;
+    --y: -60px;
+    --rotate: 210deg;
+}
+
+.fragment-10 {
+    --x: -100px;
+    --y: 60px;
+    --rotate: -150deg;
+}
+
+.fragment-11 {
+    --x: 100px;
+    --y: 60px;
+    --rotate: -210deg;
+}
+
+/* ===== NEW BADGE - APPEAR WITH AURA ===== */
+.achievement-new {
+    position: relative;
+    text-align: center;
+    animation: newBadgeAppear 1.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    /* Más lento: 1s → 1.5s */
+}
+
+@keyframes newBadgeAppear {
+    0% {
+        opacity: 0;
+        transform: scale(0.3);
+    }
+
+    60% {
+        transform: scale(1.15);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Golden Aura - MÁS LENTO */
+.golden-aura {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle, var(--tier-color), transparent 70%);
+    animation: auraPulse 3s ease-in-out infinite;
+    /* Más lento: 2s → 3s */
+    z-index: 1;
+}
+
+@keyframes auraPulse {
+
+    0%,
+    100% {
+        box-shadow: 0 0 40px var(--tier-color), 0 0 80px var(--tier-color);
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    50% {
+        box-shadow: 0 0 60px var(--tier-color), 0 0 120px var(--tier-color), 0 0 160px var(--tier-color);
+        transform: translate(-50%, -50%) scale(1.1);
+    }
+}
+
+/* Light Rays */
+.light-ray {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 4px;
+    height: 150px;
+    background: linear-gradient(to bottom, rgba(255, 215, 0, 0.8), transparent);
+    transform-origin: top center;
+    transform: translate(-50%, -50%) rotate(var(--angle));
+    animation: rayRotate 3s linear infinite;
+    z-index: 0;
+}
+
+@keyframes rayRotate {
+    from {
+        opacity: 0.6;
+    }
+
+    to {
+        opacity: 0.6;
+        transform: translate(-50%, -50%) rotate(calc(var(--angle) + 360deg));
+    }
+}
+
+/* Badge New */
+.badge-new {
+    position: relative;
+    width: 180px;
+    height: 180px;
+    margin: 0 auto 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.2), transparent);
+    border-radius: 50%;
+    box-shadow: 0 0 40px var(--tier-color), inset 0 0 30px rgba(255, 255, 255, 0.2);
+    z-index: 2;
+}
+
+.badge-icon-new {
+    font-size: 7rem;
+    animation: iconBounce 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes iconBounce {
+    0% {
+        transform: scale(0);
+    }
+
+    50% {
+        transform: scale(1.2);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Sparkles */
+.sparkle {
+    position: absolute;
+    font-size: 1.2rem;
+    animation: sparkleFloat var(--delay, 0s) 1.5s ease-out forwards;
+    opacity: 0;
+    z-index: 3;
+}
+
+@keyframes sparkleFloat {
+    0% {
+        opacity: 0;
+        transform: translate(0, 0) scale(0);
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        opacity: 0;
+        transform:
+            rotate(var(--angle)) translateX(var(--distance)) scale(1.5);
+    }
+}
+
+/* ===== TEXT ===== */
+.achievement-text {
+    position: relative;
+    z-index: 4;
+    animation: textSlideUp 0.6s 0.4s ease-out backwards;
+}
+
+@keyframes textSlideUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.achievement-title {
+    font-size: 1.8rem;
+    font-weight: 900;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 10px rgba(255, 215, 0, 0.5);
+}
+
+.achievement-name {
+    font-size: 2rem;
+    font-weight: 800;
+    color: white;
+    margin-bottom: 0.5rem;
+}
+
+.achievement-desc {
+    font-size: 1.1rem;
+    color: #d1d5db;
+    margin-bottom: 2rem;
+}
+
+/* ===== BUTTON ===== */
+.achievement-btn {
+    padding: 14px 40px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #1f2937;
+    background: linear-gradient(135deg, #ffd700, #ffed4e);
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
+    transition: all 0.3s ease;
+    animation: buttonPop 0.6s 0.8s ease-out backwards;
+    z-index: 5;
+}
+
+@keyframes buttonPop {
+    from {
+        opacity: 0;
+        transform: scale(0.8);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.achievement-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 30px rgba(255, 215, 0, 0.6);
+}
+
+/* ===== CONFETTI ===== */
+.confetti-container {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.confetti {
+    position: absolute;
+    top: -10%;
+    left: var(--x);
+    width: 10px;
+    height: 10px;
+    background: var(--color);
+    animation: confettiFall 3s var(--delay) ease-in forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(0) rotate(0deg);
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(110vh) rotate(var(--rotate));
+        opacity: 0;
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .achievement-modal {
+        max-width: 90%;
+    }
+
+    .badge-new {
+        width: 140px;
+        height: 140px;
+    }
+
+    .badge-icon-new {
+        font-size: 5rem;
+    }
+
+    .achievement-title {
+        font-size: 1.4rem;
+    }
+
+    .achievement-name {
+        font-size: 1.6rem;
+    }
+
+    .achievement-desc {
+        font-size: 1rem;
+    }
+}

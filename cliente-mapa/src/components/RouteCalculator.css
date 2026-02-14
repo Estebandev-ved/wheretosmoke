@@ -1,0 +1,526 @@
+/* ═══════════════════════════════════════════════════════════
+   🛣️ ROUTE CALCULATOR - InDrive Style Dark Theme
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes pulse-instruction {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.65;
+    }
+}
+
+.route-calculator {
+    background: rgba(18, 18, 18, 0.94);
+    backdrop-filter: blur(24px) saturate(1.4);
+    -webkit-backdrop-filter: blur(24px) saturate(1.4);
+    border-radius: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08) inset;
+    padding: 18px;
+    max-width: 380px;
+    min-width: 300px;
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    color: #e0e0e0;
+    transition: all 0.3s ease;
+}
+
+.route-calculator.light {
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.05) inset;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+    color: #333;
+}
+
+.route-calculator.light .route-title h3 {
+    color: #333;
+}
+
+.route-calculator.light .btn-new-route {
+    background: rgba(0, 0, 0, 0.05);
+    color: #555;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.route-calculator.light .result-card {
+    background: rgba(0, 0, 0, 0.03);
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.route-calculator.light .card-value {
+    color: #222;
+}
+
+/* ─── Header ─── */
+.route-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.route-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.route-icon {
+    font-size: 1.4rem;
+}
+
+.route-title h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: #fff;
+    font-weight: 700;
+}
+
+.btn-new-route {
+    padding: 7px 14px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.8rem;
+    transition: all 0.25s ease;
+}
+
+.btn-new-route:hover {
+    background: rgba(255, 255, 255, 0.16);
+    color: #fff;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🚗 INDRIVE-STYLE ROUTE INPUT
+   ═══════════════════════════════════════════════════════════ */
+
+.route-start {
+    text-align: center;
+    padding: 16px 0;
+}
+
+.start-message p {
+    color: #888;
+    font-size: 0.85rem;
+    line-height: 1.5;
+    margin: 0 0 16px 0;
+}
+
+.btn-start-route {
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #00C851 0%, #00a844 100%);
+    color: white;
+    border: none;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 18px rgba(0, 200, 81, 0.3);
+    width: 100%;
+    letter-spacing: 0.3px;
+}
+
+.btn-start-route:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 200, 81, 0.4);
+}
+
+/* ─── Route Setup (InDrive style) ─── */
+.route-setup {
+    padding: 6px 0;
+}
+
+.step-progress {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-bottom: 14px;
+    gap: 0;
+    padding: 0 4px;
+}
+
+.step-dot {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.06);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.85rem;
+    color: #666;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    border: 2px solid rgba(255, 255, 255, 0.08);
+}
+
+.step-dot.active {
+    background: rgba(0, 200, 81, 0.15);
+    color: #00C851;
+    border-color: #00C851;
+    box-shadow: 0 0 16px rgba(0, 200, 81, 0.2);
+}
+
+.step-line {
+    width: 2px;
+    height: 18px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 1px;
+}
+
+.step-labels {
+    display: flex;
+    justify-content: space-around;
+    margin-bottom: 14px;
+    font-size: 0.8rem;
+}
+
+.step-labels span {
+    color: #666;
+    font-weight: 600;
+    transition: color 0.3s;
+}
+
+.step-labels span.active {
+    color: #00C851;
+}
+
+/* ─── Instructions (InDrive input fields style) ─── */
+.instructions {
+    background: rgba(255, 255, 255, 0.04);
+    padding: 16px;
+    border-radius: 14px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.instruction-text {
+    color: #aaa;
+    font-size: 0.85rem;
+    margin-bottom: 14px;
+    line-height: 1.5;
+}
+
+.instruction-text strong {
+    color: #00C851;
+}
+
+.btn-use-location {
+    padding: 12px 20px;
+    background: rgba(0, 200, 81, 0.15);
+    color: #00C851;
+    border: 1px solid rgba(0, 200, 81, 0.25);
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    width: 100%;
+    justify-content: center;
+}
+
+.btn-use-location:hover {
+    background: rgba(0, 200, 81, 0.25);
+    border-color: rgba(0, 200, 81, 0.4);
+}
+
+.location-icon {
+    font-size: 1rem;
+}
+
+.selected-info {
+    background: rgba(0, 200, 81, 0.08);
+    padding: 10px 12px;
+    border-radius: 10px;
+    font-size: 0.78rem;
+    color: #69F0AE;
+    font-family: 'Courier New', monospace;
+    margin-bottom: 12px;
+    border: 1px solid rgba(0, 200, 81, 0.15);
+}
+
+.btn-cancel {
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.06);
+    color: #888;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.82rem;
+    transition: all 0.25s ease;
+    width: 100%;
+    margin-top: 8px;
+}
+
+.btn-cancel:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #bbb;
+}
+
+/* ─── Loading ─── */
+.loading-overlay {
+    text-align: center;
+    padding: 24px;
+    color: #00C851;
+}
+
+.spinner-route {
+    width: 40px;
+    height: 40px;
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top: 3px solid #00C851;
+    border-radius: 50%;
+    animation: spin-route 0.8s linear infinite;
+    margin: 0 auto 12px;
+}
+
+@keyframes spin-route {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* ═══════════════════════════════════════════════════════════
+   📊 RESULTS - Dark cards
+   ═══════════════════════════════════════════════════════════ */
+
+.route-results {
+    padding: 6px 0;
+}
+
+.result-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.result-card {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 14px 12px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    transition: all 0.25s ease;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+}
+
+.result-card:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.result-card.safety {
+    grid-column: 1 / -1;
+    border-width: 2px;
+}
+
+.card-icon {
+    font-size: 1.6rem;
+}
+
+.card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+    width: 100%;
+}
+
+.card-label {
+    color: #888;
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+}
+
+.card-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #fff;
+}
+
+/* ─── Simular button ─── */
+.btn-simular {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #00C851 0%, #00a844 100%) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 14px !important;
+    font-weight: bold !important;
+    font-size: 0.95rem !important;
+    cursor: pointer;
+    box-shadow: 0 4px 18px rgba(0, 200, 81, 0.3) !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.btn-simular:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 200, 81, 0.4) !important;
+}
+
+/* ─── Warnings ─── */
+.warnings-section {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.25);
+    border-radius: 14px;
+    padding: 14px;
+}
+
+.warnings-title {
+    margin: 0 0 10px 0;
+    color: #FFB74D;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.warnings-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.warning-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 10px;
+    background: rgba(255, 152, 0, 0.08);
+    border-radius: 10px;
+    margin-bottom: 6px;
+    font-size: 0.82rem;
+    color: #FFB74D;
+}
+
+.warning-item:last-child {
+    margin-bottom: 0;
+}
+
+.warning-icon {
+    font-size: 1rem;
+}
+
+.warning-time {
+    margin-left: auto;
+    font-size: 0.7rem;
+    color: rgba(255, 183, 77, 0.7);
+    font-weight: 600;
+}
+
+.more-reports {
+    text-align: center;
+    padding: 6px;
+    background: rgba(255, 152, 0, 0.06);
+    border-radius: 8px;
+    color: #FFB74D;
+    font-size: 0.78rem;
+    font-weight: 600;
+    margin-top: 6px;
+}
+
+/* ─── Safe Message ─── */
+.safe-message {
+    background: rgba(0, 200, 81, 0.08);
+    border: 1px solid rgba(0, 200, 81, 0.2);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.safe-icon {
+    font-size: 2rem;
+}
+
+.safe-message strong {
+    color: #69F0AE;
+    font-size: 0.95rem;
+    display: block;
+    margin-bottom: 3px;
+}
+
+.safe-message p {
+    margin: 0;
+    color: #81C784;
+    font-size: 0.82rem;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   ✨ ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.route-start,
+.route-setup,
+.route-results {
+    animation: slideIn 0.35s ease;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   📱 RESPONSIVE
+   ═══════════════════════════════════════════════════════════ */
+
+@media (max-width: 768px) {
+    .route-calculator {
+        max-width: calc(100vw - 32px);
+        min-width: unset;
+        padding: 14px;
+        border-radius: 18px;
+    }
+
+    .route-title h3 {
+        font-size: 0.95rem;
+    }
+
+    .result-cards {
+        gap: 8px;
+    }
+
+    .result-card {
+        padding: 10px 8px;
+    }
+
+    .card-value {
+        font-size: 1rem;
+    }
+
+    .card-label {
+        font-size: 0.65rem;
+    }
+}

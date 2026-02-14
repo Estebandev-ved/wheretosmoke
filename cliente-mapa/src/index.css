@@ -1,0 +1,202 @@
+/* 🎨 WhereToSmoke - Main Styles */
+@import './theme.css';
+
+/* ═══════════════════════════════════════════════════════════
+   📱 BASE LAYOUT
+   ═══════════════════════════════════════════════════════════ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--bg-dark);
+  color: var(--text-dark);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🗺️ LEAFLET MAP OVERRIDES
+   ═══════════════════════════════════════════════════════════ */
+
+.leaflet-container {
+  width: 100vw;
+  height: 100vh;
+  position: absolute;
+  top: 0;
+  left: 0;
+  background: var(--bg-dark);
+}
+
+/* Popup personalizado */
+.leaflet-popup-content-wrapper {
+  background: var(--glass-bg-dark) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--glass-border-dark) !important;
+  border-radius: var(--radius-lg) !important;
+  box-shadow: var(--shadow-lg) !important;
+  color: white !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+.leaflet-popup-content {
+  margin: 0 !important;
+  padding: 15px !important;
+}
+
+.leaflet-popup-tip {
+  background: var(--glass-bg-dark) !important;
+  border: 1px solid var(--glass-border-dark) !important;
+}
+
+.leaflet-popup-close-button {
+  color: white !important;
+  font-size: 20px !important;
+  padding: 8px 10px !important;
+}
+
+/* Light mode popups */
+.light-mode .leaflet-popup-content-wrapper {
+  background: var(--glass-bg-light) !important;
+  border: 1px solid var(--glass-border-light) !important;
+  color: var(--text-light) !important;
+}
+
+.light-mode .leaflet-popup-tip {
+  background: var(--glass-bg-light) !important;
+  border: 1px solid var(--glass-border-light) !important;
+}
+
+.light-mode .leaflet-popup-close-button {
+  color: var(--text-light) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   🎭 TOASTS (react-toastify)
+   ═══════════════════════════════════════════════════════════ */
+
+.Toastify__toast {
+  background: var(--glass-bg-dark) !important;
+  backdrop-filter: blur(20px) !important;
+  -webkit-backdrop-filter: blur(20px) !important;
+  border: 1px solid var(--glass-border-dark) !important;
+  border-radius: var(--radius-md) !important;
+  box-shadow: var(--shadow-lg) !important;
+}
+
+.Toastify__toast--success {
+  border-left: 4px solid var(--primary) !important;
+}
+
+.Toastify__toast--error {
+  border-left: 4px solid var(--danger) !important;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   📱 SELECTION
+   ═══════════════════════════════════════════════════════════ */
+
+::selection {
+  background: var(--primary);
+  color: white;
+}
+
+/* ═══════════════════════════════════════════════════════════
+   📍 MARKER ANIMATIONS
+   ═══════════════════════════════════════════════════════════ */
+
+@keyframes userPulse {
+  0% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(0, 200, 81, 0.7));
+  }
+
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 10px rgba(0, 200, 81, 0.9));
+  }
+
+  100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 0 rgba(0, 200, 81, 0.7));
+  }
+}
+
+.user-marker-pulse {
+  animation: userPulse 2s infinite ease-in-out;
+  border-radius: 50%;
+  /* Asegurar que el brillo sea redondo si el icono lo permite */
+}
+
+/* ═══════════════════════════════════════════════════════════
+   📍 LEAFLET LOCATE CONTROL (Blue Location Button)
+   ═══════════════════════════════════════════════════════════ */
+
+/* Customize the locate control button */
+.leaflet-control-locate a,
+.leaflet-bar a.leaflet-control-locate {
+  width: 50px !important;
+  height: 50px !important;
+  background-color: white !important;
+  background-image: url('/icons/user_location.png') !important;
+  background-size: 30px 30px !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+  border-radius: 50% !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  border: 2px solid rgba(0, 0, 0, 0.2) !important;
+  transition: all 0.3s ease !important;
+}
+
+.leaflet-control-locate a:hover,
+.leaflet-bar a.leaflet-control-locate:hover {
+  transform: scale(1.1) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4) !important;
+  background-color: #f8f9fa !important;
+}
+
+.leaflet-control-locate a:active,
+.leaflet-bar a.leaflet-control-locate:active {
+  transform: scale(0.95) !important;
+}
+
+/* Remove default icon text/arrow */
+.leaflet-control-locate a::before,
+.leaflet-control-locate a::after,
+.leaflet-bar a.leaflet-control-locate::before,
+.leaflet-bar a.leaflet-control-locate::after {
+  content: none !important;
+  display: none !important;
+}
+
+/* Active state with blue pulse */
+.leaflet-control-locate.active a,
+.leaflet-bar a.leaflet-control-locate.active {
+  border-color: #2196F3 !important;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0.7);
+  }
+
+  70% {
+    box-shadow: 0 0 0 10px rgba(33, 150, 243, 0);
+  }
+
+  100% {
+    box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
+  }
+}

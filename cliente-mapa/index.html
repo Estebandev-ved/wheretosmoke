@@ -1,0 +1,87 @@
+<!doctype html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8" />
+
+  <!-- 📱 PWA META TAGS -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#00C851" />
+  <meta name="description" content="Mapa colaborativo para la comunidad cannábica de Medellín" />
+
+  <!-- 🍎 APPLE MOBILE WEB APP -->
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="WhereToSmoke" />
+  <link rel="apple-touch-icon" href="/icon-192.png" />
+
+  <!-- 🔗 MANIFEST -->
+  <link rel="manifest" href="/manifest.json" />
+
+  <!-- 🖼️ ICONS -->
+  <link rel="icon" type="image/png" href="/icon-192.png" />
+
+  <title>WhereToSmoke - Mapa 420</title>
+
+  <style>
+    /* 💫 LOADING SPINNER mientras carga React */
+    #root:empty::after {
+      content: "";
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 5px solid #f3f3f3;
+      border-top: 5px solid #00C851;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% {
+        transform: translate(-50%, -50%) rotate(0deg);
+      }
+
+      100% {
+        transform: translate(-50%, -50%) rotate(360deg);
+      }
+    }
+
+    /* 🎨 ESTILOS GLOBALES */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+
+  <!-- 🔧 POLYFILL para sockjs-client (necesita 'global' de Node.js) -->
+  <script>
+    window.global = window;
+  </script>
+
+  <script type="module" src="/src/main.jsx"></script>
+
+  <!-- 🔧 SERVICE WORKER REGISTRATION -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(reg => console.log('✅ Service Worker registrado:', reg.scope))
+          .catch(err => console.log('❌ Error registrando SW:', err));
+      });
+    }
+  </script>
+</body>
+
+</html>

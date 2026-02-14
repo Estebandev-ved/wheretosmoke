@@ -1,0 +1,36 @@
+/**
+ * 🖱️ CUSTOM CURSOR STYLES
+ * 
+ * Estilos para cursor personalizado con efectos
+ * DESACTIVADO POR RENDIMIENTO - Cursor normal del navegador activo
+ */
+
+/* ===== CUSTOM CURSOR ===== */
+.custom-cursor {
+    display: none !important;
+}
+
+.cursor-leaf {
+    display: none !important;
+}
+
+.cursor-trail {
+    display: none !important;
+}
+
+/* Restore normal cursors everywhere */
+* {
+    cursor: auto !important;
+}
+
+input,
+textarea,
+select {
+    cursor: text !important;
+}
+
+button,
+a,
+[role="button"] {
+    cursor: pointer !important;
+}

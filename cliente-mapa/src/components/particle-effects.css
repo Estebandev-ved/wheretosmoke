@@ -1,0 +1,171 @@
+/**
+ * 💨 PARTICLE EFFECTS STYLES
+ * 
+ * Estilos para efectos de partículas interactivas
+ */
+
+.particle-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    pointer-events: none;
+}
+
+.particle-effect {
+    position: absolute;
+    transform: translate(-50%, -50%);
+}
+
+.particle {
+    position: absolute;
+    font-size: 1.5rem;
+    animation: particleExplode 1.5s ease-out forwards;
+}
+
+/* Explosion animation */
+@keyframes particleExplode {
+    0% {
+        transform: translate(0, 0) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform:
+            translate(calc(cos(var(--angle)) * 150px),
+                calc(sin(var(--angle)) * 150px)) rotate(720deg) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Spot Created - Green leaves explosion */
+.particle-spot-created .particle {
+    filter: drop-shadow(0 0 5px #10b981);
+}
+
+/* Vote RELAX - Green smoke puff */
+.particle-vote-relax .particle {
+    filter: drop-shadow(0 0 8px #10b981);
+    animation: smokeRise 2s ease-out forwards;
+}
+
+@keyframes smokeRise {
+    0% {
+        transform: translateY(0) scale(0.5);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 0.8;
+    }
+
+    100% {
+        transform: translateY(-100px) scale(2);
+        opacity: 0;
+    }
+}
+
+/* Vote TOMBO - Red smoke puff */
+.particle-vote-tombo .particle {
+    filter: drop-shadow(0 0 8px #ef4444);
+    animation: smokeRise 2s ease-out forwards;
+}
+
+/* Achievement - Gold confetti */
+.particle-achievement .particle {
+    filter: drop-shadow(0 0 10px #fbbf24);
+    animation: confettiFall 2s ease-out forwards;
+}
+
+@keyframes confettiFall {
+    0% {
+        transform: translateY(-50px) rotate(0deg) scale(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+    }
+
+    100% {
+        transform: translateY(150px) rotate(var(--angle)) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Favorite - Hearts + leaves */
+.particle-favorite .particle {
+    filter: drop-shadow(0 0 5px #ec4899);
+    animation: heartFloat 2s ease-out forwards;
+}
+
+@keyframes heartFloat {
+    0% {
+        transform: translateY(0) scale(0);
+        opacity: 0;
+    }
+
+    20% {
+        opacity: 1;
+        transform: translateY(-20px) scale(1.2);
+    }
+
+    100% {
+        transform: translateY(-150px) scale(0.5);
+        opacity: 0;
+    }
+}
+
+/* Add wobble to particles for more dynamic effect */
+.particle {
+    animation: particleExplode 1.5s ease-out forwards, wobble 0.5s ease-in-out infinite;
+}
+
+@keyframes wobble {
+
+    0%,
+    100% {
+        transform: rotate(-5deg);
+    }
+
+    50% {
+        transform: rotate(5deg);
+    }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .particle {
+        font-size: 1.2rem;
+    }
+
+    @keyframes particleExplode {
+        100% {
+            transform:
+                translate(calc(cos(var(--angle)) * 100px),
+                    calc(sin(var(--angle)) * 100px)) rotate(720deg) scale(0.5);
+            opacity: 0;
+        }
+    }
+}
+
+@media (max-width: 480px) {
+    .particle {
+        font-size: 1rem;
+    }
+
+    @keyframes particleExplode {
+        100% {
+            transform:
+                translate(calc(cos(var(--angle)) * 70px),
+                    calc(sin(var(--angle)) * 70px)) rotate(720deg) scale(0.4);
+            opacity: 0;
+        }
+    }
+}
