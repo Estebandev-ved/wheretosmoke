@@ -232,3 +232,21 @@
         letter-spacing: 0;
     }
 }
+
+/* Estilos adicionales para el botón especial de IA en el Navbar */
+.navbar-tab.special-tab {
+    color: #10b981;
+}
+
+.navbar-tab.special-tab .navbar-tab-icon {
+    background: rgba(16, 185, 129, 0.1);
+    border-radius: 50%;
+    padding: 5px;
+    margin-bottom: 2px;
+    transition: all 0.3s ease;
+}
+
+.navbar-tab.special-tab:active .navbar-tab-icon {
+    background: rgba(16, 185, 129, 0.3);
+    transform: scale(0.95);
+}

@@ -18,6 +18,7 @@ import { ParticleProvider } from './components/ParticleEffects';
 import { SoundProvider } from './context/SoundContext';
 import { AchievementProvider } from './context/AchievementContext';
 import 'react-toastify/dist/ReactToastify.css';
+import AIChatComponent from './components/AIChatComponent';
 
 /**
  * 📱 APP PRINCIPAL - WhereToSmoke
@@ -40,6 +41,9 @@ function App() {
     setDarkMode(newMode);
     localStorage.setItem('darkMode', JSON.stringify(newMode));
   };
+
+  // 🤖 ESTADO DEL CHATBOT
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   return (
     <BrowserRouter>
@@ -84,7 +88,10 @@ function App() {
                   </PageTransition>
 
                   {/* 🧭 NAVBAR INFERIOR - Visible en todas las páginas */}
-                  <Navbar darkMode={darkMode} />
+                  <Navbar darkMode={darkMode} onChatClick={() => setIsChatOpen(!isChatOpen)} />
+
+                  {/* 🤖 CHATBOT IA */}
+                  <AIChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
                 </div>
               </ParticleProvider>
             </ToastProvider>

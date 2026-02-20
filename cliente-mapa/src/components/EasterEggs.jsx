@@ -27,6 +27,7 @@ const EasterEggs = () => {
     // Konami Code Listener
     useEffect(() => {
         const handleKeyDown = (e) => {
+            if (!e.key) return;
             const key = e.key.toLowerCase();
 
             if (key === konamiCode[konamiIndex] || key === konamiCode[konamiIndex].toLowerCase()) {

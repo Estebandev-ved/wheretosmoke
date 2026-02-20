@@ -126,6 +126,13 @@
 			<groupId>org.hibernate.orm</groupId>
 			<artifactId>hibernate-spatial</artifactId>
 		</dependency>
+
+		<!-- ☁️ AZURE OPENAI -->
+		<dependency>
+			<groupId>com.azure</groupId>
+			<artifactId>azure-ai-openai</artifactId>
+			<version>1.0.0-beta.12</version>
+		</dependency>
 	</dependencies>
 
 	<build>
