@@ -8,7 +8,14 @@ Registro cronológico de decisiones y cambios. Lo más reciente va arriba.
 - `GeoChat.jsx` y `MapComponent.jsx` migrados a STOMP con el token en `connectHeaders` (ya no va en la URL).
 - **Decisión del usuario:** las alertas en vivo (`/topic/alerts`) son solo para usuarios con login. No se abre ningún topic público.
 - Pendiente: probar una conexión real (reiniciar el backend); el token de 24 h solo se valida al conectar.
-## 2026-11-08 · Implementación del rediseño, Fases 1 y 2 (sin commit aún)
+## 2026-11-08 · Fase 3B: HUD del mapa (sin commit aún)
+
+- Nuevos `MapHUD.jsx`, `SpotCard.jsx`, `map-hud.css`; reescritos `Controls.jsx` (chips Todos/Tombo/Relax con contadores reales); `SearchBar` (`embedded`), `DayNightClock` (`compact`). `MapComponent.jsx` pierde ~360 líneas (columna de botones, personajes decorativos, Popup por spot).
+- Móvil (375 px): búsqueda a ancho completo; chips Nivel/monedas/racha (llevan a Misiones/Tienda) o «Inicia sesión» para invitados; reloj como píldora; filtros; botón de ubicación y menú (Ranking, Descubrir, Círculos, Rutas, modo claro/oscuro, perfil); tarjeta inferior del spot con Cómo llegar / Ver detalle / Chat. Revisado en el navegador: sin solapes ni scroll horizontal.
+- Sin probar: 1280 px, votos y Chat desde la tarjeta, acciones del menú (Ranking, Círculos, Rutas), safe-area y reduced-motion.
+- Avisos: GeoChat en escritorio puede tapar la pila de acciones; `SpotDetailModal` y navbar comparten z-index 2000; `UserButton.jsx` quedó sin uso; `MapComponent.jsx` conserva 5 errores de lint previos.
+
+## 2026-11-08 · Implementación del rediseño, Fases 1 y 2 (commit 0f9e2e4)
 
 **Fase 1 (frontend):** tokens de diseño en `theme.css`, `SplashScreen` con progreso real (sesión, mapa, spots) y toque en Bob, navbar de 5 pestañas (Mapa, Feed, Misiones, Tienda, Perfil), accesos a Descubrir/IA/Info dentro de Perfil, botón flotante de IA en el mapa. Pendiente de probar: onboarding tras la splash, modo claro, backend caído.
 **Defecto conocido:** en móvil la barra de búsqueda del mapa queda tapada por el reloj y la columna de botones izquierda se solapa → Fase 3B (HUD del mapa).

@@ -167,6 +167,7 @@ const PanicButton = ({ darkMode = false }) => {
             style={styles.button}
             onClick={enterPanicMode}
             title="Modo discreto"
+            aria-label="Activar modo discreto"
         >
             🔢
         </button>

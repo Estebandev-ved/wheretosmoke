@@ -1,0 +1,292 @@
+/* ═══════════════════════════════════════════════════════════
+   HUD del mapa: barra superior, pila de acciones y tarjeta de spot.
+   z-index: mapa (1) < HUD (1000) < modales (2000+) / navbar (2000)
+   ═══════════════════════════════════════════════════════════ */
+
+.map-hud {
+    position: fixed;
+    z-index: 1000;
+    font-family: var(--font-body);
+}
+
+/* ─── Barra superior ─── */
+.map-hud-top {
+    top: calc(env(safe-area-inset-top, 0px) + 10px);
+    left: 12px;
+    right: 12px;
+    max-width: 480px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    pointer-events: none; /* el mapa sigue recibiendo gestos entre chips */
+}
+.map-hud-top > * { pointer-events: auto; }
+
+.hud-row,
+.hud-filters {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    padding: 2px 0;
+}
+.hud-row::-webkit-scrollbar,
+.hud-filters::-webkit-scrollbar { display: none; }
+
+/* ─── Chips ─── */
+.hud-chip {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 12px;
+    border-radius: var(--r-pill);
+    border: 1px solid var(--border-subtle);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    box-shadow: var(--elev-1);
+    transition: border-color var(--transition-fast), background var(--transition-fast), transform var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+/* Area tactil >= 44px sin agrandar el chip visualmente */
+.hud-chip { position: relative; }
+.hud-chip::after { content: ''; position: absolute; inset: -4px 0; }
+.hud-chip:hover { border-color: var(--border-strong); }
+.hud-chip:active { transform: scale(0.97); }
+.hud-chip--level { color: var(--accent); }
+.hud-chip--coins { color: var(--gold); border-color: rgba(250, 204, 21, 0.28); background: var(--gold-soft); }
+.hud-chip--streak { color: #FB923C; }
+.hud-chip--streak.is-done { border-color: rgba(251, 146, 60, 0.4); }
+.hud-chip--login { color: var(--accent); border-color: rgba(34, 197, 94, 0.35); }
+.hud-chip--user { max-width: 130px; color: var(--text-muted); }
+.hud-chip__ellipsis { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.hud-chip--filter { color: var(--text-muted); min-height: 38px; }
+.hud-chip--filter.is-active.hud-chip--accent {
+    color: var(--accent);
+    background: var(--accent-soft);
+    border-color: rgba(34, 197, 94, 0.5);
+}
+.hud-chip--filter.is-active.hud-chip--danger {
+    color: #F87171;
+    background: rgba(255, 68, 68, 0.14);
+    border-color: rgba(255, 68, 68, 0.5);
+}
+.hud-chip__count {
+    min-width: 20px;
+    padding: 3px 6px;
+    border-radius: var(--r-pill);
+    background: rgba(255, 255, 255, 0.1);
+    font-size: 11px;
+    text-align: center;
+}
+.light-mode .hud-chip__count { background: rgba(0, 0, 0, 0.08); }
+
+.hud-chip:focus-visible,
+.hud-fab:focus-visible,
+.hud-menu__item:focus-visible,
+.spot-card__btn:focus-visible,
+.spot-card__close:focus-visible,
+.map-hud .clock-icon:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+/* ─── Reloj dia/noche compacto (pildora) ─── */
+.map-hud .day-night-clock.compact {
+    position: relative;
+    top: auto;
+    right: auto;
+    flex: 0 0 auto;
+    margin-left: auto;
+    min-height: 36px;
+    gap: 6px;
+    padding: 0 10px 0 6px;
+    background: var(--glass);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--r-pill);
+    box-shadow: var(--elev-1);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text);
+    transform: none;
+    animation: none;
+}
+.map-hud .day-night-clock.compact:hover { transform: none; }
+.map-hud .day-night-clock.compact .clock-icon { width: 28px; height: 28px; position: relative; }
+.map-hud .day-night-clock.compact .clock-icon::after { content: ''; position: absolute; inset: -8px; }
+.map-hud .day-night-clock.compact .icon-emoji { font-size: 1.1rem; animation: none; }
+.map-hud .day-night-clock.compact .clock-greeting,
+.map-hud .day-night-clock.compact .clock-glow { display: none; }
+.map-hud .day-night-clock.compact .clock-time {
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 13px;
+    font-weight: 600;
+    white-space: nowrap;
+    background: none;
+    -webkit-text-fill-color: currentColor;
+}
+
+/* ─── Pila de acciones (derecha) ─── */
+.hud-stack {
+    top: calc(env(safe-area-inset-top, 0px) + 170px);
+    right: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 10px;
+}
+.hud-fab {
+    width: 46px;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--text);
+    cursor: pointer;
+    box-shadow: var(--elev-1);
+    padding: 0;
+    transition: border-color var(--transition-fast), color var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+.hud-fab:hover { border-color: var(--accent); color: var(--accent); }
+.hud-fab.is-open { color: var(--accent); border-color: var(--accent); }
+
+.hud-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px;
+    min-width: 210px;
+    border-radius: var(--r-lg);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface);
+    box-shadow: var(--elev-2);
+    animation: hud-pop 0.16s ease-out;
+    transform-origin: top right;
+}
+.hud-menu__item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    padding: 0 12px;
+    border: 0;
+    border-radius: var(--r-md);
+    background: transparent;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+}
+.hud-menu__item:hover { background: var(--surface-3); }
+.hud-menu__item.is-active { color: var(--accent); background: var(--accent-soft); }
+
+@keyframes hud-pop {
+    from { opacity: 0; transform: scale(0.96) translateY(-4px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ─── Tarjeta de spot (bottom sheet flotante) ─── */
+.spot-card {
+    position: fixed;
+    z-index: 1000;
+    left: 12px;
+    right: 12px;
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 146px); /* sobre navbar y boton discreto */
+    max-width: 440px;
+    margin: 0 auto;
+    padding: 14px 16px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border-subtle);
+    background: var(--surface);
+    color: var(--text);
+    box-shadow: var(--elev-2);
+    animation: hud-sheet 0.22s ease-out;
+}
+.spot-card__grab { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 0 auto 10px; }
+.spot-card__close {
+    position: absolute; top: 8px; right: 8px;
+    width: 44px; height: 44px;
+    display: flex; align-items: center; justify-content: center;
+    border: 0; background: transparent; color: var(--text-muted); cursor: pointer; border-radius: 50%;
+}
+.spot-card__close:hover { color: var(--text); background: var(--surface-3); }
+.spot-card__head { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; padding-right: 40px; }
+.spot-card__state, .spot-card__tag {
+    padding: 4px 10px; border-radius: var(--r-pill); font-size: 12px; font-weight: 600;
+}
+.spot-card__state.is-ok { color: var(--accent); background: var(--accent-soft); }
+.spot-card__state.is-danger { color: #F87171; background: rgba(255, 68, 68, 0.14); }
+.spot-card__tag { color: var(--text-muted); border: 1px solid var(--border-subtle); font-weight: 500; }
+.spot-card__title {
+    margin: 10px 0 4px;
+    font-family: var(--font-display);
+    font-size: 20px;
+    font-weight: 700;
+    line-height: 1.2;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+.spot-card__meta { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--text-muted); margin-bottom: 12px; }
+.spot-card__rating { display: inline-flex; align-items: center; gap: 3px; color: var(--gold); font-weight: 600; }
+.spot-card__msg { flex-basis: 100%; }
+.spot-card__actions { display: flex; gap: 8px; margin-top: 12px; }
+.spot-card__btn {
+    flex: 1 1 0;
+    min-height: 44px;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 0 8px;
+    border-radius: var(--r-md);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-2);
+    color: var(--text);
+    font-family: var(--font-display);
+    font-size: 13px; font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.spot-card__btn:hover { border-color: var(--border-strong); }
+.spot-card__btn--primary { background: var(--accent); color: #04140A; border-color: var(--accent); flex: 1.3 1 0; }
+.spot-card__btn--primary:hover { background: var(--accent-strong); }
+
+@keyframes hud-sheet {
+    from { opacity: 0; transform: translateY(14px); }
+    to { opacity: 1; transform: none; }
+}
+
+/* ─── Escritorio ─── */
+@media (min-width: 769px) {
+    .map-hud-top { left: 20px; top: 20px; right: auto; width: 460px; }
+    .hud-stack { top: 20px; right: 20px; }
+    .spot-card { left: 76px; right: auto; bottom: 90px; margin: 0; width: 420px; }
+}
+
+@media (max-width: 380px) {
+    .hud-chip { padding: 0 10px; font-size: 12px; }
+    .hud-chip--user { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hud-menu, .spot-card { animation: none; }
+    .hud-chip, .hud-fab { transition: none; }
+}

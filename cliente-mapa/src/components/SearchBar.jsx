@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-import { HiSun, HiMoon } from 'react-icons/hi2';
+import { HiSun, HiMoon, HiMagnifyingGlass } from 'react-icons/hi2';
 
 /**
  * 🔍 BARRA DE BÚSQUEDA (Rediseño Premium)
@@ -8,7 +8,7 @@ import { HiSun, HiMoon } from 'react-icons/hi2';
  * Input flotante con glassmorphism y resultados animados
  * Incluye Toggle de Modo Oscuro al lado
  */
-const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
+const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef, embedded = false }) => {
     const [query, setQuery] = useState('');
     const [results, setResults] = useState([]);
     const [isSearching, setIsSearching] = useState(false);
@@ -62,27 +62,34 @@ const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
     const isMobile = window.innerWidth <= 768;
 
     const styles = {
-        container: {
+        container: embedded ? {
+            // Dentro del MapHUD: el HUD controla posicion y ancho
+            position: 'relative',
+            width: '100%',
+            display: 'flex',
+            alignItems: 'flex-start',
+            gap: '10px'
+        } : {
             position: 'absolute',
-            top: isMobile ? '15px' : '20px', // 👆 Más arriba como pidió el usuario
+            top: isMobile ? '15px' : '20px',
             left: isMobile ? '16px' : '20px',
             zIndex: 1000,
             width: 'min(380px, calc(100vw - 32px))',
             display: 'flex',
             alignItems: 'flex-start',
-            gap: '10px' // Espacio entre barra y botón toggle
+            gap: '10px'
         },
         inputWrapper: {
             flex: 1,
             display: 'flex',
             alignItems: 'center',
-            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: embedded ? 'var(--glass)' : (darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)'),
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderRadius: '16px',
-            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-            padding: '4px 6px 4px 16px',
-            boxShadow: '0 4px 20px rgba(0,0,0,0.15)',
+            border: embedded ? '1px solid var(--border-subtle)' : `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
+            padding: '4px 4px 4px 16px',
+            boxShadow: embedded ? 'var(--elev-1)' : '0 4px 20px rgba(0,0,0,0.15)',
             transition: 'all 0.3s ease'
         },
         toggleBtn: {
@@ -106,20 +113,20 @@ const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
         input: {
             flex: 1,
             border: 'none',
-            fontSize: '15px',
+            fontSize: '16px',
             outline: 'none',
             backgroundColor: 'transparent',
-            color: darkMode ? 'white' : '#333',
+            color: embedded ? 'var(--text)' : (darkMode ? 'white' : '#333'),
             minWidth: 0,
             fontWeight: '500'
         },
         searchBtn: {
-            width: '40px',
-            height: '40px',
+            width: '44px',
+            height: '44px',
             borderRadius: '12px',
             border: 'none',
-            backgroundColor: '#00C851',
-            color: 'white',
+            backgroundColor: embedded ? 'var(--accent)' : '#00C851',
+            color: embedded ? '#04140A' : 'white',
             cursor: 'pointer',
             display: 'flex',
             alignItems: 'center',
@@ -130,10 +137,10 @@ const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
         },
         resultsList: {
             position: 'absolute',
-            top: '60px',
+            top: '56px',
             left: 0,
-            right: isMobile ? 0 : '58px', // Dejar espacio si el botón toggle está al lado
-            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+            right: (isMobile || embedded || !setDarkMode) ? 0 : '58px',
+            backgroundColor: embedded ? 'var(--surface)' : (darkMode ? 'rgba(30, 30, 30, 0.95)' : 'rgba(255, 255, 255, 0.95)'),
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
             borderRadius: '16px',
@@ -178,26 +185,31 @@ const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     onKeyDown={handleKeyDown}
-                    placeholder="Buscar lugar..."
+                    placeholder="Buscar lugar en Medellín..."
+                    aria-label="Buscar lugar"
                     style={styles.input}
                 />
                 <button
                     onClick={buscar}
                     disabled={isSearching}
                     style={styles.searchBtn}
+                    aria-label="Buscar"
                 >
-                    {isSearching ? <span className="animate-spin">⌛</span> : '🔍'}
+                    {isSearching ? <span className="animate-spin">⌛</span> : <HiMagnifyingGlass size={20} />}
                 </button>
             </div>
 
             {/* 🌓 Botón Toggle Modo Oscuro (Al lado de la 'lunea'/lupa) */}
-            <button
-                onClick={() => setDarkMode && setDarkMode(!darkMode)}
-                style={styles.toggleBtn}
-                title="Cambiar modo"
-            >
-                {darkMode ? <HiSun /> : <HiMoon />}
-            </button>
+            {setDarkMode && (
+                <button
+                    onClick={() => setDarkMode(!darkMode)}
+                    style={styles.toggleBtn}
+                    title="Cambiar modo"
+                    aria-label="Cambiar modo claro u oscuro"
+                >
+                    {darkMode ? <HiSun /> : <HiMoon />}
+                </button>
+            )}
 
             {showResults && (
                 <div style={styles.resultsList}>
@@ -205,6 +217,9 @@ const SearchBar = ({ darkMode, setDarkMode, onLocationSelect, mapRef }) => {
                         results.map((lugar, index) => (
                             <div
                                 key={index}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(e) => { if (e.key === 'Enter') seleccionarLugar(lugar); }}
                                 onClick={() => seleccionarLugar(lugar)}
                                 style={styles.resultItem}
                                 onMouseEnter={(e) => e.currentTarget.style.backgroundColor = darkMode ? 'rgba(255,255,255,0.05)' : 'rgba(0,0,0,0.03)'}

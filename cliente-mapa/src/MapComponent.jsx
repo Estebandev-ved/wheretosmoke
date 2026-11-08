@@ -1,7 +1,5 @@
 import { API_BASE, WS_URL } from './config';
 import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
-import { HiTrophy, HiRocketLaunch, HiUserGroup, HiArrowsRightLeft } from 'react-icons/hi2';
-import { FaPaw } from 'react-icons/fa';
 import { MapContainer, TileLayer, Marker, Popup, useMapEvents, useMap, Polyline, CircleMarker } from 'react-leaflet';
 import MarkerClusterGroup from 'react-leaflet-cluster';
 import 'leaflet/dist/leaflet.css';
@@ -16,14 +14,11 @@ import SockJS from 'sockjs-client';
 import { Client } from '@stomp/stompjs';
 
 // Componentes
-import Controls from './components/Controls';
-import SearchBar from './components/SearchBar';
+import MapHUD from './components/MapHUD';
+import SpotCard from './components/SpotCard';
 import { markBoot } from './services/bootStatus';
 import AuthModal from './components/AuthModal';
-import UserButton from './components/UserButton';
 import PanicButton from './components/PanicButton';
-import VoteButtons from './components/VoteButtons';
-import DayNightClock from './components/DayNightClock';
 import GeoZones from './components/GeoZones';
 import TrustCircles from './components/TrustCircles';
 import GeoChat from './components/GeoChat';
@@ -168,6 +163,9 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
 
     // 📍 Estado para modal de detalle de spot
     const [selectedSpot, setSelectedSpot] = useState(null);
+
+    // 🃏 Spot mostrado en la tarjeta inferior (por id, para que los votos se refresquen solos)
+    const [cardSpotId, setCardSpotId] = useState(null);
 
     // 🏆 Estado para leaderboard
     const [showLeaderboard, setShowLeaderboard] = useState(false);
@@ -431,6 +429,8 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
         return spotDTO.spot.estado === filter;
     });
 
+    const cardSpotDTO = cardSpotId != null ? spots.find((s) => s.spot.id === cardSpotId) || null : null;
+
     // 🎨 URL del mapa según modo oscuro o claro
     // CARTO exige API key y sin ella pinta marcas de agua "API KEY REQUIRED".
     // Usamos mosaicos de OpenStreetMap (sin clave) y el modo oscuro se logra con un filtro CSS.
@@ -491,79 +491,8 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                             key={spot.id}
                             position={[spot.latitud, spot.longitud]}
                             icon={spot.estado === 'ROJO' ? redIcon : greenIcon}
+                            eventHandlers={{ click: () => setCardSpotId(spot.id) }}
                         >
-                            <Popup>
-                                <div style={{
-                                    textAlign: 'center',
-                                    minWidth: '220px',
-                                    padding: '5px'
-                                }}>
-                                    <h3 style={{ margin: '0 0 5px 0' }}>{spot.nombre}</h3>
-                                    <p style={{ margin: '0 0 10px 0', fontSize: '12px', color: '#666' }}>{spot.descripcion}</p>
-
-                                    <div style={{
-                                        padding: '5px', borderRadius: '5px', marginBottom: '10px', fontWeight: 'bold',
-                                        backgroundColor: spot.estado === 'ROJO' ? '#ffebee' : '#e8f5e9',
-                                        color: spot.estado === 'ROJO' ? '#c62828' : '#2e7d32'
-                                    }}>
-                                        {spot.estado === 'ROJO' ? '🚨 PELIGRO' : '✅ RELAX'}
-                                    </div>
-
-                                    <div style={{ fontSize: '11px', color: '#666', marginBottom: '10px' }}>
-                                        {spotDTO.mensajeEstado}
-                                    </div>
-
-                                    {/* 🗳️ VOTE BUTTONS PREMIUM */}
-                                    <VoteButtons
-                                        onTomboClick={() => handleReporte(spot.id, 'tombo')}
-                                        onRelaxClick={() => handleReporte(spot.id, 'relax')}
-                                        disabled={spotDTO.usuarioYaVoto}
-                                        votosTombo={spotDTO.votosTombo}
-                                        votosRelax={spotDTO.votosRelax}
-                                        size="small"
-                                    />
-
-                                    {/* 📍 Botón Ver Detalle */}
-                                    <button
-                                        onClick={() => setSelectedSpot(spot)}
-                                        style={{
-                                            marginTop: '10px',
-                                            width: '100%',
-                                            padding: '8px',
-                                            backgroundColor: darkMode ? '#333' : '#f5f5f5',
-                                            color: darkMode ? 'white' : '#333',
-                                            border: 'none',
-                                            borderRadius: '5px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px'
-                                        }}
-                                    >
-                                        📸 Ver fotos y comentarios
-                                    </button>
-
-                                    {/* 💬 Botón Chat */}
-                                    <button
-                                        onClick={() => {
-                                            setChatSpot(spot);
-                                            setShowGeoChat(true);
-                                        }}
-                                        style={{
-                                            marginTop: '8px',
-                                            width: '100%',
-                                            padding: '8px',
-                                            backgroundColor: '#2196F3',
-                                            color: 'white',
-                                            border: 'none',
-                                            borderRadius: '5px',
-                                            cursor: 'pointer',
-                                            fontSize: '12px',
-                                            fontWeight: '600'
-                                        }}
-                                    >
-                                        💬 Chatear aquí
-                                    </button>
-                                </div>
-                            </Popup>
                         </Marker>
                     );
                 })}
@@ -646,71 +575,45 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                 )}
             </MapContainer>
 
-            {/* 🎮 CONTROLES FLOTANTES */}
-            <Controls
+{/* 🎮 HUD DEL MAPA (busqueda, chips, filtros, acciones) */}
+            <MapHUD
                 darkMode={darkMode}
                 setDarkMode={setDarkMode}
+                mapRef={mapRef}
                 filter={filter}
                 setFilter={setFilter}
-                totalSpots={spots.length}
+                counts={{
+                    total: spots.length,
+                    tombo: spots.filter((s) => s.spot.estado === 'ROJO').length,
+                    relax: spots.filter((s) => s.spot.estado === 'VERDE').length,
+                }}
+                onLocate={irAMiUbicacion}
+                onOpenLeaderboard={() => setShowLeaderboard(true)}
+                onOpenSugeridos={() => setShowSugeridos(true)}
+                onToggleCircles={() => setShowTrustCircles(!showTrustCircles)}
+                onToggleRoutes={() => setShowRouteCalculator(!showRouteCalculator)}
+                circlesActive={showTrustCircles}
+                routesActive={showRouteCalculator}
+                onLoginClick={() => setShowAuthModal(true)}
+                onProfileClick={() => setShowUserProfile(true)}
             />
 
-            {/* 🔍 BARRA DE BÚSQUEDA */}
-            <SearchBar
-                darkMode={darkMode}
-                mapRef={mapRef}
-            />
-
-            {/* 👤 BOTÓN DE USUARIO */}
-            <div style={{ position: 'fixed', bottom: window.innerWidth <= 768 ? '280px' : '330px', left: window.innerWidth <= 768 ? '10px' : '15px', zIndex: 1000 }}>
-                <UserButton
-                    darkMode={darkMode}
-                    onLoginClick={() => setShowAuthModal(true)}
-                    onProfileClick={() => setShowUserProfile(true)}
-                />
-            </div>
-
-            {/* 📍 BOTÓN GPS - Responsivo */}
-            <div style={{ position: 'fixed', bottom: window.innerWidth <= 768 ? '80px' : '90px', right: window.innerWidth <= 768 ? '12px' : '18px', zIndex: 1000 }}>
-                <button
-                    onClick={irAMiUbicacion}
-                    style={{
-                        backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                        backdropFilter: 'blur(20px)',
-                        WebkitBackdropFilter: 'blur(20px)',
-                        border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                        color: darkMode ? 'white' : '#333',
-                        padding: '0',
-                        width: '52px',
-                        height: '52px',
-                        borderRadius: '16px',
-                        boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
-                        cursor: 'pointer',
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center',
-                        transition: 'all 0.25s ease'
+            {/* 📍 TARJETA DEL SPOT SELECCIONADO */}
+            {cardSpotDTO && (
+                <SpotCard
+                    spotDTO={cardSpotDTO}
+                    distanciaM={userLocation && cardSpotDTO.spot.latitud
+                        ? calcularDistancia(userLocation[0], userLocation[1], cardSpotDTO.spot.latitud, cardSpotDTO.spot.longitud)
+                        : null}
+                    onClose={() => setCardSpotId(null)}
+                    onVote={handleReporte}
+                    onDetail={() => setSelectedSpot(cardSpotDTO.spot)}
+                    onChat={() => {
+                        setChatSpot(cardSpotDTO.spot);
+                        setShowGeoChat(true);
                     }}
-                    title="Ir a mi ubicación"
-                >
-                    <img
-                        src="/icons/user_location.png"
-                        alt="Mi ubicación"
-                        style={{
-                            width: '30px',
-                            height: '30px',
-                            objectFit: 'contain',
-                            filter: 'drop-shadow(0 0 3px rgba(33,150,243,0.4))'
-                        }}
-                    />
-                </button>
-            </div>
-
-            {/* 🌓 DAY/NIGHT CLOCK */}
-            <DayNightClock
-                darkMode={darkMode}
-                onToggleDarkMode={() => setDarkMode(!darkMode)}
-            />
+                />
+            )}
 
             {/* 🔐 MODAL DE AUTENTICACIÓN */}
             <AuthModal
@@ -831,190 +734,6 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
 
             {/* 🚨 BOTÓN DE PÁNICO */}
             <PanicButton darkMode={darkMode} />
-
-            {/* 🎮 BOTONES FLOTANTES (Izquierda) - Responsivos */}
-            <div style={{
-                position: 'fixed',
-                bottom: window.innerWidth <= 768 ? '80px' : '90px', // Subido para dar espacio 
-                left: window.innerWidth <= 768 ? '10px' : '20px',
-                display: 'flex',
-                flexDirection: 'column',
-                gap: window.innerWidth <= 768 ? '10px' : '14px',
-                zIndex: 1000
-            }}>
-                {/* 🏆 Leaderboard - El Campanero */}
-                <div style={{ position: 'relative' }}>
-                    <button
-                        onClick={() => setShowLeaderboard(true)}
-                        style={{
-                            width: window.innerWidth <= 768 ? '42px' : '50px',
-                            height: window.innerWidth <= 768 ? '42px' : '50px',
-                            borderRadius: '14px',
-                            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                            color: darkMode ? 'white' : '#333',
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            padding: 0
-                        }}
-                        title="Leaderboard"
-                    >
-                        <HiTrophy size={window.innerWidth <= 768 ? 20 : 24} />
-                    </button>
-                    {/* Decoration */}
-                    <img
-                        src="/icons/bud_angry.png"
-                        alt="El Campanero"
-                        style={{
-                            position: 'absolute',
-                            left: '45px',
-                            bottom: '5px',
-                            width: '40px',
-                            height: 'auto',
-                            pointerEvents: 'none',
-                            zIndex: 1001,
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                            transform: 'rotate(10deg)'
-                        }}
-                    />
-                </div>
-
-                {/* 🔥 Descubrir - Tren A Vapor */}
-                <div style={{ position: 'relative' }}>
-                    <button
-                        onClick={() => setShowSugeridos(true)}
-                        style={{
-                            width: window.innerWidth <= 768 ? '42px' : '50px',
-                            height: window.innerWidth <= 768 ? '42px' : '50px',
-                            borderRadius: '14px',
-                            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                            color: '#00C851',
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.2)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            padding: 0
-                        }}
-                        title="Descubrir spots"
-                    >
-                        <HiRocketLaunch size={window.innerWidth <= 768 ? 20 : 24} />
-                    </button>
-                    <img
-                        src="/icons/bud_smoking.png"
-                        alt="Tren A Vapor"
-                        style={{
-                            position: 'absolute',
-                            left: '42px',
-                            bottom: '-5px',
-                            width: '45px',
-                            height: 'auto',
-                            pointerEvents: 'none',
-                            zIndex: 1001,
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                        }}
-                    />
-                </div>
-
-                {/* 👥 Círculos - Jack Sparrow */}
-                <div style={{ position: 'relative' }}>
-                    <button
-                        onClick={() => setShowTrustCircles(!showTrustCircles)}
-                        style={{
-                            width: window.innerWidth <= 768 ? '42px' : '50px',
-                            height: window.innerWidth <= 768 ? '42px' : '50px',
-                            borderRadius: '14px',
-                            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                            color: showTrustCircles ? (darkMode ? '#4CAF50' : '#00C851') : (darkMode ? 'white' : '#333'),
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: showTrustCircles ? '0 0 15px rgba(76, 175, 80, 0.5)' : '0 4px 15px rgba(0,0,0,0.2)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            padding: 0
-                        }}
-                        title="Círculos de Confianza"
-                    >
-                        <FaPaw size={window.innerWidth <= 768 ? 20 : 24} />
-                    </button>
-                    <img
-                        src="/icons/bud_map.png"
-                        alt="Jack Sparrow"
-                        style={{
-                            position: 'absolute',
-                            left: '42px',
-                            top: '-5px',
-                            width: '40px',
-                            height: 'auto',
-                            pointerEvents: 'none',
-                            zIndex: 1001,
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))',
-                            transform: 'scaleX(-1)'
-                        }}
-                    />
-                </div>
-
-                {/* 🛣️ Rutas - Maritombo */}
-                <div style={{ position: 'relative' }}>
-                    <button
-                        onClick={() => setShowRouteCalculator(!showRouteCalculator)}
-                        style={{
-                            width: window.innerWidth <= 768 ? '42px' : '50px',
-                            height: window.innerWidth <= 768 ? '42px' : '50px',
-                            borderRadius: '14px',
-                            backgroundColor: showRouteCalculator
-                                ? '#2196F3'
-                                : (darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)'),
-                            backdropFilter: 'blur(12px)',
-                            WebkitBackdropFilter: 'blur(12px)',
-                            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-                            color: showRouteCalculator ? 'white' : (darkMode ? 'white' : '#333'),
-                            fontSize: '20px',
-                            cursor: 'pointer',
-                            display: 'flex',
-                            alignItems: 'center',
-                            justifyContent: 'center',
-                            boxShadow: showRouteCalculator ? '0 0 15px rgba(33, 150, 243, 0.5)' : '0 4px 15px rgba(0,0,0,0.2)',
-                            transition: 'all 0.2s cubic-bezier(0.4, 0, 0.2, 1)',
-                            padding: 0
-                        }}
-                        title="Rutas de Bajo Perfil"
-                    >
-                        <HiArrowsRightLeft size={window.innerWidth <= 768 ? 20 : 24} />
-                    </button>
-                    <img
-                        src="/icons/bud_police.png"
-                        alt="Maritombo"
-                        style={{
-                            position: 'absolute',
-                            left: '45px',
-                            bottom: '0px',
-                            width: '42px',
-                            height: 'auto',
-                            pointerEvents: 'none',
-                            zIndex: 1001,
-                            filter: 'drop-shadow(0 2px 4px rgba(0,0,0,0.3))'
-                        }}
-                    />
-                </div>
-            </div>
 
             {/* 👥 PANEL CÍRCULOS DE CONFIANZA */}
             {showTrustCircles && (

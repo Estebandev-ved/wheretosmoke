@@ -11,7 +11,7 @@ import './day-night-clock.css';
  * - 🌆 Atardecer (5pm - 7pm)
  */
 
-const DayNightClock = ({ darkMode, onToggleDarkMode }) => {
+const DayNightClock = ({ darkMode, onToggleDarkMode, compact = false }) => {
     const [currentTime, setCurrentTime] = useState(new Date());
     const [is24Hour, setIs24Hour] = useState(false);
 
@@ -67,8 +67,15 @@ const DayNightClock = ({ darkMode, onToggleDarkMode }) => {
     };
 
     return (
-        <div className={`day-night-clock ${timeOfDay}`}>
-            <div className="clock-icon" onClick={onToggleDarkMode}>
+        <div className={`day-night-clock ${timeOfDay}${compact ? ' compact' : ''}`}>
+            <div
+                className="clock-icon"
+                onClick={onToggleDarkMode}
+                role="button"
+                tabIndex={0}
+                aria-label={darkMode ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+                onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggleDarkMode?.(); } }}
+            >
                 <span className="icon-emoji">{icon}</span>
             </div>
 
