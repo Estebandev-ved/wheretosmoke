@@ -12,11 +12,16 @@ import Navbar from './components/Navbar';
 import FeedPage from './components/FeedPage';
 import DescubrirPage from './components/DescubrirPage';
 import AboutPage from './components/AboutPage';
+import MisionesPage from './components/MisionesPage';
+import TiendaPage from './components/TiendaPage';
+import ProfilePage from './components/ProfilePage';
+import SplashScreen from './components/SplashScreen';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './components/WeedToast';
 import { ParticleProvider } from './components/ParticleEffects';
 import { SoundProvider } from './context/SoundContext';
 import { AchievementProvider } from './context/AchievementContext';
+import { GamificacionProvider } from './context/GamificacionContext';
 import 'react-toastify/dist/ReactToastify.css';
 import AIChatComponent from './components/AIChatComponent';
 
@@ -30,6 +35,7 @@ import AIChatComponent from './components/AIChatComponent';
  */
 function App() {
   const [showOnboarding, setShowOnboarding] = useState(true);
+  const [splashDone, setSplashDone] = useState(false);
 
   // 🌙 ESTADO GLOBAL DE MODO OSCURO
   const [darkMode, setDarkMode] = useState(() => {
@@ -49,6 +55,7 @@ function App() {
     <BrowserRouter>
       <AuthProvider>
         <SoundProvider>
+          <GamificacionProvider>
           <AchievementProvider>
             <ToastProvider>
               <ParticleProvider>
@@ -66,7 +73,7 @@ function App() {
                   {/* <CustomCursor /> */}
 
                   {/* 🎓 TUTORIAL DE BIENVENIDA */}
-                  <OnboardingTutorial onComplete={() => setShowOnboarding(false)} />
+                  {splashDone && <OnboardingTutorial onComplete={() => setShowOnboarding(false)} />}
 
                   <PageTransition>
                     <Routes>
@@ -82,6 +89,11 @@ function App() {
                       {/* ℹ️ QUIÉNES SOMOS */}
                       <Route path="/nosotros" element={<AboutPage darkMode={darkMode} />} />
 
+                      {/* 🎯 MISIONES / 🛍️ TIENDA / 👤 PERFIL */}
+                      <Route path="/misiones" element={<MisionesPage />} />
+                      <Route path="/tienda" element={<TiendaPage />} />
+                      <Route path="/perfil" element={<ProfilePage darkMode={darkMode} onChatClick={() => setIsChatOpen(true)} />} />
+
                       {/* 🔒 PANEL DE ADMINISTRACIÓN */}
                       <Route path="/admin" element={<AdminPanel />} />
                     </Routes>
@@ -90,12 +102,16 @@ function App() {
                   {/* 🧭 NAVBAR INFERIOR - Visible en todas las páginas */}
                   <Navbar darkMode={darkMode} onChatClick={() => setIsChatOpen(!isChatOpen)} />
 
+                  {/* ⏳ PANTALLA DE CARGA */}
+                  {!splashDone && <SplashScreen onDone={() => setSplashDone(true)} />}
+
                   {/* 🤖 CHATBOT IA */}
                   <AIChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
                 </div>
               </ParticleProvider>
             </ToastProvider>
           </AchievementProvider>
+          </GamificacionProvider>
         </SoundProvider>
       </AuthProvider>
     </BrowserRouter>

@@ -200,3 +200,10 @@ body {
     box-shadow: 0 0 0 0 rgba(33, 150, 243, 0);
   }
 }
+/* 🗺️ Mosaicos del mapa: modo oscuro con filtro CSS (OSM no tiene tema oscuro) */
+.map-tiles-dark {
+  filter: invert(1) hue-rotate(180deg) brightness(0.85) contrast(0.9) saturate(0.55);
+}
+.map-tiles-light {
+  filter: saturate(0.85) contrast(0.98);
+}

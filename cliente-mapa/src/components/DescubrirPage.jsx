@@ -1,10 +1,11 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { HiRocketLaunch, HiMapPin, HiStar, HiShieldExclamation, HiSparkles, HiMagnifyingGlass } from 'react-icons/hi2';
 import RatingStars from './RatingStars';
 import './feed-page.css'; // Reuses some feed-page styles
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * 🔥 DESCUBRIR PAGE - Explorar spots

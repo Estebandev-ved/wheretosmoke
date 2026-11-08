@@ -1,8 +1,11 @@
+import { API_BASE, WS_URL } from '../config';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import './GeoChat.css';
 
-const API_BASE_URL = 'http://localhost:8081/api';
+const API_BASE_URL = API_BASE;
 
 export default function GeoChat({ spot, userLocation, onClose }) {
     const [messages, setMessages] = useState([]);
@@ -66,26 +69,32 @@ export default function GeoChat({ spot, userLocation, onClose }) {
         if (!spot) return;
 
         const token = localStorage.getItem('token');
-        const ws = new WebSocket(`ws://localhost:8081/ws?token=${token}`);
+        if (!token) return;
 
-        ws.onopen = () => {
+        const client = new Client({
+            webSocketFactory: () => new SockJS(WS_URL),
+            connectHeaders: { Authorization: `Bearer ${token}` },
+            reconnectDelay: 5000,
+        });
+
+        client.onConnect = () => {
             console.log('WebSocket conectado para chat del spot:', spot.id);
-            ws.send(JSON.stringify({
-                type: 'subscribe',
-                topic: `/topic/chat/${spot.id}`
-            }));
+            client.subscribe(`/topic/chat/${spot.id}`, (frame) => {
+                const newMsg = JSON.parse(frame.body);
+                setMessages(prev => [...prev, newMsg]);
+                scrollToBottom();
+            });
         };
 
-        ws.onmessage = (event) => {
-            const newMsg = JSON.parse(event.data);
-            setMessages(prev => [...prev, newMsg]);
-            scrollToBottom();
+        client.onStompError = (frame) => {
+            console.error('Error STOMP:', frame.headers?.message);
         };
 
-        setWsConnection(ws);
+        client.activate();
+        setWsConnection(client);
 
         return () => {
-            ws.close();
+            client.deactivate();
         };
     }, [spot]);
 

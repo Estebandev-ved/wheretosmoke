@@ -60,6 +60,8 @@ public class SecurityConfig {
                         // 🌐 Públicos: autenticación, WebSocket y lectura de datos del mapa
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
+                        // Página de errores de Spring: sin esto un 500 se ve como 403
+                        .requestMatchers("/error").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
                         // Votos anónimos por fingerprint (tombo / relax)
                         .requestMatchers(HttpMethod.POST, "/api/spots/*/tombo", "/api/spots/*/relax").permitAll()
@@ -67,6 +69,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/geozonas/validar").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/gamificacion/leaderboard",
                                 "/api/gamificacion/badges").permitAll()
+                        // Catálogo de la tienda público (con flags de usuario si envía token)
+                        .requestMatchers(HttpMethod.GET, "/api/tienda/articulos").permitAll()
                         // 👑 Solo ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/api/push/broadcast").hasRole("ADMIN")

@@ -1,10 +1,13 @@
+import { API_BASE, WS_URL } from '../config';
 import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
+import SockJS from 'sockjs-client';
+import { Client } from '@stomp/stompjs';
 import { useAuth } from '../context/AuthContext';
 import './TrustCircles.css';
 
-const API_BASE_URL = 'http://localhost:8081/api';
+const API_BASE_URL = API_BASE;
 
 export default function TrustCircles({ userLocation, onCircleMembersUpdate, onClose, darkMode }) {
     const { user } = useAuth();
@@ -45,28 +48,34 @@ export default function TrustCircles({ userLocation, onCircleMembersUpdate, onCl
         if (!selectedCircle) return;
 
         const token = localStorage.getItem('token');
-        const ws = new WebSocket(`ws://localhost:8081/ws?token=${token}`);
+        if (!token) return;
 
-        ws.onopen = () => {
+        const client = new Client({
+            webSocketFactory: () => new SockJS(WS_URL),
+            connectHeaders: { Authorization: `Bearer ${token}` },
+            reconnectDelay: 5000,
+        });
+
+        client.onConnect = () => {
             console.log('WebSocket conectado para círculo:', selectedCircle.id);
-            ws.send(JSON.stringify({
-                type: 'subscribe',
-                topic: `/topic/circulo/${selectedCircle.id}/ubicaciones`
-            }));
+            client.subscribe(`/topic/circulo/${selectedCircle.id}/ubicaciones`, (frame) => {
+                const data = JSON.parse(frame.body);
+                // Actualizar miembros con nuevas ubicaciones
+                if (data.ubicacion) {
+                    onCircleMembersUpdate && onCircleMembersUpdate(data);
+                }
+            });
         };
 
-        ws.onmessage = (event) => {
-            const data = JSON.parse(event.data);
-            // Actualizar miembros con nuevas ubicaciones
-            if (data.ubicacion) {
-                onCircleMembersUpdate && onCircleMembersUpdate(data);
-            }
+        client.onStompError = (frame) => {
+            console.error('Error STOMP:', frame.headers?.message);
         };
 
-        setWsConnection(ws);
+        client.activate();
+        setWsConnection(client);
 
         return () => {
-            ws.close();
+            client.deactivate();
         };
     }, [selectedCircle]);
 

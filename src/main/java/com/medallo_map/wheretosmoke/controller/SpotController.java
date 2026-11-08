@@ -69,8 +69,9 @@ public class SpotController {
      * Este endpoint NO cambió, sigue igual
      */
     @PostMapping
-    public Spot crearSpot(@RequestBody Spot spot) {
-        return spotService.guardarSpot(spot);
+    public Spot crearSpot(@RequestBody Spot spot,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.medallo_map.wheretosmoke.model.Usuario usuario) {
+        return spotService.guardarSpot(spot, usuario != null ? usuario.getId() : null);
     }
 
     /**
@@ -84,8 +85,9 @@ public class SpotController {
     @PostMapping("/{id}/tombo")
     public SpotVotacionDTO alertaPolicia(
             @PathVariable Long id,
-            @RequestParam String fingerprint) {
-        return spotService.reportarPolicia(id, fingerprint);
+            @RequestParam String fingerprint,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.medallo_map.wheretosmoke.model.Usuario usuario) {
+        return spotService.reportarPolicia(id, fingerprint, usuario != null ? usuario.getId() : null);
     }
 
     /**
@@ -96,7 +98,8 @@ public class SpotController {
     @PostMapping("/{id}/relax")
     public SpotVotacionDTO alertaRelax(
             @PathVariable Long id,
-            @RequestParam String fingerprint) {
-        return spotService.reportarRelax(id, fingerprint);
+            @RequestParam String fingerprint,
+            @org.springframework.security.core.annotation.AuthenticationPrincipal com.medallo_map.wheretosmoke.model.Usuario usuario) {
+        return spotService.reportarRelax(id, fingerprint, usuario != null ? usuario.getId() : null);
     }
 }

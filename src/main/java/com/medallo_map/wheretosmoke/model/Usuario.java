@@ -63,6 +63,21 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private Integer puntos = 0;
 
+    // MONEDAS Y RACHA: solo el servidor las modifica, con UPDATE atómico en
+    // UsuarioRepository. updatable=false evita que un save() de una entidad
+    // desactualizada pise el saldo.
+    @Column(name = "monedas", nullable = false, updatable = false, columnDefinition = "int not null default 0")
+    @Builder.Default
+    private Integer monedas = 0;
+
+    @Column(name = "racha_dias", nullable = false, updatable = false, columnDefinition = "int not null default 0")
+    @Builder.Default
+    private Integer rachaDias = 0;
+
+    // Fecha (America/Bogota) del último check-in diario
+    @Column(name = "ultima_actividad", updatable = false)
+    private java.time.LocalDate ultimaActividad;
+
     // BADGES (JSON array de badges ganados, ej: ["PIONERO", "CENTINELA"])
     @Column(name = "badges", length = 500)
     private String badges;

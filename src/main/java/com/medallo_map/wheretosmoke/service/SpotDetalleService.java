@@ -31,6 +31,7 @@ public class SpotDetalleService {
     private final HistorialAlertaRepository historialAlertaRepository;
     private final UsuarioRepository usuarioRepository;
     private final GamificacionService gamificacionService;
+    private final MisionService misionService;
 
     // ═══════════════════════════════════════════════════════════════
     // 📍 DETALLE COMPLETO DE SPOT
@@ -112,6 +113,7 @@ public class SpotDetalleService {
         // Dar puntos
         if (usuarioId != null) {
             gamificacionService.puntosPorFoto(usuarioId);
+            misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.SUBIR_FOTO);
         }
 
         FotoDTO dto = FotoDTO.fromFoto(foto);
@@ -170,6 +172,7 @@ public class SpotDetalleService {
         // Dar puntos
         if (usuarioId != null) {
             gamificacionService.puntosPorComentario(usuarioId);
+            misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.COMENTAR);
         }
 
         return ComentarioDTO.fromComentario(comentario);
@@ -216,6 +219,7 @@ public class SpotDetalleService {
         // Dar puntos (solo si es nueva)
         if (calificacion.getId() == null && usuarioId != null) {
             gamificacionService.puntosPorCalificacion(usuarioId);
+            misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.CALIFICAR);
         }
 
         return obtenerCalificacionesDetalle(spotId);

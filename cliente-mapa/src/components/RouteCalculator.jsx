@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import {
@@ -12,7 +13,7 @@ import {
 } from 'react-icons/hi2';
 import './RouteCalculator.css';
 
-const API_BASE_URL = 'http://localhost:8081/api';
+const API_BASE_URL = API_BASE;
 
 export default function RouteCalculator({ userLocation, onRouteCalculated, onModeChange, onSimulationStart, darkMode, onClose }) {
     const [origen, setOrigen] = useState(null);

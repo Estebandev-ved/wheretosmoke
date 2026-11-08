@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -5,7 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import PushNotificationButton from './PushNotificationButton';
 import RatingStars from './RatingStars';
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * 👤 PERFIL DE USUARIO

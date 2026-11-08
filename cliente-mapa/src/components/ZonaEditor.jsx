@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useRef } from 'react';
 import { MapContainer, TileLayer, Polygon, Marker, useMapEvents } from 'react-leaflet';
 import L from 'leaflet';
@@ -93,7 +94,7 @@ const ZonaEditor = ({ isOpen, onClose, onSave }) => {
             console.log('📤 Enviando zona:', zonaData);
 
             const { data } = await axios.post(
-                'http://localhost:8081/api/admin/geozonas',
+                `${API_BASE}/admin/geozonas`,
                 zonaData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );

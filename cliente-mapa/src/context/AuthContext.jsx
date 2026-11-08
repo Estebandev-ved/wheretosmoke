@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -26,7 +27,7 @@ export const AuthProvider = ({ children }) => {
     const [token, setToken] = useState(() => localStorage.getItem('token'));
     const [loading, setLoading] = useState(true);
 
-    const API_URL = 'http://localhost:8081/api/auth';
+    const API_URL = `${API_BASE}/auth`;
 
     // 📝 Configurar axios para incluir el token en todas las peticiones
     useEffect(() => {

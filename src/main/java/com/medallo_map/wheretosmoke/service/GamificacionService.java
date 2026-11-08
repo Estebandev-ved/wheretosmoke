@@ -1,8 +1,12 @@
 package com.medallo_map.wheretosmoke.service;
 
+import java.time.Clock;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.data.domain.PageRequest;
@@ -10,8 +14,10 @@ import org.springframework.stereotype.Service;
 
 import com.medallo_map.wheretosmoke.dto.PerfilGamificacionDTO;
 import com.medallo_map.wheretosmoke.model.Badge;
+import com.medallo_map.wheretosmoke.model.InventarioUsuario;
 import com.medallo_map.wheretosmoke.model.Usuario;
 import com.medallo_map.wheretosmoke.repository.FotoRepository;
+import com.medallo_map.wheretosmoke.repository.InventarioUsuarioRepository;
 import com.medallo_map.wheretosmoke.repository.UsuarioRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -27,6 +33,8 @@ public class GamificacionService {
 
     private final UsuarioRepository usuarioRepository;
     private final FotoRepository fotoRepository;
+    private final InventarioUsuarioRepository inventarioRepository;
+    private final Clock clock;
 
     // ⚙️ CONFIGURACIÓN DE PUNTOS
     private static final int PUNTOS_CREAR_SPOT = 10;
@@ -155,7 +163,7 @@ public class GamificacionService {
         Badge siguienteBadge = calcularSiguienteBadge(usuario, badgesGanados);
         int puntosFaltantes = siguienteBadge != null ? calcularPuntosFaltantes(usuario, siguienteBadge) : 0;
 
-        return PerfilGamificacionDTO.builder()
+        PerfilGamificacionDTO perfil = PerfilGamificacionDTO.builder()
                 .usuarioId(usuario.getId())
                 .username(usuario.getUsername())
                 .puntos(usuario.getPuntos())
@@ -168,6 +176,30 @@ public class GamificacionService {
                 .siguienteBadge(siguienteBadge)
                 .puntosFaltantes(puntosFaltantes)
                 .build();
+
+        // Gamificación v2: nivel, rango, monedas, racha y cosméticos equipados
+        completarNivel(perfil, usuario);
+        LocalDate hoy = LocalDate.now(clock);
+        Integer saldo = usuarioRepository.obtenerMonedas(usuarioId);
+        perfil.setMonedas(saldo == null ? 0 : saldo);
+        perfil.setRachaDias(ReglasGamificacion.rachaVigente(usuario.getUltimaActividad(), hoy, usuario.getRachaDias()));
+        perfil.setCheckinHoy(hoy.equals(usuario.getUltimaActividad()));
+        Map<String, String> equipados = new LinkedHashMap<>();
+        inventarioRepository.findByUsuarioId(usuarioId).stream()
+                .filter(InventarioUsuario::isEquipado)
+                .forEach(i -> equipados.put(i.getArticulo().getCategoria().name(), i.getArticulo().getImagen()));
+        perfil.setEquipados(equipados);
+        return perfil;
+    }
+
+    /** Rellena nivel, título de rango y umbrales de XP según usuarios.puntos (ver ReglasGamificacion). */
+    private void completarNivel(PerfilGamificacionDTO perfil, Usuario usuario) {
+        int nivel = ReglasGamificacion.nivelPara(usuario.getPuntos());
+        perfil.setNivel(nivel);
+        perfil.setTituloRango(ReglasGamificacion.tituloRango(nivel));
+        perfil.setXpNivelActual(ReglasGamificacion.xpParaNivel(nivel));
+        perfil.setXpSiguienteNivel(nivel >= ReglasGamificacion.NIVEL_MAX ? null
+                : ReglasGamificacion.xpParaNivel(nivel + 1));
     }
 
     /**
@@ -177,14 +209,18 @@ public class GamificacionService {
         return usuarioRepository.findAll(PageRequest.of(0, 10,
                 org.springframework.data.domain.Sort.by("puntos").descending()))
                 .stream()
-                .map(usuario -> PerfilGamificacionDTO.builder()
-                        .usuarioId(usuario.getId())
-                        .username(usuario.getUsername())
-                        .puntos(usuario.getPuntos())
-                        .badgesGanados(parseBadges(usuario.getBadges()))
-                        .spotsCreados(usuario.getSpotsCreados())
-                        .reportesHechos(usuario.getReportesHechos())
-                        .build())
+                .map(usuario -> {
+                    PerfilGamificacionDTO p = PerfilGamificacionDTO.builder()
+                            .usuarioId(usuario.getId())
+                            .username(usuario.getUsername())
+                            .puntos(usuario.getPuntos())
+                            .badgesGanados(parseBadges(usuario.getBadges()))
+                            .spotsCreados(usuario.getSpotsCreados())
+                            .reportesHechos(usuario.getReportesHechos())
+                            .build();
+                    completarNivel(p, usuario); // nivel y rango son públicos; monedas no
+                    return p;
+                })
                 .collect(Collectors.toList());
     }
 

@@ -1,10 +1,11 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { HiPhoto, HiHeart, HiChatBubbleLeft, HiMapPin, HiSparkles, HiShieldExclamation, HiPaperAirplane } from 'react-icons/hi2';
 import { useAuth } from '../context/AuthContext';
 import './feed-page.css';
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * 📸 FEED PAGE - Feed de fotos con likes y comentarios

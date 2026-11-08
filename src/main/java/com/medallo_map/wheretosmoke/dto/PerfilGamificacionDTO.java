@@ -32,4 +32,14 @@ public class PerfilGamificacionDTO {
     // Siguiente badge a conseguir
     private Badge siguienteBadge;
     private Integer puntosFaltantes;
+
+    // Gamificación v2 (monedas/nivel/racha). monedas y checkinHoy son null en perfiles ajenos.
+    private Integer nivel;
+    private String tituloRango;
+    private Integer xpNivelActual;      // XP total donde empieza el nivel actual
+    private Integer xpSiguienteNivel;   // XP total para el siguiente nivel (null si nivel máximo)
+    private Integer monedas;
+    private Integer rachaDias;          // racha vigente (0 si se rompió)
+    private Boolean checkinHoy;
+    private java.util.Map<String, String> equipados; // categoría -> imagen del artículo equipado
 }

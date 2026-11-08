@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import { Polygon } from 'react-leaflet';
 import axios from 'axios';
@@ -18,7 +19,7 @@ const GeoZones = () => {
 
     const fetchZonasActivas = async () => {
         try {
-            const { data } = await axios.get('http://localhost:8081/api/geozonas/activas');
+            const { data } = await axios.get(`${API_BASE}/geozonas/activas`);
             setZonas(data);
             console.log('🗺️ Zonas activas cargadas:', data.length);
         } catch (error) {

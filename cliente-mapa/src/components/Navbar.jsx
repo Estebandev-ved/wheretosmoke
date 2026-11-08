@@ -1,13 +1,13 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { HiMap, HiPhoto, HiRocketLaunch, HiInformationCircle, HiSparkles } from 'react-icons/hi2';
+import { HiMap, HiPhoto, HiFlag, HiShoppingBag, HiUser, HiSparkles } from 'react-icons/hi2';
 import './navbar.css';
 
 /**
  * 🧭 NAVBAR INFERIOR - Navegación principal de la app
  * 
- * Bottom bar con 4 tabs: Mapa, Feed, Descubrir, Nosotros
- * + 🤖 Botón de IA
+ * Bottom bar con 5 tabs: Mapa, Feed, Misiones, Tienda, Perfil
+ * + acceso flotante a la IA en el mapa (el resto vive en Perfil)
  */
 const Navbar = ({ darkMode = false, onChatClick }) => {
     const location = useLocation();
@@ -17,10 +17,9 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
     const tabs = [
         { path: '/', label: 'Mapa', icon: HiMap },
         { path: '/feed', label: 'Feed', icon: HiPhoto },
-        // Botón central de IA (Acción especial)
-        { action: 'chat', label: 'IA', icon: HiSparkles, special: true },
-        { path: '/descubrir', label: 'Descubrir', icon: HiRocketLaunch },
-        { path: '/nosotros', label: 'Info', icon: HiInformationCircle },
+        { path: '/misiones', label: 'Misiones', icon: HiFlag },
+        { path: '/tienda', label: 'Tienda', icon: HiShoppingBag },
+        { path: '/perfil', label: 'Perfil', icon: HiUser },
     ];
 
     return (
@@ -41,6 +40,7 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
                             }
                         }}
                         aria-label={tab.label}
+                        aria-current={isActive ? 'page' : undefined}
                     >
                         <span className="navbar-tab-icon">
                             <IconComponent size={22} />
@@ -49,6 +49,16 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
                     </button>
                 );
             })}
+            {location.pathname === '/' && (
+                <button
+                    type="button"
+                    className="navbar-ia-fab"
+                    onClick={onChatClick}
+                    aria-label="Abrir asistente de IA"
+                >
+                    <HiSparkles size={20} />
+                </button>
+            )}
         </nav>
     );
 };

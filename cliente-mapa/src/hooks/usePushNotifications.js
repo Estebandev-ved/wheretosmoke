@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -57,7 +58,7 @@ export const usePushNotifications = () => {
 
             // 2. Enviar suscripción al backend
             console.log('Sending subscription to backend:', subscription);
-            await axios.post(`${import.meta.env.VITE_API_URL || 'http://localhost:8081/api'}/push/subscribe?userId=${user.username || 'anon'}`, subscription);
+            await axios.post(`${API_BASE}/push/subscribe`, subscription);
 
             setIsSubscribed(true);
             setPermission('granted');

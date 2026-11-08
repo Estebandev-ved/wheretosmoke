@@ -45,6 +45,9 @@ public class SpotService {
     @Autowired
     private GeoZonaService geoZonaService;
 
+    @Autowired
+    private MisionService misionService;
+
     // Factory para crear objetos Point (necesario para JTS)
     private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -98,6 +101,11 @@ public class SpotService {
      * GUARDAR UN NUEVO SPOT - CON VALIDACION DE GEO-ZONA
      */
     public Spot guardarSpot(Spot spot) {
+        return guardarSpot(spot, null);
+    }
+
+    /** Variante con usuario autenticado: cuenta para misiones (CREAR_SPOT). */
+    public Spot guardarSpot(Spot spot, Long usuarioId) {
         // Validar que este en Medellin
         if (!geoZonaService.puntoEnMedellin(spot.getLatitud(), spot.getLongitud())) {
             throw new RuntimeException("Solo se permiten spots en Medellin");
@@ -111,7 +119,9 @@ public class SpotService {
         // Todo OK, crear spot
         spot.setEstado("VERDE");
         spot.setUltimaAlerta(LocalDateTime.now());
-        return spotRepository.save(spot);
+        Spot guardado = spotRepository.save(spot);
+        misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.CREAR_SPOT);
+        return guardado;
     }
 
     /**
@@ -155,6 +165,11 @@ public class SpotService {
      * 4️⃣ REPORTAR POLICÍA (TOMBO) - CON WEBSOCKET
      */
     public SpotVotacionDTO reportarPolicia(Long spotId, String fingerprint) {
+        return reportarPolicia(spotId, fingerprint, null);
+    }
+
+    /** usuarioId (opcional): si el votante está autenticado, el voto nuevo cuenta para misiones. */
+    public SpotVotacionDTO reportarPolicia(Long spotId, String fingerprint, Long usuarioId) {
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new RuntimeException("Spot no encontrado"));
 
@@ -174,6 +189,8 @@ public class SpotService {
         // IMPORTANTE: Guardar ubicacion para rutas de bajo perfil
         nuevoReporte.setLocation(spot.getLocation());
         reporteRepository.save(nuevoReporte);
+        // Solo votos nuevos de usuarios logueados; el límite diario lo pone la meta de la misión
+        misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.VOTAR_SPOT);
 
         // 🔢 Contar votos TOMBO actuales
         int votosTombo = reporteRepository.contarVotosPorTipo(spotId, "TOMBO", limite);
@@ -208,6 +225,10 @@ public class SpotService {
      * 5️⃣ REPORTAR RELAX - CON WEBSOCKET
      */
     public SpotVotacionDTO reportarRelax(Long spotId, String fingerprint) {
+        return reportarRelax(spotId, fingerprint, null);
+    }
+
+    public SpotVotacionDTO reportarRelax(Long spotId, String fingerprint, Long usuarioId) {
         Spot spot = spotRepository.findById(spotId)
                 .orElseThrow(() -> new RuntimeException("Spot no encontrado"));
 
@@ -227,6 +248,8 @@ public class SpotService {
         // IMPORTANTE: Guardar ubicacion para rutas de bajo perfil
         nuevoReporte.setLocation(spot.getLocation());
         reporteRepository.save(nuevoReporte);
+        // Solo votos nuevos de usuarios logueados; el límite diario lo pone la meta de la misión
+        misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.VOTAR_SPOT);
 
         // 🔢 Contar votos actuales (ambos tipos)
         int votosRelax = reporteRepository.contarVotosPorTipo(spotId, "RELAX", limite);

@@ -1,4 +1,5 @@
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8081/api';
+import { API_BASE } from '../config';
+const API_URL = API_BASE;
 
 export const sendMessageToAI = async (message, latitude = null, longitude = null) => {
     try {

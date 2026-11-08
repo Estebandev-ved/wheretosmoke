@@ -1,9 +1,10 @@
+import { API_BASE } from '../config';
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import ConfirmDialog from './ConfirmDialog';
 import '../admin.css';
 
-const API_BASE_URL = 'http://localhost:8081/api';
+const API_BASE_URL = API_BASE;
 
 /**
  * 📍 ADMIN SPOT MANAGEMENT - Gestión de spots

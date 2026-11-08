@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { useAuth } from '../context/AuthContext';
@@ -23,7 +24,7 @@ const AdminGeoZones = () => {
 
     const cargarZonas = async () => {
         try {
-            const { data } = await axios.get('http://localhost:8081/api/admin/geozonas', {
+            const { data } = await axios.get(`${API_BASE}/admin/geozonas`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setZonas(data);
@@ -37,7 +38,7 @@ const AdminGeoZones = () => {
 
     const cargarEstadisticas = async () => {
         try {
-            const { data } = await axios.get('http://localhost:8081/api/admin/geozonas/stats', {
+            const { data } = await axios.get(`${API_BASE}/admin/geozonas/stats`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStats(data);
@@ -50,7 +51,7 @@ const AdminGeoZones = () => {
         try {
             const endpoint = zona.activa ? 'desactivar' : 'activar';
             const { data } = await axios.patch(
-                `http://localhost:8081/api/admin/geozonas/${zona.id}/${endpoint}`,
+                `${API_BASE}/admin/geozonas/${zona.id}/${endpoint}`,
                 {},
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -70,7 +71,7 @@ const AdminGeoZones = () => {
         if (!confirm('¿Seguro que quieres eliminar esta zona?')) return;
 
         try {
-            await axios.delete(`http://localhost:8081/api/admin/geozonas/${id}`, {
+            await axios.delete(`${API_BASE}/admin/geozonas/${id}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
 

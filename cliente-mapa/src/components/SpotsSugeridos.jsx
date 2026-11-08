@@ -1,10 +1,11 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import axios from 'axios';
 import RatingStars from './RatingStars';
 import { HiMapPin, HiStar, HiRocketLaunch, HiShieldExclamation, HiSparkles, HiMagnifyingGlass, HiFire } from 'react-icons/hi2';
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * 📍 SPOTS SUGERIDOS

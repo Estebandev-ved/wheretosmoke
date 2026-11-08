@@ -68,9 +68,11 @@ const AuthModal = ({ isOpen, onClose, darkMode }) => {
             zIndex: 2000
         },
         modal: {
-            backgroundColor: darkMode ? '#2c2c2c' : 'white',
-            color: darkMode ? 'white' : '#333',
-            borderRadius: '15px',
+            backgroundColor: darkMode ? 'var(--surface)' : 'white',
+            color: darkMode ? 'var(--text)' : '#333',
+            border: darkMode ? '1px solid var(--border-subtle)' : 'none',
+            fontFamily: 'var(--font-body)',
+            borderRadius: '16px',
             padding: '25px',
             width: '90%',
             maxWidth: '400px',
@@ -86,8 +88,8 @@ const AuthModal = ({ isOpen, onClose, darkMode }) => {
             padding: '10px',
             textAlign: 'center',
             cursor: 'pointer',
-            borderBottom: active ? '3px solid #00C851' : 'none',
-            color: active ? '#00C851' : (darkMode ? '#888' : '#666'),
+            borderBottom: active ? '3px solid var(--accent)' : 'none',
+            color: active ? 'var(--accent)' : (darkMode ? '#888' : '#666'),
             fontWeight: active ? 'bold' : 'normal',
             transition: 'all 0.2s'
         }),
@@ -95,9 +97,9 @@ const AuthModal = ({ isOpen, onClose, darkMode }) => {
             width: '100%',
             padding: '12px',
             marginBottom: '15px',
-            borderRadius: '8px',
-            border: `1px solid ${darkMode ? '#555' : '#ddd'}`,
-            backgroundColor: darkMode ? '#3c3c3c' : 'white',
+            borderRadius: '12px',
+            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.16)' : '#ddd'}`,
+            backgroundColor: darkMode ? 'var(--surface-2)' : 'white',
             color: darkMode ? 'white' : '#333',
             fontSize: '14px',
             boxSizing: 'border-box'
@@ -105,11 +107,11 @@ const AuthModal = ({ isOpen, onClose, darkMode }) => {
         button: {
             width: '100%',
             padding: '12px',
-            borderRadius: '8px',
+            borderRadius: '12px',
             border: 'none',
-            backgroundColor: '#00C851',
-            color: 'white',
-            fontWeight: 'bold',
+            backgroundColor: 'var(--accent)',
+            color: '#04130A',
+            fontWeight: '700',
             cursor: loading ? 'not-allowed' : 'pointer',
             fontSize: '16px',
             opacity: loading ? 0.7 : 1
@@ -129,7 +131,7 @@ const AuthModal = ({ isOpen, onClose, darkMode }) => {
     return (
         <div style={modalStyles.overlay} onClick={onClose}>
             <div style={{ ...modalStyles.modal, position: 'relative' }} onClick={e => e.stopPropagation()}>
-                <button style={modalStyles.closeBtn} onClick={onClose}>×</button>
+                <button style={modalStyles.closeBtn} onClick={onClose} aria-label="Cerrar">×</button>
 
                 <h2 style={{ marginTop: 0, textAlign: 'center' }}>
                     {activeTab === 'login' ? '🔑 Iniciar Sesión' : '📝 Registrarse'}

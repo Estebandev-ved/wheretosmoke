@@ -37,11 +37,11 @@ const Controls = ({ darkMode, setDarkMode, filter, setFilter, totalSpots }) => {
             transition: 'all 0.25s ease'
         },
         panel: {
-            backgroundColor: darkMode ? 'rgba(30, 30, 30, 0.9)' : 'rgba(255, 255, 255, 0.9)',
+            backgroundColor: darkMode ? 'var(--glass)' : 'rgba(255, 255, 255, 0.9)',
             backdropFilter: 'blur(20px)',
             WebkitBackdropFilter: 'blur(20px)',
-            border: `1px solid ${darkMode ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.1)'}`,
-            borderRadius: '14px',
+            border: `1px solid ${darkMode ? 'var(--border-subtle)' : 'rgba(0,0,0,0.1)'}`,
+            borderRadius: '16px',
             boxShadow: '0 4px 20px rgba(0,0,0,0.2)',
             padding: '10px',
             minWidth: '120px'
@@ -61,7 +61,7 @@ const Controls = ({ darkMode, setDarkMode, filter, setFilter, totalSpots }) => {
                 ? (type === 'danger' ? 'rgba(255,68,68,0.2)' : 'rgba(0,200,81,0.2)')
                 : 'transparent',
             color: isActive
-                ? (type === 'danger' ? '#ff4444' : '#00C851')
+                ? (type === 'danger' ? '#ef4444' : 'var(--accent)')
                 : (darkMode ? 'rgba(255,255,255,0.7)' : 'rgba(0,0,0,0.6)'),
             border: isActive
                 ? `1px solid ${type === 'danger' ? 'rgba(255,68,68,0.3)' : 'rgba(0,200,81,0.3)'}`

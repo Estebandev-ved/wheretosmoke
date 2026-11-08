@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import {
@@ -8,7 +9,7 @@ import {
 } from 'react-icons/hi2';
 import './about-page.css';
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * ℹ️ ABOUT PAGE - Quiénes Somos

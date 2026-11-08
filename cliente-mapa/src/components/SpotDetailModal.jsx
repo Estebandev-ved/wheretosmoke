@@ -1,3 +1,4 @@
+import { API_BASE } from '../config';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { toast } from 'react-toastify';
@@ -6,7 +7,7 @@ import PhotoUploader from './PhotoUploader';
 import AlertHistory from './AlertHistory';
 import { useAuth } from '../context/AuthContext';
 
-const API_URL = 'http://localhost:8081/api';
+const API_URL = API_BASE;
 
 /**
  * 📍 MODAL DE DETALLE DE SPOT
@@ -163,15 +164,17 @@ const SpotDetailModal = ({
             width: '100%',
             maxWidth: '500px',
             maxHeight: '85vh',
-            backgroundColor: darkMode ? '#1c1c1c' : 'white',
-            borderRadius: '20px',
+            backgroundColor: darkMode ? 'var(--surface)' : 'white',
+            border: darkMode ? '1px solid var(--border-subtle)' : 'none',
+            boxShadow: 'var(--elev-2)',
+            borderRadius: '16px',
             overflow: 'hidden',
             display: 'flex',
             flexDirection: 'column'
         },
         header: {
             padding: '15px 20px',
-            backgroundColor: spot?.estado === 'ROJO' ? '#ff4444' : '#00C851',
+            backgroundColor: spot?.estado === 'ROJO' ? '#ef4444' : 'var(--accent-strong)',
             color: 'white',
             display: 'flex',
             alignItems: 'center',
@@ -185,6 +188,7 @@ const SpotDetailModal = ({
             cursor: 'pointer'
         },
         title: {
+            fontFamily: 'var(--font-display)',
             flex: 1,
             fontSize: '18px',
             fontWeight: 'bold',
@@ -301,7 +305,7 @@ const SpotDetailModal = ({
             <div style={styles.modal} onClick={(e) => e.stopPropagation()}>
                 {/* Header */}
                 <div style={styles.header}>
-                    <button style={styles.closeBtn} onClick={onClose}>←</button>
+                    <button style={styles.closeBtn} onClick={onClose} aria-label="Volver">←</button>
                     <h2 style={styles.title}>{spot.nombre}</h2>
                     <button style={styles.favoriteBtn} onClick={toggleFavorito}>
                         {detalle?.esFavorito ? '❤️' : '🤍'}

@@ -250,3 +250,37 @@
     background: rgba(16, 185, 129, 0.3);
     transform: scale(0.95);
 }
+/* Acceso flotante a la IA (solo en el mapa) */
+.navbar-ia-fab {
+    position: absolute;
+    right: 4px;
+    bottom: calc(100% + 12px);
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 14px;
+    border: 1px solid var(--border-subtle);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--accent);
+    box-shadow: var(--elev-1);
+    cursor: pointer;
+}
+
+.navbar-ia-fab:hover { border-color: var(--accent); }
+
+/* Tokens del sistema Pro en el navbar */
+.navbar-bottom { background: rgba(11, 15, 12, 0.9); border-radius: 16px; }
+.navbar-tab:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.navbar-tab-label { color: rgba(255, 255, 255, 0.55); }
+.navbar-tab-icon { color: rgba(255, 255, 255, 0.55); }
+.navbar-tab.active .navbar-tab-icon,
+.navbar-tab.active .navbar-tab-label { color: var(--accent); }
+.navbar-bottom.light .navbar-tab-label,
+.navbar-bottom.light .navbar-tab-icon { color: rgba(0, 0, 0, 0.55); }
+.navbar-bottom.light { background: rgba(255, 255, 255, 0.9); }
+.navbar-bottom.light .navbar-tab.active .navbar-tab-icon,
+.navbar-bottom.light .navbar-tab.active .navbar-tab-label { color: #15803D; }

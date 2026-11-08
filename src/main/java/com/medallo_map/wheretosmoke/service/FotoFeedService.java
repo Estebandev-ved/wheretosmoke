@@ -33,6 +33,7 @@ public class FotoFeedService {
     private final ComentarioFotoRepository comentarioFotoRepository;
     private final LikeFotoRepository likeFotoRepository;
     private final UsuarioRepository usuarioRepository;
+    private final MisionService misionService;
 
     // ═══════════════════════════════════════════════════════════════
     // ❤️ LIKES - Toggle (like/unlike)
@@ -116,6 +117,9 @@ public class FotoFeedService {
                 .build();
 
         comentario = comentarioFotoRepository.save(comentario);
+        if (usuarioId != null) {
+            misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.COMENTAR);
+        }
         return ComentarioFotoDTO.fromComentarioFoto(comentario);
     }
 }

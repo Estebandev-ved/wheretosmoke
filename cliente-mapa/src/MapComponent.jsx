@@ -1,3 +1,4 @@
+import { API_BASE, WS_URL } from './config';
 import React, { useEffect, useState, useRef, lazy, Suspense } from 'react';
 import { HiTrophy, HiRocketLaunch, HiUserGroup, HiArrowsRightLeft } from 'react-icons/hi2';
 import { FaPaw } from 'react-icons/fa';
@@ -17,6 +18,7 @@ import { Client } from '@stomp/stompjs';
 // Componentes
 import Controls from './components/Controls';
 import SearchBar from './components/SearchBar';
+import { markBoot } from './services/bootStatus';
 import AuthModal from './components/AuthModal';
 import UserButton from './components/UserButton';
 import PanicButton from './components/PanicButton';
@@ -101,7 +103,7 @@ function ClickHandler({ alHacerClick, toast, routeMode }) {
 
             // 🚧 Validar zona activa (Backend)
             try {
-                const { data } = await axios.post('http://localhost:8081/api/geozonas/validar', { lat, lng });
+                const { data } = await axios.post(`${API_BASE}/geozonas/validar`, { lat, lng });
 
                 if (!data.permitido) {
                     toast.warning(data.mensaje);
@@ -202,7 +204,7 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
 
     const { isAuthenticated, token } = useAuth();
 
-    const API_URL = 'http://localhost:8081/api/spots';
+    const API_URL = `${API_BASE}/spots`;
 
     // 🔑 Generar fingerprint
     useEffect(() => {
@@ -238,9 +240,16 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
 
     // 📡 CONECTAR WEBSOCKET para alertas en tiempo real
     useEffect(() => {
-        const socket = new SockJS('http://localhost:8081/ws');
+        // El backend exige JWT en el CONNECT de STOMP
+        if (!localStorage.getItem('token')) return;
+
         const client = new Client({
-            webSocketFactory: () => socket,
+            webSocketFactory: () => new SockJS(WS_URL),
+            beforeConnect: () => {
+                client.connectHeaders = {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                };
+            },
             reconnectDelay: 5000,
             heartbeatIncoming: 4000,
             heartbeatOutgoing: 4000,
@@ -300,8 +309,14 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
             setSpots(response.data);
         } catch (error) {
             console.error("Error cargando spots:", error);
+        } finally {
+            markBoot('spots');
         }
     };
+
+    useEffect(() => {
+        markBoot('map');
+    }, []);
 
     useEffect(() => {
         if (userFingerprint) {
@@ -417,10 +432,10 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
     });
 
     // 🎨 URL del mapa según modo oscuro o claro
-    const apiKey = import.meta.env.VITE_CARTO_API_KEY || "";
-    const tileUrl = darkMode
-        ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${apiKey ? `?api_key=${apiKey}` : ""}`
-        : `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png${apiKey ? `?api_key=${apiKey}` : ""}`;
+    // CARTO exige API key y sin ella pinta marcas de agua "API KEY REQUIRED".
+    // Usamos mosaicos de OpenStreetMap (sin clave) y el modo oscuro se logra con un filtro CSS.
+    // Para producción define VITE_TILE_URL con un proveedor propio (MapTiler, Stadia, etc.).
+    const tileUrl = import.meta.env.VITE_TILE_URL || 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
 
     return (
         <>
@@ -435,8 +450,11 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                 maxBoundsViscosity={1.0} // Restringir pan fuera de Medellín
             >
                 <TileLayer
-                    attribution='&copy; OpenStreetMap contributors'
+                    key={darkMode ? 'tiles-dark' : 'tiles-light'}
+                    attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                     url={tileUrl}
+                    maxZoom={19}
+                    className={darkMode ? 'map-tiles-dark' : 'map-tiles-light'}
                 />
 
                 {/* 📍 Componente para capturar la referencia del mapa */}
