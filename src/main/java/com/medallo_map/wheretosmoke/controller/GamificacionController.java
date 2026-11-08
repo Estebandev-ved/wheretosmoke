@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/gamificacion")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class GamificacionController {
 
     private final GamificacionService gamificacionService;

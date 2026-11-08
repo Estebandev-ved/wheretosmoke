@@ -402,7 +402,11 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
             fetchSpots();
         } catch (error) {
             console.error(error);
-            toast.error("❌ Error guardando el sitio");
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                toast.warning("🔒 Inicia sesión para crear spots");
+            } else {
+                toast.error("❌ Error guardando el sitio");
+            }
         }
     };
 
@@ -413,9 +417,10 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
     });
 
     // 🎨 URL del mapa según modo oscuro o claro
+    const apiKey = import.meta.env.VITE_CARTO_API_KEY || "";
     const tileUrl = darkMode
-        ? "https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        : "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png";
+        ? `https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${apiKey ? `?api_key=${apiKey}` : ""}`
+        : `https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png${apiKey ? `?api_key=${apiKey}` : ""}`;
 
     return (
         <>

@@ -245,7 +245,7 @@ const ZonaEditor = ({ isOpen, onClose, onSave }) => {
                             style={{ height: '100%', width: '100%' }}
                         >
                             <TileLayer
-                                url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
+                                url={`https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png${import.meta.env.VITE_CARTO_API_KEY ? `?api_key=${import.meta.env.VITE_CARTO_API_KEY}` : ""}`}
                                 attribution='&copy; OpenStreetMap'
                             />
 

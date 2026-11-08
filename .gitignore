@@ -31,3 +31,13 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Secretos (nunca versionar) ###
+secrets.properties
+.env
+.env.*
+!.env.example
+cliente-mapa/.env
+cliente-mapa/private_key.txt
+cliente-mapa/public_key.txt
+cliente-mapa/keys.txt

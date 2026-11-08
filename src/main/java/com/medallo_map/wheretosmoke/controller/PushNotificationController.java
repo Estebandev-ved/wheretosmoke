@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/push")
-@CrossOrigin(origins = "*")
 public class PushNotificationController {
 
     @Autowired

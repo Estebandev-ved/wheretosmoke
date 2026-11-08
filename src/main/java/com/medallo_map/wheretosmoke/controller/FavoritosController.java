@@ -19,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/favoritos")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class FavoritosController {
 
     private final FavoritosService favoritosService;

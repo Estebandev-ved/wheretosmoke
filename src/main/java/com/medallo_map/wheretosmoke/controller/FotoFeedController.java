@@ -21,7 +21,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/fotos")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class FotoFeedController {
 
     private final FotoFeedService fotoFeedService;

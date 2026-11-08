@@ -19,7 +19,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("/api/spots")
-@CrossOrigin(origins = "*") // Permite que React se conecte desde localhost:5173
 public class SpotController {
 
     @Autowired

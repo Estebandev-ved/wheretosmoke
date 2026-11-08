@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/spots")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class SpotDetalleController {
 
     private final SpotDetalleService spotDetalleService;

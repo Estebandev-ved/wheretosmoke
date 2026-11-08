@@ -1,5 +1,6 @@
 package com.medallo_map.wheretosmoke.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
@@ -23,6 +24,7 @@ import com.medallo_map.wheretosmoke.repository.UsuarioRepository;
 import com.medallo_map.wheretosmoke.security.JwtAuthenticationFilter;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * ⚙️ CONFIGURACIÓN DE SEGURIDAD - Spring Boot 4.0 / Spring Security 7.0
@@ -38,6 +40,9 @@ public class SecurityConfig {
     private final JwtAuthenticationFilter jwtAuthFilter;
     private final UsuarioRepository usuarioRepository;
 
+    @Value("${app.cors.allowed-origins}")
+    private List<String> allowedOrigins;
+
     public SecurityConfig(@Lazy JwtAuthenticationFilter jwtAuthFilter, UsuarioRepository usuarioRepository) {
         this.jwtAuthFilter = jwtAuthFilter;
         this.usuarioRepository = usuarioRepository;
@@ -52,25 +57,22 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(auth -> auth
-                        // 🌐 ENDPOINTS PÚBLICOS
+                        // 🌐 Públicos: autenticación, WebSocket y lectura de datos del mapa
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/spots").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/spots").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/spots/**").permitAll()
                         .requestMatchers("/ws/**").permitAll()
-                        // 📸 Nuevos endpoints de detalle
-                        .requestMatchers(HttpMethod.GET, "/api/spots/*/detalle").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/spots/*/fotos").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/spots/*/comentarios").permitAll()
-                        // 🏆 Gamificación pública
-                        .requestMatchers(HttpMethod.GET, "/api/gamificacion/leaderboard").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/gamificacion/badges").permitAll()
-                        // 👑 ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/spots/**").permitAll()
+                        // Votos anónimos por fingerprint (tombo / relax)
+                        .requestMatchers(HttpMethod.POST, "/api/spots/*/tombo", "/api/spots/*/relax").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/geozonas/activas", "/api/rutas/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/geozonas/validar").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/gamificacion/leaderboard",
+                                "/api/gamificacion/badges").permitAll()
+                        // 👑 Solo ADMIN
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/push/broadcast").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/spots/**").hasRole("ADMIN")
-                        // Todo lo demás público por ahora
-                        .anyRequest().permitAll())
+                        // 🔒 Todo lo demás requiere sesión iniciada
+                        .anyRequest().authenticated())
                 .sessionManagement(session -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -85,11 +87,8 @@ public class SecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // Permitir localhost:5173 (Vite), localhost:3000 (React)
-        configuration.setAllowedOrigins(Arrays.asList(
-                "http://localhost:5173",
-                "http://localhost:3000",
-                "http://127.0.0.1:5173"));
+        // Orígenes configurables vía app.cors.allowed-origins
+        configuration.setAllowedOrigins(allowedOrigins);
 
         // Permitir TODOS los métodos HTTP incluyendo PATCH
         configuration.setAllowedMethods(Arrays.asList(
