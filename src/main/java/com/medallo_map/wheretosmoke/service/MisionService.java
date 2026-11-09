@@ -4,7 +4,6 @@ import java.time.Clock;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,8 +81,9 @@ public class MisionService {
     public MisionesResponseDTO obtenerMisiones(Long usuarioId) {
         LocalDate dia = ReglasGamificacion.periodoDiario(clock);
         LocalDate semana = ReglasGamificacion.periodoSemanal(clock);
+        // List (no Set.of): en lunes dia == semana y Set.of lanzaría IllegalArgumentException por duplicado.
         List<MisionUsuario> progresos = misionUsuarioRepository.findByUsuarioIdAndPeriodoIn(usuarioId,
-                Set.of(dia, semana));
+                List.of(dia, semana));
 
         List<MisionDTO> diarias = new ArrayList<>();
         List<MisionDTO> semanales = new ArrayList<>();
