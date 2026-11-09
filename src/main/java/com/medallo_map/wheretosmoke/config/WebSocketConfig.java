@@ -165,7 +165,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void registerStompEndpoints(StompEndpointRegistry registry) {
         registry
                 .addEndpoint("/ws")
-                .setAllowedOrigins(allowedOrigins.toArray(new String[0]))
+                .setAllowedOriginPatterns(allowedOrigins.toArray(new String[0]))
                 .withSockJS(); // Fallback para navegadores que no soportan WebSocket
     }
 

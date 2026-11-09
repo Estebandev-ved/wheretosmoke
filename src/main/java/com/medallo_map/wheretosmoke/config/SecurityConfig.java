@@ -96,7 +96,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
 
         // Orígenes configurables vía app.cors.allowed-origins
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOriginPatterns(allowedOrigins);
 
         // Permitir TODOS los métodos HTTP incluyendo PATCH
         configuration.setAllowedMethods(Arrays.asList(
