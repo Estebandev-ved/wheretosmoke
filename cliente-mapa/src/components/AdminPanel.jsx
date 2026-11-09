@@ -6,6 +6,7 @@ import AdminUserManagement from './AdminUserManagement';
 import AdminSpotManagement from './AdminSpotManagement';
 import AdminGeoZones from './AdminGeoZones';
 import '../admin.css';
+import '../admin-pro.css'; // Tema corporativo (sobrescribe admin.css)
 
 /**
  * 🔒 ADMIN PANEL - Panel de administración principal

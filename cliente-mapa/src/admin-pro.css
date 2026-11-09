@@ -1,0 +1,496 @@
+/* =========================================================
+   🏢 ADMIN PANEL — TEMA CORPORATIVO
+   Capa que sobrescribe admin.css. Cargar siempre después.
+   Paleta: azul corporativo, neutros fríos, tipografía sobria.
+   ========================================================= */
+
+:root {
+    --pro-bg: #f3f5f9;
+    --pro-surface: #ffffff;
+    --pro-surface-alt: #f8fafc;
+    --pro-border: #e2e8f0;
+    --pro-text: #0f172a;
+    --pro-text-soft: #475569;
+    --pro-text-muted: #94a3b8;
+    --pro-sidebar: #0b1220;
+    --pro-sidebar-hover: #161f33;
+    --pro-sidebar-active: #1d4ed8;
+    --pro-accent: #2563eb;
+    --pro-success: #15803d;
+    --pro-success-bg: #dcfce7;
+    --pro-danger: #b91c1c;
+    --pro-danger-bg: #fee2e2;
+    --pro-warning: #b45309;
+    --pro-warning-bg: #fef3c7;
+    --pro-info-bg: #dbeafe;
+    --pro-shadow: 0 1px 2px rgba(15, 23, 42, 0.06), 0 1px 3px rgba(15, 23, 42, 0.04);
+    --pro-radius: 10px;
+}
+
+/* ===== LAYOUT ===== */
+.admin-panel {
+    background: var(--pro-bg);
+    color: var(--pro-text);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+}
+
+.admin-sidebar {
+    width: 252px;
+    background: var(--pro-sidebar);
+    border-right: none;
+    box-shadow: none;
+    backdrop-filter: none;
+    padding: 1.5rem 1rem;
+    color: #cbd5e1;
+}
+
+.admin-logo {
+    border-bottom: 1px solid #1e293b;
+    margin-bottom: 1.25rem;
+    padding: 0 0.5rem 1.1rem;
+}
+
+.admin-logo h2 {
+    background: none;
+    -webkit-text-fill-color: #ffffff;
+    -webkit-background-clip: border-box;
+    background-clip: border-box;
+    color: #ffffff;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    margin: 0 0 0.35rem;
+}
+
+.admin-user {
+    color: #94a3b8;
+    font-size: 0.8rem;
+    margin: 0;
+}
+
+.admin-nav {
+    gap: 0.25rem;
+}
+
+.nav-btn {
+    background: transparent;
+    border: none;
+    color: #cbd5e1;
+    border-radius: 8px;
+    padding: 0.6rem 0.75rem;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-align: left;
+    transition: background 0.15s, color 0.15s;
+}
+
+.nav-btn:hover {
+    background: var(--pro-sidebar-hover);
+    color: #ffffff;
+}
+
+.nav-btn.active {
+    background: var(--pro-sidebar-active);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+.admin-sidebar-footer {
+    border-top: 1px solid #1e293b;
+    padding-top: 1rem;
+    gap: 0.5rem;
+}
+
+.btn-back,
+.btn-logout {
+    background: transparent;
+    border: 1px solid #1e293b;
+    color: #cbd5e1;
+    border-radius: 8px;
+    font-size: 0.85rem;
+}
+
+.btn-back:hover,
+.btn-logout:hover {
+    background: var(--pro-sidebar-hover);
+    color: #ffffff;
+}
+
+.admin-content {
+    padding: 2rem 2.25rem;
+    background: var(--pro-bg);
+    color: var(--pro-text);
+}
+
+/* ===== ENCABEZADOS ===== */
+.admin-header {
+    margin-bottom: 1.5rem;
+    padding-bottom: 0;
+}
+
+.admin-header h1 {
+    color: var(--pro-text);
+    font-size: 1.45rem;
+    font-weight: 700;
+    margin: 0 0 0.25rem;
+}
+
+.admin-subtitle {
+    color: var(--pro-text-soft);
+    font-size: 0.875rem;
+    margin: 0;
+}
+
+/* ===== TARJETAS / STATS ===== */
+.stat-card,
+.trends-section,
+.category-distribution,
+.spot-card {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    border-radius: var(--pro-radius);
+    box-shadow: var(--pro-shadow);
+    backdrop-filter: none;
+    color: var(--pro-text);
+}
+
+.stat-card:hover {
+    transform: none;
+    box-shadow: var(--pro-shadow);
+}
+
+.stat-number,
+.stat-value {
+    color: var(--pro-text);
+    font-weight: 700;
+}
+
+.stat-label,
+.stat-details,
+.stat-trend {
+    color: var(--pro-text-soft);
+}
+
+/* ===== FILTROS ===== */
+.admin-filters {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    border-radius: var(--pro-radius);
+    box-shadow: var(--pro-shadow);
+    padding: 0.85rem;
+    margin-bottom: 1rem;
+    gap: 0.6rem;
+}
+
+.search-input,
+.filter-select {
+    background: var(--pro-surface);
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    color: var(--pro-text);
+    font-size: 0.875rem;
+    padding: 0.55rem 0.75rem;
+}
+
+.search-input:focus,
+.filter-select:focus {
+    outline: none;
+    border-color: var(--pro-accent);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+/* ===== TABLA ===== */
+.users-table-container {
+    background: var(--pro-surface);
+    border: 1px solid var(--pro-border);
+    border-radius: var(--pro-radius);
+    box-shadow: var(--pro-shadow);
+    overflow: hidden;
+}
+
+.users-table {
+    width: 100%;
+    border-collapse: collapse;
+    color: var(--pro-text);
+}
+
+.users-table thead th {
+    background: var(--pro-surface-alt);
+    color: var(--pro-text-soft);
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid var(--pro-border);
+    text-align: left;
+}
+
+.users-table tbody td {
+    padding: 0.8rem 1rem;
+    border-bottom: 1px solid #eef2f7;
+    color: var(--pro-text);
+    vertical-align: middle;
+}
+
+.users-table tbody tr:hover {
+    background: #f8fbff;
+}
+
+.users-table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+.users-table tr.user-banned td {
+    background: #fff7f7;
+}
+
+.user-username {
+    font-weight: 600;
+}
+
+.user-email,
+.user-date {
+    color: var(--pro-text-soft);
+}
+
+.user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--pro-info-bg);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+}
+
+/* ===== BADGES ===== */
+.role-badge,
+.status-badge,
+.flag-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.2rem 0.6rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border: none;
+}
+
+.role-badge.admin {
+    background: var(--pro-info-bg);
+    color: #1e40af;
+}
+
+.role-badge.user {
+    background: #f1f5f9;
+    color: var(--pro-text-soft);
+}
+
+.status-badge.active {
+    background: var(--pro-success-bg);
+    color: var(--pro-success);
+}
+
+.status-badge.banned {
+    background: var(--pro-danger-bg);
+    color: var(--pro-danger);
+}
+
+/* Indicador de conexión (en línea) */
+.presence {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    font-size: 0.8rem;
+    color: var(--pro-text-soft);
+    white-space: nowrap;
+}
+
+.presence-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--pro-text-muted);
+}
+
+.presence.online .presence-dot {
+    background: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.2);
+}
+
+.presence.online {
+    color: var(--pro-success);
+    font-weight: 600;
+}
+
+/* ===== BOTONES ===== */
+.btn-small {
+    border-radius: 6px;
+    border: 1px solid var(--pro-border);
+    background: var(--pro-surface);
+    color: var(--pro-text-soft);
+    font-size: 0.8rem;
+    padding: 0.35rem 0.55rem;
+    cursor: pointer;
+}
+
+.btn-small:hover {
+    background: var(--pro-surface-alt);
+    color: var(--pro-text);
+}
+
+.btn-small.btn-view {
+    color: var(--pro-accent);
+    border-color: #bfdbfe;
+    font-weight: 600;
+    padding: 0.35rem 0.7rem;
+}
+
+.btn-small.btn-ban:hover,
+.btn-small.btn-hard-delete:hover,
+.btn-small.btn-delete:hover {
+    background: var(--pro-danger-bg);
+    color: var(--pro-danger);
+    border-color: #fecaca;
+}
+
+/* ===== FICHA DE USUARIO (modal) ===== */
+.ficha-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.45);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    padding: 1rem;
+}
+
+.ficha-panel {
+    background: var(--pro-surface);
+    color: var(--pro-text);
+    width: min(680px, 100%);
+    max-height: 90vh;
+    overflow-y: auto;
+    border-radius: 12px;
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.25);
+}
+
+.ficha-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid var(--pro-border);
+}
+
+.ficha-header h2 {
+    margin: 0;
+    font-size: 1.1rem;
+    font-weight: 700;
+}
+
+.ficha-close {
+    background: none;
+    border: none;
+    font-size: 1.4rem;
+    color: var(--pro-text-soft);
+    cursor: pointer;
+    line-height: 1;
+}
+
+.ficha-body {
+    padding: 1.25rem 1.4rem 1.5rem;
+}
+
+.ficha-section-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--pro-text-muted);
+    margin: 1.25rem 0 0.6rem;
+}
+
+.ficha-section-title:first-child {
+    margin-top: 0;
+}
+
+.ficha-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: 0.75rem;
+}
+
+.ficha-field {
+    background: var(--pro-surface-alt);
+    border: 1px solid var(--pro-border);
+    border-radius: 8px;
+    padding: 0.6rem 0.8rem;
+}
+
+.ficha-field span {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--pro-text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.2rem;
+}
+
+.ficha-field strong {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--pro-text);
+    word-break: break-word;
+}
+
+.ficha-actions {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: 1.25rem;
+}
+
+.ficha-actions button {
+    border-radius: 8px;
+    padding: 0.5rem 0.9rem;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid var(--pro-border);
+    background: var(--pro-surface);
+    color: var(--pro-text);
+}
+
+.ficha-actions button.danger {
+    color: var(--pro-danger);
+    border-color: #fecaca;
+}
+
+/* ===== ESTADOS VACÍOS / CARGA ===== */
+.admin-loading,
+.no-results {
+    color: var(--pro-text-soft);
+    padding: 2rem;
+    text-align: center;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+    .admin-panel {
+        flex-direction: column;
+    }
+
+    .admin-sidebar {
+        width: 100%;
+    }
+
+    .admin-content {
+        padding: 1.25rem;
+    }
+}
