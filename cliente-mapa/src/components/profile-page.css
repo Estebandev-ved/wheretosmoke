@@ -52,3 +52,5 @@
 @media (prefers-reduced-motion: reduce) {
     .pf-item { transition: none; }
 }
+
+.gm-page .profile-item .pf-badge { margin-left: auto; box-shadow: none; }

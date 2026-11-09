@@ -40,6 +40,19 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
      */
     boolean existsByUsername(String username);
 
+    /**
+     * Búsqueda pública por nombre: {@code contiene} y {@code prefijo} son patrones LIKE en minúsculas con
+     * los comodines del usuario ya escapados con '!' (ver BusquedaUsuarios). Excluye al propio usuario, cuentas
+     * inactivas y personas bloqueadas en cualquier sentido. Los que empiezan por el texto salen primero.
+     */
+    @Query("SELECT u FROM Usuario u WHERE u.id <> :yo AND u.activo = true "
+            + "AND LOWER(u.username) LIKE :contiene ESCAPE '!' "
+            + "AND u.id NOT IN (SELECT b.bloqueadoId FROM Bloqueo b WHERE b.bloqueadorId = :yo) "
+            + "AND u.id NOT IN (SELECT b2.bloqueadorId FROM Bloqueo b2 WHERE b2.bloqueadoId = :yo) "
+            + "ORDER BY CASE WHEN LOWER(u.username) LIKE :prefijo ESCAPE '!' THEN 0 ELSE 1 END, u.username")
+    java.util.List<Usuario> buscarPorNombre(@Param("yo") Long yo, @Param("contiene") String contiene,
+            @Param("prefijo") String prefijo, org.springframework.data.domain.Pageable pageable);
+
     // ── Gamificación: operaciones atómicas (nunca read-modify-write en Java) ──
 
     /** Carga el usuario con bloqueo de escritura (serializa equipar/desequipar). */

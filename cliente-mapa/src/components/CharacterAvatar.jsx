@@ -13,13 +13,13 @@ const CharacterAvatar = ({ size = 96, skin, marco, mascota, alt = 'Tu personaje'
     >
         <div className="gm-avatar-ring"><img src={resolveItemImage(skin)} alt={alt} /></div>
         {marco && (
-            <div className="gm-avatar-emblem" title={`Marco: ${marco.nombre}`}>
+            <div className="gm-avatar-emblem" title={marco.nombre ? `Marco: ${marco.nombre}` : undefined}>
                 <img src={resolveItemImage(marco.imagen)} alt="" />
             </div>
         )}
         {mascota && (
-            <div className="gm-avatar-pet" title={`Mascota: ${mascota.nombre}`}>
-                <img src={resolveItemImage(mascota.imagen)} alt={`Mascota ${mascota.nombre}`} />
+            <div className="gm-avatar-pet" title={mascota.nombre ? `Mascota: ${mascota.nombre}` : undefined}>
+                <img src={resolveItemImage(mascota.imagen)} alt={mascota.nombre ? `Mascota ${mascota.nombre}` : 'Mascota'} />
             </div>
         )}
     </div>

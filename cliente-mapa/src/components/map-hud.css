@@ -336,3 +336,7 @@
     .hud-menu, .spot-card { animation: none; }
     .hud-chip, .hud-fab, .hud-pill { transition: none; }
 }
+
+/* Punto de aviso (mensajes / solicitudes) en el menú de acciones */
+.hud-fab { position: relative; }
+.hud-menu__dot { margin-left: auto; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4); }

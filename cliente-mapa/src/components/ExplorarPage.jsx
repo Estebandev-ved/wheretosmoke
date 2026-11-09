@@ -1,6 +1,7 @@
 import React, { lazy, Suspense, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { HiMapPin, HiPhoto, HiTrophy } from 'react-icons/hi2';
+import AccesosSociales from './social/AccesosSociales';
 import './gamificacion.css';
 import './explorar.css';
 
@@ -60,9 +61,12 @@ const ExplorarPage = ({ darkMode = true }) => {
         <main className={`gm-page ex-page ${darkMode ? '' : 'ex-light'}`}>
             <header className="ex-header">
                 <div className="ex-header-inner">
-                    <div className="ex-title">
-                        <h1>Explorar</h1>
-                        <p className="gm-sub">{SUBTITULOS[activa]}</p>
+                    <div className="ex-title-row">
+                        <div className="ex-title">
+                            <h1>Explorar</h1>
+                            <p className="gm-sub">{SUBTITULOS[activa]}</p>
+                        </div>
+                        <AccesosSociales />
                     </div>
                     <div className="ex-tabs" role="tablist" aria-label="Secciones de Explorar" onKeyDown={onKeyDown}>
                         {SECCIONES.map(({ key, label, icon: Icon }) => (

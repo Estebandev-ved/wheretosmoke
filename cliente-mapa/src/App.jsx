@@ -15,12 +15,17 @@ import MisionesPage from './components/MisionesPage';
 import TiendaPage from './components/TiendaPage';
 import ProfilePage from './components/ProfilePage';
 import SplashScreen from './components/SplashScreen';
+import PerfilPublico from './components/social/PerfilPublico';
+import AmigosPage from './components/social/AmigosPage';
+import ChatBandeja from './components/social/ChatBandeja';
+import ChatConversacion from './components/social/ChatConversacion';
 import { AuthProvider } from './context/AuthContext';
 import { ToastProvider } from './components/WeedToast';
 import { ParticleProvider } from './components/ParticleEffects';
 import { SoundProvider } from './context/SoundContext';
 import { AchievementProvider } from './context/AchievementContext';
 import { GamificacionProvider } from './context/GamificacionContext';
+import { MensajesProvider } from './context/MensajesContext';
 import 'react-toastify/dist/ReactToastify.css';
 import AIChatComponent from './components/AIChatComponent';
 
@@ -58,6 +63,7 @@ function App() {
           <AchievementProvider>
             <ToastProvider>
               <ParticleProvider>
+                <MensajesProvider>
                 <div className={`App ${darkMode ? 'dark-mode' : 'light-mode'}`}>
                   {/* 🌌 FONDO ANIMADO */}
                   <AnimatedBackground darkMode={darkMode} />
@@ -93,6 +99,12 @@ function App() {
                       <Route path="/tienda" element={<TiendaPage />} />
                       <Route path="/perfil" element={<ProfilePage darkMode={darkMode} onChatClick={() => setIsChatOpen(true)} />} />
 
+                      {/* 👥 SOCIAL: perfil público, amigos y mensajes directos */}
+                      <Route path="/usuario/:id" element={<PerfilPublico />} />
+                      <Route path="/amigos" element={<AmigosPage />} />
+                      <Route path="/chat" element={<ChatBandeja />} />
+                      <Route path="/chat/:id" element={<ChatConversacion />} />
+
                       {/* 🔒 PANEL DE ADMINISTRACIÓN */}
                       <Route path="/admin" element={<AdminPanel />} />
                     </Routes>
@@ -107,6 +119,7 @@ function App() {
                   {/* 🤖 CHATBOT IA */}
                   <AIChatComponent isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
                 </div>
+                </MensajesProvider>
               </ParticleProvider>
             </ToastProvider>
           </AchievementProvider>

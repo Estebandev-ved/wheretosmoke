@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import {
     HiTrophy, HiRocketLaunch, HiUserGroup, HiArrowsRightLeft, HiSun, HiMoon,
     HiViewfinderCircle, HiSquares2X2, HiXMark, HiUser, HiArrowRightOnRectangle,
-    HiSpeakerWave, HiSpeakerXMark,
+    HiSpeakerWave, HiSpeakerXMark, HiChatBubbleLeftRight,
 } from 'react-icons/hi2';
 import { FaCoins } from 'react-icons/fa';
 import SearchBar from './SearchBar';
@@ -13,6 +13,7 @@ import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useCirculoActividad } from '../hooks/useCirculoActividad';
 import { useGlobalSound } from '../context/SoundContext';
+import useMensajes from '../hooks/useMensajes';
 import LlamaRacha from './fx/LlamaRacha';
 import MascotaCompanera from './fx/MascotaCompanera';
 import { PildoraHoraFeliz, InsigniaX2, HoraFelizAviso } from './HoraFeliz';
@@ -34,6 +35,7 @@ const MapHUD = ({
     const { isAuthenticated, user } = useAuth();
     const gm = useGamificacion();
     const { soundEnabled, toggleSound } = useGlobalSound();
+    const { total: avisos, noLeidos } = useMensajes();
     const [menuOpen, setMenuOpen] = useState(false);
     const stackRef = useRef(null);
     const actividad = useCirculoActividad(isAuthenticated, user?.username, circlesActive);
@@ -60,6 +62,7 @@ const MapHUD = ({
     const menuItems = [
         { key: 'circ', label: 'Círculos de confianza', icon: HiUserGroup, onClick: run(abrirCirculos), active: circlesActive },
         { key: 'rutas', label: 'Ruta de bajo perfil', icon: HiArrowsRightLeft, onClick: run(onToggleRoutes), active: routesActive },
+        { key: 'msgs', label: 'Mensajes', icon: HiChatBubbleLeftRight, onClick: run(() => navigate('/chat')), dot: avisos > 0 },
         { key: 'rank', label: 'Ranking', icon: HiTrophy, onClick: run(() => navigate('/explorar?tab=ranking')) },
         { key: 'desc', label: 'Descubrir spots', icon: HiRocketLaunch, onClick: run(() => navigate('/explorar?tab=spots')) },
         { key: 'sep', separator: true },
@@ -155,10 +158,11 @@ const MapHUD = ({
                     aria-haspopup="menu"
                 >
                     {menuOpen ? <HiXMark size={22} aria-hidden="true" /> : <HiSquares2X2 size={22} aria-hidden="true" />}
+                    {!menuOpen && avisos > 0 && <i className="hud-chip__dot" aria-hidden="true" />}
                 </button>
                 {menuOpen && (
                     <div className="hud-menu" role="menu">
-                        {menuItems.map(({ key, label, icon, onClick, active, separator, role, checked }) => {
+                        {menuItems.map(({ key, label, icon, onClick, active, separator, role, checked, dot }) => {
                             if (separator) return <div key={key} className="hud-menu__sep" role="separator" />;
                             const Icon = icon;
                             return (
@@ -169,10 +173,11 @@ const MapHUD = ({
                                 aria-checked={checked}
                                 className={`hud-menu__item${active ? ' is-active' : ''}`}
                                 onClick={onClick}
-                                aria-label={label}
+                                aria-label={dot ? `${label}${noLeidos > 0 ? `, ${noLeidos} sin leer` : ', novedades'}` : label}
                             >
                                 <Icon size={20} aria-hidden="true" />
                                 <span>{label}</span>
+                                {dot && <i className="hud-menu__dot" aria-hidden="true" />}
                             </button>
                             );
                         })}

@@ -17,6 +17,8 @@ public interface SelloComunaRepository extends JpaRepository<SelloComuna, Long> 
 
     List<SelloComuna> findByUsuarioId(Long usuarioId);
 
+    long countByUsuarioId(Long usuarioId);
+
     /** 1 si el sello se otorgó ahora, 0 si el usuario ya lo tenía (atómico). */
     @Transactional
     @Modifying

@@ -1,9 +1,10 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiUser, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy, HiPlayCircle, HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
+import { HiUser, HiUsers, HiChatBubbleLeftRight, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy, HiPlayCircle, HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
+import useMensajes from '../hooks/useMensajes';
 import { useToast } from './WeedToast';
 import { createPortal } from 'react-dom';
 import { usePullToRefresh } from '../hooks/usePullToRefresh';
@@ -21,6 +22,7 @@ import { resolveItemImage, avatarPorGenero, RAREZAS, ORDEN_RAREZA, CATEGORIAS } 
 import './gamificacion.css';
 import './tienda.css';
 import './profile-page.css';
+import './social/social-usuarios.css';
 
 const UserProfile = lazy(() => import('./UserProfile'));
 
@@ -30,6 +32,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const g = useGamificacion();
     const { sounds, soundEnabled, toggleSound } = useGlobalSound();
     const toast = useToast();
+    const { noLeidos, solicitudes } = useMensajes();
 
     const [showProfile, setShowProfile] = useState(false);
     const [showAuth, setShowAuth] = useState(false);
@@ -299,6 +302,16 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                 {/* Accesos */}
                 <section aria-label="Accesos">
                     <div className="pf-accesos">
+                        <button type="button" className="profile-item" onClick={() => navigate('/amigos')}>
+                            <HiUsers size={20} aria-hidden="true" />
+                            <span>Mis amigos<small>{solicitudes > 0 ? `${solicitudes} ${solicitudes === 1 ? 'solicitud pendiente' : 'solicitudes pendientes'}` : 'Agrega gente y revisa solicitudes'}</small></span>
+                            {solicitudes > 0 && <b className="su-badge pf-badge" aria-hidden="true">{solicitudes > 9 ? '9+' : solicitudes}</b>}
+                        </button>
+                        <button type="button" className="profile-item" onClick={() => navigate('/chat')}>
+                            <HiChatBubbleLeftRight size={20} aria-hidden="true" />
+                            <span>Mensajes<small>{noLeidos > 0 ? `${noLeidos} sin leer` : 'Chatea con tus amigos'}</small></span>
+                            {noLeidos > 0 && <b className="su-badge pf-badge" aria-hidden="true">{noLeidos > 9 ? '9+' : noLeidos}</b>}
+                        </button>
                         <button type="button" className="profile-item profile-item--primary" onClick={() => setShowProfile(true)}>
                             <HiUser size={20} aria-hidden="true" />
                             <span>Mi cuenta<small>Favoritos, notificaciones y ajustes</small></span>

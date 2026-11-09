@@ -29,6 +29,9 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
 
     long countByComuna(String comuna);
 
+    /** Spots descubiertos (creados) por un usuario. */
+    long countByCreadorId(Long creadorId);
+
     /** [comuna, total de spots] por comuna (una sola consulta). */
     @Query("SELECT s.comuna, COUNT(s) FROM Spot s WHERE s.comuna IS NOT NULL GROUP BY s.comuna")
     List<Object[]> contarPorComuna();

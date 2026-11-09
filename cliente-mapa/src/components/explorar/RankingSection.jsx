@@ -7,6 +7,8 @@ import { getLeaderboard } from '../../services/gamificacionApi';
 import CharacterAvatar from '../CharacterAvatar';
 import AuthModal from '../AuthModal';
 import ComunasRanking from './ComunasRanking';
+import UsuarioLink from '../social/UsuarioLink';
+import '../social/social-usuarios.css';
 
 const pctXp = (u) => {
     const base = u.xpNivelActual ?? 0;
@@ -59,7 +61,7 @@ const Podio = ({ top, yoId, g }) => {
                             {pos === 1 && <HiTrophy className="ex-pod-crown" size={22} aria-hidden="true" />}
                             <AvatarUsuario u={u} size={pos === 1 ? 76 : 62} esYo={esYo} g={g} />
                         </div>
-                        <strong className="ex-pod-name">{u.username}{esYo ? ' (tú)' : ''}</strong>
+                        <strong className="ex-pod-name"><UsuarioLink id={u.usuarioId} username={u.username} className="su-cover">{u.username}{esYo ? ' (tú)' : ''}</UsuarioLink></strong>
                         <span className="ex-pod-lvl">Nv. {u.nivel ?? 1} · {u.tituloRango || 'Novato'}</span>
                         <span className="gm-chip ex-pod-xp">{u.puntos ?? 0} XP</span>
                     </li>
@@ -141,7 +143,7 @@ const RankingPersonas = () => {
                                 <span className="ex-rank-pos" aria-label={`Puesto ${i + 4}`}>{i + 4}</span>
                                 <AvatarUsuario u={u} size={40} esYo={esYo} g={g} />
                                 <div className="ex-rank-info">
-                                    <strong>{u.username}{esYo ? ' (tú)' : ''}</strong>
+                                    <strong><UsuarioLink id={u.usuarioId} username={u.username} className="su-cover">{u.username}{esYo ? ' (tú)' : ''}</UsuarioLink></strong>
                                     <span>Nv. {u.nivel ?? 1} · {u.tituloRango || 'Novato'}</span>
                                     <div className="gm-bar gm-bar--thin" aria-hidden="true"><span style={{ width: `${pctXp(u)}%` }} /></div>
                                 </div>

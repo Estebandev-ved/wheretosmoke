@@ -1,3 +1,5 @@
+import UsuarioLink from './social/UsuarioLink';
+import './social/social-usuarios.css';
 import { API_BASE, WS_URL } from '../config';
 import { useState, useEffect, useRef, useCallback } from 'react';
 import axios from 'axios';
@@ -408,7 +410,7 @@ export default function TrustCircles({ userLocation, onCircleMembersUpdate, onCl
                                         {miembros.map((m) => (
                                             <li key={m.usuarioId}>
                                                 <span className={`tc-avatar${m.compartiendoUbicacion ? ' is-live' : ''}`}><img src={MASCOTA} alt="" /></span>
-                                                <span className="tc-members__name">{m.username}{m.username === user?.username && ' (tú)'}</span>
+                                                <span className="tc-members__name"><UsuarioLink id={m.usuarioId} username={m.username}>{m.username}</UsuarioLink>{m.username === user?.username && ' (tú)'}</span>
                                                 {m.compartiendoUbicacion && (
                                                     <span className="tc-live"><HiMapPin size={13} aria-hidden="true" /> Compartiendo</span>
                                                 )}

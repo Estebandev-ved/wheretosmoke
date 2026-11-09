@@ -46,6 +46,27 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     private final UsuarioRepository usuarioRepository;
 
     private static final Pattern TOPIC_CIRCULO = Pattern.compile("^/topic/circulo/([^/]+)(/.*)?$");
+    /** Única forma permitida de pedir colas privadas: /user/queue/<nombre>, resuelta al propio usuario de la sesión. */
+    private static final Pattern COLA_USUARIO = Pattern.compile("^/user/queue/[A-Za-z0-9_.-]+$");
+
+    /**
+     * Principal STOMP autenticado. Su nombre es el ID del usuario (no el username): los destinos de usuario
+     * (/user/queue/...) se resuelven por getName(), y un id numérico nunca trae caracteres que rompan el destino.
+     * El servidor envía a convertAndSendToUser(String.valueOf(usuarioId), ...).
+     */
+    static final class PrincipalUsuario extends UsernamePasswordAuthenticationToken {
+        private static final long serialVersionUID = 1L;
+
+        PrincipalUsuario(UserDetails user) {
+            super(user, null, user.getAuthorities());
+        }
+
+        @Override
+        public String getName() {
+            return getPrincipal() instanceof Usuario u && u.getId() != null ? String.valueOf(u.getId())
+                    : super.getName();
+        }
+    }
 
     @Value("${app.cors.allowed-origins}")
     private List<String> allowedOrigins;
@@ -91,6 +112,31 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     }
 
     /**
+     * Mensajería privada: las colas son por usuario por diseño. El cliente solo puede pedir
+     * /user/queue/<nombre> (Spring la resuelve a SU sesión). Se bloquea suscribirse directo a /queue/**
+     * (el nombre interno incluye el id de sesión de otro usuario) y cualquier otro /user/**.
+     */
+    private void validarDestinoSuscripcion(String destino) {
+        if (destino == null) {
+            return;
+        }
+        if (destino.startsWith("/queue") || (destino.startsWith("/user") && !COLA_USUARIO.matcher(destino).matches())) {
+            throw new MessagingException("Destino no permitido");
+        }
+    }
+
+    /**
+     * Los clientes solo pueden enviar a /app/**. Sin esto, un SEND a /user/<id>/queue/... sería entregado
+     * por Spring a esa persona (suplantación de mensajes y eventos de lectura), y un SEND a /topic o /queue
+     * se retransmitiría directo por el broker.
+     */
+    private void validarDestinoEnvio(String destino) {
+        if (destino == null || !destino.startsWith("/app/")) {
+            throw new MessagingException("Destino de envío no permitido");
+        }
+    }
+
+    /**
      * 🔌 Configurar el broker de mensajes
      * 
      * /topic = Para mensajes broadcast (a todos)
@@ -101,6 +147,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     public void configureMessageBroker(MessageBrokerRegistry config) {
         // Habilitar broker para /topic (broadcast) y /queue (mensajes privados)
         config.enableSimpleBroker("/topic", "/queue");
+
+        // Colas por usuario: el cliente se suscribe a /user/queue/mensajes y el servidor publica con
+        // convertAndSendToUser(<id>, "/queue/mensajes", ...). Spring lo traduce a la sesión de ese usuario.
+        config.setUserDestinationPrefix("/user");
 
         // Prefijo para mensajes del cliente al servidor
         config.setApplicationDestinationPrefixes("/app");
@@ -146,8 +196,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         if (!jwtService.isTokenValid(jwt, user)) {
                             throw new MessagingException("Token JWT inválido");
                         }
-                        accessor.setUser(new UsernamePasswordAuthenticationToken(
-                                user, null, user.getAuthorities()));
+                        accessor.setUser(new PrincipalUsuario(user));
                     } catch (MessagingException e) {
                         throw e;
                     } catch (Exception e) {
@@ -157,7 +206,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                         && !StompCommand.DISCONNECT.equals(accessor.getCommand())) {
                     throw new MessagingException("No autenticado");
                 } else if (StompCommand.SUBSCRIBE.equals(accessor.getCommand())) {
+                    validarDestinoSuscripcion(accessor.getDestination());
                     validarSuscripcion(accessor.getDestination(), accessor.getUser());
+                } else if (StompCommand.SEND.equals(accessor.getCommand())) {
+                    validarDestinoEnvio(accessor.getDestination());
                 }
                 return message;
             }

@@ -2,6 +2,8 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { HiArrowPath, HiUsers, HiMapPin } from 'react-icons/hi2';
 import { getRankingComunas } from '../../services/socialApi';
 import CharacterAvatar from '../CharacterAvatar';
+import UsuarioLink from '../social/UsuarioLink';
+import '../social/social-usuarios.css';
 
 const Esqueleto = () => (
     <div className="ex-loading" aria-busy="true" aria-label="Cargando comunas">
@@ -83,7 +85,7 @@ const ComunasRanking = () => {
                                 {top.map((u) => (
                                     <li key={u.usuarioId}>
                                         <CharacterAvatar size={28} alt="" />
-                                        <span className="ex-terr-user">@{u.username}</span>
+                                        <span className="ex-terr-user"><UsuarioLink id={u.usuarioId} username={u.username} className="su-cover">@{u.username}</UsuarioLink></span>
                                         <small>{u.puntos} XP</small>
                                     </li>
                                 ))}

@@ -14,6 +14,12 @@ public interface InventarioUsuarioRepository extends JpaRepository<InventarioUsu
 
     List<InventarioUsuario> findByUsuarioId(Long usuarioId);
 
+    /** Artículos equipados de varios usuarios en una sola consulta (listas sociales sin N+1). */
+    @org.springframework.data.jpa.repository.Query("SELECT i FROM InventarioUsuario i JOIN FETCH i.articulo "
+            + "WHERE i.usuarioId IN :ids AND i.equipado = true")
+    List<InventarioUsuario> findEquipadosDe(
+            @org.springframework.data.repository.query.Param("ids") java.util.Collection<Long> ids);
+
     Optional<InventarioUsuario> findByUsuarioIdAndArticuloId(Long usuarioId, Long articuloId);
 
     boolean existsByUsuarioIdAndArticuloId(Long usuarioId, Long articuloId);

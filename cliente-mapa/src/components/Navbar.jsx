@@ -30,6 +30,9 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
         { path: '/perfil', label: 'Perfil', icon: HiUser },
     ];
 
+    // Dentro de una conversación la barra de entrada ocupa el lugar de la navegación
+    if (/^\/chat\/[^/]+/.test(location.pathname)) return null;
+
     return (
         <nav className={`navbar-bottom ${darkMode ? '' : 'light'}`}>
             {tabs.map((tab, index) => {
