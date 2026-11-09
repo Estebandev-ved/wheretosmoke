@@ -42,6 +42,11 @@ self.addEventListener('fetch', (event) => {
     // Solo cachear GET requests
     if (event.request.method !== 'GET') return;
 
+    // Ignorar esquemas que la Cache API no soporta (chrome-extension://, moz-extension://, etc.)
+    // Las pone el navegador/extensiones; si se intentan cachear lanzan TypeError en consola.
+    const url = new URL(event.request.url);
+    if (url.protocol !== 'http:' && url.protocol !== 'https:') return;
+
     event.respondWith(
         fetch(event.request)
             .then((response) => {
