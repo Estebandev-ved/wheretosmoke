@@ -47,3 +47,13 @@ export const getMensajes = (usuarioId, { antes, limite = 30 } = {}) =>
 export const enviarMensaje = (usuarioId, texto) => post(`/mensajes/${usuarioId}`, { texto });
 export const marcarLeido = (usuarioId) => post(`/mensajes/${usuarioId}/leido`);
 export const getNoLeidos = () => get('/mensajes/no-leidos');
+
+// Personas: sugerencias, descubrir, actividad y privacidad
+const put = (url, body) => axios.put(`${API_BASE}${url}`, body ?? {}, { headers: headers() }).then((r) => r.data);
+export const getSugeridas = ({ pagina = 0, limite = 10 } = {}) => get('/personas/sugeridas', { pagina, limite });
+export const descubrirPersonas = ({ q, comuna, orden = 'activos', pagina = 0, limite = 12 } = {}) =>
+    get('/personas/descubrir', { q: q || undefined, comuna: comuna || undefined, orden, pagina, limite });
+export const getAmigosEnComun = (id) => get(`/usuarios/${id}/amigos-en-comun`);
+export const getActividadAmigos = (limite = 8) => get('/amigos/actividad', { limite });
+export const getPrivacidad = () => get('/usuarios/me/privacidad');
+export const guardarPrivacidad = (p) => put('/usuarios/me/privacidad', p);

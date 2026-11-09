@@ -77,7 +77,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/push/broadcast").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/spots/**").hasRole("ADMIN")
                         // 👥 Capa social (perfil público, amigos, bloqueos, mensajes privados): solo con sesión
-                        .requestMatchers("/api/usuarios/**", "/api/amigos/**", "/api/mensajes/**").authenticated()
+                        .requestMatchers("/api/usuarios/**", "/api/amigos/**", "/api/mensajes/**",
+                                "/api/personas/**").authenticated()
                         // 🔒 Todo lo demás requiere sesión iniciada
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session

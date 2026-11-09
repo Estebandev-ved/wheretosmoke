@@ -14,7 +14,7 @@
 .ex-title h1 { font-size: 24px; }
 
 /* Control segmentado */
-.ex-tabs { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; padding: 4px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--border-subtle); }
+.ex-tabs { display: grid; grid-template-columns: repeat(var(--ex-tabs, 3), 1fr); gap: 4px; padding: 4px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--border-subtle); }
 .ex-tab {
     display: inline-flex; align-items: center; justify-content: center; gap: 6px;
     min-height: 44px; border: 0; border-radius: calc(var(--r-md) - 4px);
@@ -173,6 +173,7 @@
     .ex-spot--carousel { width: 216px; }
     .ex-skel-card { width: 216px; }
     .ex-pod-lvl { white-space: normal; }
+    .ex-tab { font-size: 13px; gap: 4px; padding: 0 2px; }
 }
 @media (prefers-reduced-motion: reduce) {
     .ex-panel, .ex-sheet, .ex-sheet-wrap, .ex-pop, .ex-burst { animation: none !important; }

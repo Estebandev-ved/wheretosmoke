@@ -3,6 +3,7 @@ import { HiXMark, HiStar, HiArrowTopRightOnSquare, HiArrowsRightLeft, HiChatBubb
 import VoteButtons from './VoteButtons';
 import './social.css';
 import './map-hud.css';
+import UsuarioLink from './social/UsuarioLink';
 
 const CATEGORIAS = {
     PARQUE: 'Parque público',
@@ -56,7 +57,7 @@ const SpotCard = ({ spotDTO, distanciaM, onClose, onVote, onDetail, onChat, onRo
             {(spot.comuna || spot.descubridorNombre) && (
                 <div className="spot-card__social">
                     {spot.comuna && <span className="spot-card__comuna">{spot.comuna}</span>}
-                    {spot.descubridorNombre && <span className="spot-card__desc">🏆 Descubierto por @{spot.descubridorNombre}</span>}
+                    {spot.descubridorNombre && <span className="spot-card__desc">🏆 Descubierto por <UsuarioLink id={spot.creadorId} username={spot.descubridorNombre}>@{spot.descubridorNombre}</UsuarioLink></span>}
                 </div>
             )}
 

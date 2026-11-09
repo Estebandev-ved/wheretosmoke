@@ -154,3 +154,17 @@ mostraba como 403 porque `/error` exigía login.
 - Chat: burbujas con agrupación por día/remitente, "Ver mensajes anteriores" sin saltos de scroll, UI optimista con reintento/descartar, "Visto", aviso "mensaje nuevo" si estás leyendo más arriba, textarea autoajustable con contador y Enter para enviar. El texto siempre se pinta como texto.
 - Pendiente: Feed y SpotCard no traen id de usuario (`FotoDTO`, `ComentarioFotoDTO`, `descubridorNombre` solo llevan el nombre), así que esos nombres aún no enlazan.
 - Usuarios de prueba creados en local: `social_test_a` / `social_test_b` (@example.com).
+
+## 2026-11-08 · Backend: gente que quizás conozcas, privacidad y actividad de amigos
+- Endpoints (todos autenticados, errores `{"error":...}`): `GET /api/personas/sugeridas`, `GET /api/personas/descubrir`, `GET /api/usuarios/{id}/amigos-en-comun`, `GET|PUT /api/usuarios/me/privacidad`, `GET /api/amigos/actividad`. `amigosEnComun` añadido a `/api/usuarios/{id}/perfil` y `/api/usuarios/buscar`.
+- Puntaje explicable (`PersonasService`): amigo en común 10 (tope 8), círculo compartido 8 (tope 3), comuna con visitas en 30 d 4 (tope 3), nivel ±3 → 2, activo 7 d → 1, nuevo 14 d → 1; desempate por id. Si faltan candidatos con señal se rellena con los 60 más activos y 30 más nuevos. ~13 consultas por página, todas en lote (`PersonasRepository` nativas + JPQL `personasActivas|Nuevas|PorNivel` en `UsuarioRepository`).
+- Privacidad: columnas `usuarios.visible_en_sugerencias` (default 1) y `acepta_solicitudes` (default 'TODOS') con `columnDefinition` para filas existentes y lectores tolerantes a null. `AmistadService.enviarSolicitud` responde 403 con mensaje si el destino es NADIE o AMIGOS_DE_AMIGOS sin amigos en común (aceptar una solicitud entrante no se ve afectado).
+- Actividad de amigos: spots creados (fecha = primera visita del creador, `Spot` no guarda fecha de creación), sellos de comuna y fotos (sin cargar `image_data`); sin ubicación.
+- Tests: `PersonasServiceTest` (Mockito). Sin verificar: las consultas nativas contra MySQL real (el contexto sí arranca y valida las JPQL).
+
+## 2026-11-08 · Cliente: red social ampliada (Personas, sugerencias, privacidad)
+- Explorar tiene pestaña **Personas** (`?tab=personas`): "Actividad de tus amigos", carrusel "Gente que quizás conozcas" (razones, amigos en común en hoja, Conectar optimista con Cancelar, ✕ descarta y se guarda en localStorage `wts_personas_descartadas`) y "Descubrir personas" (búsqueda con debounce, orden Activos/Nuevos/Nivel, comuna, scroll infinito con IntersectionObserver). Invitado: invitación a iniciar sesión.
+- Reutilizable en `components/social/personas/`: `usePersonas` (paginación, 404 = lista vacía), `TarjetaPersona`, `CarruselSugeridas` (también en /amigos y "Más personas" al final del perfil de un amigo), `ListaPersonas`, `AmigosEnComunSheet`, `ActividadAmigos`, `PrivacidadSheet`.
+- `BotonAmistadRapido` ahora es optimista (revierte y muestra el mensaje del backend, p. ej. 403), con Cancelar, háptica suave y micro-animación; el perfil público muestra "N amigos en común" (acepta número o lista) y vibra al enviar/aceptar.
+- Perfil → "Privacidad social": interruptor de sugerencias y quién puede enviar solicitudes, guardado inmediato con revertido si falla.
+- Verificado en navegador contra un mock local de los endpoints nuevos (backend aún devolvía 404). Sin verificar contra el backend real.

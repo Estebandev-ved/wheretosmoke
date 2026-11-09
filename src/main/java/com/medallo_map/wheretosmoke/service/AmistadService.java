@@ -110,6 +110,7 @@ public class AmistadService {
             return new SolicitudResultado(confirmar(existente, yo).getId(), "AMIGOS");
         }
 
+        verificarPrivacidad(yo, destino);
         if (amistadRepository.contarAmigos(yo, EstadoAmistad.ACEPTADA) >= MAX_AMIGOS) {
             throw new NegocioException(HttpStatus.CONFLICT, "Alcanzaste el límite de " + MAX_AMIGOS + " amigos");
         }
@@ -121,6 +122,23 @@ public class AmistadService {
                 .usuarioMenor(menor).usuarioMayor(mayor).solicitanteId(yo)
                 .estado(EstadoAmistad.PENDIENTE).fechaSolicitud(LocalDateTime.now(clock)).build());
         return new SolicitudResultado(nueva.getId(), "ENVIADA");
+    }
+
+    /** Respeta "quién puede enviarme solicitudes" del destinatario (TODOS | AMIGOS_DE_AMIGOS | NADIE). */
+    private void verificarPrivacidad(Long yo, Usuario destino) {
+        String modo = destino.modoSolicitudes();
+        if ("NADIE".equals(modo)) {
+            throw new NegocioException(HttpStatus.FORBIDDEN, "Esta persona no acepta solicitudes de amistad");
+        }
+        if ("AMIGOS_DE_AMIGOS".equals(modo)) {
+            Set<Long> mios = idsAmigos(yo);
+            boolean enComun = !mios.isEmpty() && amistadRepository.findRelacionesCon(destino.getId(), mios).stream()
+                    .anyMatch(a -> a.getEstado() == EstadoAmistad.ACEPTADA);
+            if (!enComun) {
+                throw new NegocioException(HttpStatus.FORBIDDEN,
+                        "Esta persona solo acepta solicitudes de amigos de sus amigos");
+            }
+        }
     }
 
     @Transactional

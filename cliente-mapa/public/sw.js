@@ -72,7 +72,7 @@ self.addEventListener('fetch', (event) => {
 // 📲 PUSH NOTIFICATIONS (preparado para futuras notificaciones)
 self.addEventListener('push', (event) => {
     const data = event.data ? event.data.json() : {};
-    const title = data.title || '🚨 Alerta WhereToSmoke';
+    const title = data.title || '🚨 Alerta Peguelo';
     const options = {
         body: data.body || 'Nueva alerta en tu zona',
         icon: '/icon-192.png',

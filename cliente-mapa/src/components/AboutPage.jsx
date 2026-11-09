@@ -125,9 +125,9 @@ const AboutPage = ({ darkMode = false }) => {
             {/* ═══ HERO ═══ */}
             <div className="about-hero">
                 <div className="about-hero-logo">
-                    <img src="/icons/relax_marker.png" alt="WhereToSmoke Logo" />
+                    <img src="/icons/relax_marker.png" alt="Peguelo Logo" />
                 </div>
-                <h1 className="about-hero-title">WhereToSmoke</h1>
+                <h1 className="about-hero-title">Peguelo</h1>
                 <p className="about-hero-subtitle">
                     La comunidad de Medellín para encontrar y compartir los mejores spots, con alertas en tiempo real y mucho más.
                 </p>
@@ -239,7 +239,7 @@ const AboutPage = ({ darkMode = false }) => {
                     Hecho con <HiHeart size={12} style={{ verticalAlign: 'middle', color: '#F44336' }} /> en <span className="about-footer-brand">Medellín</span>
                 </p>
                 <p className="about-footer-text" style={{ marginTop: '6px' }}>
-                    WhereToSmoke v1.0 &copy; 2026
+                    Peguelo v1.0 &copy; 2026
                 </p>
             </div>
         </div>

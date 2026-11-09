@@ -13,7 +13,7 @@ import org.springframework.web.method.annotation.MethodArgumentTypeMismatchExcep
 import com.medallo_map.wheretosmoke.exception.NegocioException;
 
 /** Errores {"error": "mensaje"} para perfil público, amigos, bloqueos y mensajes privados. */
-@RestControllerAdvice(assignableTypes = { SocialController.class })
+@RestControllerAdvice(assignableTypes = { SocialController.class, PersonasController.class })
 public class SocialExceptionHandler {
 
     @ExceptionHandler(NegocioException.class)

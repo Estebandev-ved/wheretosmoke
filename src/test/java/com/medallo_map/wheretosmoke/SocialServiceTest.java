@@ -92,7 +92,8 @@ class SocialServiceTest {
         resumen = new UsuarioResumenService(usuarios, inventario);
         amistadService = new AmistadService(amistades, bloqueos, usuarios, mensajes, resumen, RELOJ);
         bloqueoService = new BloqueoService(bloqueos, amistades, usuarios, resumen, RELOJ);
-        perfilService = new PerfilPublicoService(usuarios, amistades, bloqueos, spots, sellos, resumen, RELOJ);
+        perfilService = new PerfilPublicoService(usuarios, amistades, bloqueos, spots, sellos, resumen,
+                mock(com.medallo_map.wheretosmoke.repository.PersonasRepository.class), RELOJ);
 
         for (long id : new long[] { YO, ANA, LUIS }) {
             when(usuarios.findById(id)).thenReturn(Optional.of(usuario(id)));

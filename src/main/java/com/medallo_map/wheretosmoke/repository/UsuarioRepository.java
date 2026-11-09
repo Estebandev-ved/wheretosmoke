@@ -53,6 +53,42 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     java.util.List<Usuario> buscarPorNombre(@Param("yo") Long yo, @Param("contiene") String contiene,
             @Param("prefijo") String prefijo, org.springframework.data.domain.Pageable pageable);
 
+    /**
+     * Filtro común de /api/personas: activos, visibles, sin bloqueo en ningún sentido, sin amigos ya aceptados.
+     * {@code :contiene} es un patrón LIKE en minúsculas con '!' como escape ("%" si no hay texto) y
+     * {@code :comuna} es "" si no se filtra por comuna.
+     */
+    String FILTRO_PERSONAS = "FROM Usuario u WHERE u.id <> :yo AND u.activo = true "
+            + "AND (u.visibleEnSugerencias IS NULL OR u.visibleEnSugerencias = true) "
+            + "AND LOWER(u.username) LIKE :contiene ESCAPE '!' "
+            + "AND (:comuna = '' OR u.id IN (SELECT v.usuarioId FROM VisitaSpot v, Spot sp "
+            + "WHERE sp.id = v.spotId AND sp.comuna = :comuna)) "
+            + "AND u.id NOT IN (SELECT b.bloqueadoId FROM Bloqueo b WHERE b.bloqueadorId = :yo) "
+            + "AND u.id NOT IN (SELECT b2.bloqueadorId FROM Bloqueo b2 WHERE b2.bloqueadoId = :yo) "
+            + "AND u.id NOT IN (SELECT a.usuarioMayor FROM Amistad a WHERE a.usuarioMenor = :yo "
+            + "AND a.estado = com.medallo_map.wheretosmoke.model.EstadoAmistad.ACEPTADA) "
+            + "AND u.id NOT IN (SELECT a2.usuarioMenor FROM Amistad a2 WHERE a2.usuarioMayor = :yo "
+            + "AND a2.estado = com.medallo_map.wheretosmoke.model.EstadoAmistad.ACEPTADA) ";
+
+    @Query("SELECT u " + FILTRO_PERSONAS + "ORDER BY u.lastLogin DESC, u.id DESC")
+    org.springframework.data.domain.Slice<Usuario> personasActivas(@Param("yo") Long yo,
+            @Param("contiene") String contiene, @Param("comuna") String comuna,
+            org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT u " + FILTRO_PERSONAS + "ORDER BY u.createdAt DESC, u.id DESC")
+    org.springframework.data.domain.Slice<Usuario> personasNuevas(@Param("yo") Long yo,
+            @Param("contiene") String contiene, @Param("comuna") String comuna,
+            org.springframework.data.domain.Pageable pageable);
+
+    @Query("SELECT u " + FILTRO_PERSONAS + "ORDER BY u.puntos DESC, u.id DESC")
+    org.springframework.data.domain.Slice<Usuario> personasPorNivel(@Param("yo") Long yo,
+            @Param("contiene") String contiene, @Param("comuna") String comuna,
+            org.springframework.data.domain.Pageable pageable);
+
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query("UPDATE Usuario u SET u.visibleEnSugerencias = :visible, u.aceptaSolicitudes = :modo WHERE u.id = :id")
+    int actualizarPrivacidad(@Param("id") Long id, @Param("visible") boolean visible, @Param("modo") String modo);
+
     // ── Gamificación: operaciones atómicas (nunca read-modify-write en Java) ──
 
     /** Carga el usuario con bloqueo de escritura (serializa equipar/desequipar). */

@@ -32,7 +32,7 @@ public class PushNotificationService {
         suscripciones.computeIfAbsent(usuarioId, k -> new ArrayList<>()).add(subscription);
 
         // Enviar notificación de bienvenida
-        enviarNotificacion(usuarioId, "¡Bienvenido a WhereToSmoke!", "Recibirás alertas de tombos y spots cercanos.");
+        enviarNotificacion(usuarioId, "¡Bienvenido a Peguelo!", "Recibirás alertas de tombos y spots cercanos.");
     }
 
     /**

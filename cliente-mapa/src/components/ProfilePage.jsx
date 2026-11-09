@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiUser, HiUsers, HiChatBubbleLeftRight, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy, HiPlayCircle, HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
+import { HiUser, HiUsers, HiChatBubbleLeftRight, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy, HiPlayCircle, HiSpeakerWave, HiSpeakerXMark, HiShieldCheck } from 'react-icons/hi2';
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
@@ -25,6 +25,7 @@ import './profile-page.css';
 import './social/social-usuarios.css';
 
 const UserProfile = lazy(() => import('./UserProfile'));
+const PrivacidadSheet = lazy(() => import('./social/personas/PrivacidadSheet'));
 
 const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const navigate = useNavigate();
@@ -35,6 +36,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const { noLeidos, solicitudes } = useMensajes();
 
     const [showProfile, setShowProfile] = useState(false);
+    const [showPrivacidad, setShowPrivacidad] = useState(false);
     const [showAuth, setShowAuth] = useState(false);
     const [badges, setBadges] = useState([]);
     const [catActiva, setCatActiva] = useState('SKIN');
@@ -96,7 +98,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
             </button>
             <button type="button" className="profile-item" onClick={() => navigate('/nosotros')}>
                 <HiInformationCircle size={20} aria-hidden="true" />
-                <span>Quiénes somos<small>Sobre WhereToSmoke</small></span>
+                <span>Quiénes somos<small>Sobre Peguelo</small></span>
             </button>
         </div>
     );
@@ -312,6 +314,10 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                             <span>Mensajes<small>{noLeidos > 0 ? `${noLeidos} sin leer` : 'Chatea con tus amigos'}</small></span>
                             {noLeidos > 0 && <b className="su-badge pf-badge" aria-hidden="true">{noLeidos > 9 ? '9+' : noLeidos}</b>}
                         </button>
+                        <button type="button" className="profile-item" onClick={() => setShowPrivacidad(true)} aria-haspopup="dialog">
+                            <HiShieldCheck size={20} aria-hidden="true" />
+                            <span>Privacidad social<small>Sugerencias y quién te envía solicitudes</small></span>
+                        </button>
                         <button type="button" className="profile-item profile-item--primary" onClick={() => setShowProfile(true)}>
                             <HiUser size={20} aria-hidden="true" />
                             <span>Mi cuenta<small>Favoritos, notificaciones y ajustes</small></span>
@@ -324,6 +330,9 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                 </section>
             </div>
 
+            {showPrivacidad && (
+                <Suspense fallback={null}><PrivacidadSheet onClose={() => setShowPrivacidad(false)} /></Suspense>
+            )}
             {showProfile && (
                 <Suspense fallback={null}>
                     <UserProfile darkMode={darkMode} isOpen={showProfile} onClose={() => setShowProfile(false)} />

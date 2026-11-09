@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import axios from 'axios';
 import { HiArrowPath, HiStar, HiMapPin, HiSparkles, HiShieldExclamation, HiFire } from 'react-icons/hi2';
 import { API_BASE } from '../../config';
+import UsuarioLink from '../social/UsuarioLink';
 
 const SpotDetailModal = lazy(() => import('../SpotDetailModal'));
 
@@ -62,7 +63,7 @@ const SpotCardEx = ({ spot, ubicacion, onOpen, compacta }) => {
                     {dist && <span className="ex-dist"><HiMapPin size={12} aria-hidden="true" />{dist}</span>}
                 </div>
                 {spot.descubridorNombre && (
-                    <span className="ex-desc">🏆 Descubierto por @{spot.descubridorNombre}</span>
+                    <span className="ex-desc">🏆 Descubierto por <UsuarioLink id={spot.creadorId} username={spot.descubridorNombre}>@{spot.descubridorNombre}</UsuarioLink></span>
                 )}
                 <div className="ex-spot-stats">
                     <span className="ex-rating" title="Calificación promedio">

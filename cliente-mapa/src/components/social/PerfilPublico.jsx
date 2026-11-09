@@ -3,11 +3,14 @@ import { createPortal } from 'react-dom';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 import {
     HiArrowLeft, HiArrowPath, HiEllipsisVertical, HiUserPlus, HiChatBubbleLeftEllipsis,
-    HiCheckBadge, HiClock, HiNoSymbol, HiUserMinus, HiXMark, HiCheck, HiMapPin,
+    HiCheckBadge, HiClock, HiNoSymbol, HiUserMinus, HiXMark, HiCheck, HiMapPin, HiUsers,
 } from 'react-icons/hi2';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../WeedToast';
 import useMensajes from '../../hooks/useMensajes';
+import useHaptics from '../../hooks/useHaptics';
+import CarruselSugeridas from './personas/CarruselSugeridas';
+import AmigosEnComunSheet from './personas/AmigosEnComunSheet';
 import AuthModal from '../AuthModal';
 import LlamaRacha from '../fx/LlamaRacha';
 import AvatarUsuario from './AvatarUsuario';
@@ -20,6 +23,7 @@ import { mesAnio } from '../../utils/social';
 import '../gamificacion.css';
 import '../profile-page.css';
 import './social-usuarios.css';
+import './personas/personas.css';
 
 const Estado = ({ img, titulo, texto, children, alerta }) => (
     <div className="gm-card gm-state" role={alerta ? 'alert' : undefined}>
@@ -44,6 +48,7 @@ const PerfilCargado = ({ id }) => {
     const { isAuthenticated, loading: authCargando } = useAuth();
     const toast = useToast();
     const { refrescar } = useMensajes();
+    const h = useHaptics();
 
     const [perfil, setPerfil] = useState(null);
     const [fallo, setFallo] = useState(null); // {codigo, mensaje}
@@ -51,6 +56,7 @@ const PerfilCargado = ({ id }) => {
     const [menuAbierto, setMenuAbierto] = useState(false);
     const [confirmar, setConfirmar] = useState(null); // 'eliminar' | 'bloquear'
     const [showAuth, setShowAuth] = useState(false);
+    const [verComun, setVerComun] = useState(false);
     const menuRef = useRef(null);
 
     const cargar = useCallback(async () => {
@@ -92,7 +98,7 @@ const PerfilCargado = ({ id }) => {
         setOcupado(true);
         try {
             await accion();
-            if (okMsg) toast.success(okMsg);
+            if (okMsg) { toast.success(okMsg); h.exito(); }
             await cargar();
             refrescar();
         } catch (e) {
@@ -157,6 +163,7 @@ const PerfilCargado = ({ id }) => {
 
     const est = perfil.estadoAmistad;
     const bloqueadoPorMi = !!perfil.bloqueadoPorMi;
+    const comunes = Array.isArray(perfil.amigosEnComun) ? perfil.amigosEnComun.length : Number(perfil.amigosEnComun) || 0;
     const stats = [
         { v: (perfil.puntos ?? 0).toLocaleString('es-CO'), l: 'XP' },
         { v: perfil.spotsDescubiertos ?? 0, l: 'Spots descubiertos' },
@@ -285,15 +292,24 @@ const PerfilCargado = ({ id }) => {
                     </ul>
                 </section>
 
-                <section className="gm-card pu-acciones" aria-label="Acciones" aria-live="polite">
+                {comunes > 0 && (
+                    <button type="button" className="gm-btn pe-comun-perfil" onClick={() => setVerComun(true)} aria-haspopup="dialog" aria-label={`${comunes} ${comunes === 1 ? 'amigo' : 'amigos'} en común con ${perfil.username}. Ver lista`}>
+                        <HiUsers size={16} aria-hidden="true" /> {comunes} {comunes === 1 ? 'amigo' : 'amigos'} en común
+                    </button>
+                )}
+
+                <section key={est} className="gm-card pu-acciones pu-acciones--pop" aria-label="Acciones" aria-live="polite">
                     {acciones}
                 </section>
 
                 {(perfil.spotsDescubiertos ?? 0) > 0 && (
                     <p className="pu-pie"><HiMapPin size={14} aria-hidden="true" /> {perfil.username} ha descubierto {perfil.spotsDescubiertos} {perfil.spotsDescubiertos === 1 ? 'spot' : 'spots'} para la comunidad.</p>
                 )}
+
+                {est === 'AMIGOS' && <CarruselSugeridas titulo="Más personas" compacta limite={8} />}
             </div>
 
+            {verComun && <AmigosEnComunSheet usuarioId={perfil.id} nombre={perfil.username} onClose={() => setVerComun(false)} />}
             {confirmar === 'eliminar' && (
                 <ConfirmSheet
                     titulo="Eliminar amigo"

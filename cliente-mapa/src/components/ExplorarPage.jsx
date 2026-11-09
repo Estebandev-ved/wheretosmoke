@@ -1,6 +1,6 @@
 import React, { lazy, Suspense, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { HiMapPin, HiPhoto, HiTrophy } from 'react-icons/hi2';
+import { HiMapPin, HiPhoto, HiTrophy, HiUsers } from 'react-icons/hi2';
 import AccesosSociales from './social/AccesosSociales';
 import './gamificacion.css';
 import './explorar.css';
@@ -8,16 +8,19 @@ import './explorar.css';
 const SpotsSection = lazy(() => import('./explorar/SpotsSection'));
 const FeedSection = lazy(() => import('./explorar/FeedSection'));
 const RankingSection = lazy(() => import('./explorar/RankingSection'));
+const PersonasSection = lazy(() => import('./explorar/PersonasSection'));
 
 const SECCIONES = [
     { key: 'spots', label: 'Spots', icon: HiMapPin, Comp: SpotsSection },
     { key: 'feed', label: 'Feed', icon: HiPhoto, Comp: FeedSection },
     { key: 'ranking', label: 'Ranking', icon: HiTrophy, Comp: RankingSection },
+    { key: 'personas', label: 'Personas', icon: HiUsers, Comp: PersonasSection },
 ];
 const SUBTITULOS = {
     spots: 'Descubre los mejores spots de Medellín.',
     feed: 'Lo último que sube la comunidad.',
     ranking: 'Quiénes más aportan a la comunidad.',
+    personas: 'Conoce gente nueva y mira qué hacen tus amigos.',
 };
 
 const CargandoSeccion = () => (
@@ -29,8 +32,8 @@ const CargandoSeccion = () => (
 );
 
 /**
- * Explorar: reúne Spots, Feed y Ranking con un control segmentado.
- * La sección activa vive en la URL (?tab=spots|feed|ranking).
+ * Explorar: reúne Spots, Feed, Ranking y Personas con un control segmentado.
+ * La sección activa vive en la URL (?tab=spots|feed|ranking|personas).
  */
 const ExplorarPage = ({ darkMode = true }) => {
     const [params, setParams] = useSearchParams();
@@ -68,7 +71,7 @@ const ExplorarPage = ({ darkMode = true }) => {
                         </div>
                         <AccesosSociales />
                     </div>
-                    <div className="ex-tabs" role="tablist" aria-label="Secciones de Explorar" onKeyDown={onKeyDown}>
+                    <div className="ex-tabs" style={{ "--ex-tabs": SECCIONES.length }} role="tablist" aria-label="Secciones de Explorar" onKeyDown={onKeyDown}>
                         {SECCIONES.map(({ key, label, icon: Icon }) => (
                             <button
                                 key={key}

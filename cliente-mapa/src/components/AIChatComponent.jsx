@@ -5,7 +5,7 @@ import { sendMessageToAI } from '../services/AIChatService';
 const AIChatComponent = ({ isOpen, onClose }) => {
     // const [isOpen, setIsOpen] = useState(false); // Controlled by parent
     const [messages, setMessages] = useState([
-        { sender: 'ai', text: '¡Hola! Soy tu asistente de WhereToSmoke. ¿En qué puedo ayudarte hoy?' }
+        { sender: 'ai', text: '¡Hola! Soy tu asistente de Peguelo. ¿En qué puedo ayudarte hoy?' }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);

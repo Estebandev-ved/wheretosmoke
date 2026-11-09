@@ -20,6 +20,7 @@ import com.medallo_map.wheretosmoke.model.EstadoAmistad;
 import com.medallo_map.wheretosmoke.model.Usuario;
 import com.medallo_map.wheretosmoke.repository.AmistadRepository;
 import com.medallo_map.wheretosmoke.repository.BloqueoRepository;
+import com.medallo_map.wheretosmoke.repository.PersonasRepository;
 import com.medallo_map.wheretosmoke.repository.SelloComunaRepository;
 import com.medallo_map.wheretosmoke.repository.SpotRepository;
 import com.medallo_map.wheretosmoke.repository.UsuarioRepository;
@@ -46,6 +47,7 @@ public class PerfilPublicoService {
     private final SpotRepository spotRepository;
     private final SelloComunaRepository selloRepository;
     private final UsuarioResumenService resumen;
+    private final PersonasRepository personasRepository;
     private final Clock clock;
 
     /** Escapa los comodines LIKE (% _) y el propio carácter de escape para que el texto sea literal. */
@@ -80,11 +82,12 @@ public class PerfilPublicoService {
         Map<Long, Amistad> relaciones = new HashMap<>();
         amistadRepository.findRelacionesCon(yo, ids).forEach(a -> relaciones.put(a.otroDe(yo), a));
         Map<Long, Map<String, String>> equipados = resumen.equipados(ids);
+        Map<Long, Integer> enComun = enComunCon(yo, ids);
         return encontrados.stream().map(u -> {
             int nivel = UsuarioResumenService.nivel(u);
             return new UsuarioBusqueda(u.getId(), u.getUsername(), nivel, ReglasGamificacion.tituloRango(nivel),
                     equipados.getOrDefault(u.getId(), Map.of()),
-                    AmistadService.estadoDe(relaciones.get(u.getId()), yo));
+                    AmistadService.estadoDe(relaciones.get(u.getId()), yo), enComun.getOrDefault(u.getId(), 0));
         }).toList();
     }
 
@@ -122,6 +125,20 @@ public class PerfilPublicoService {
                 equipados, u.getCreatedAt(), spotRepository.countByCreadorId(id),
                 selloRepository.countByUsuarioId(id),
                 amistadRepository.contarAmigos(id, EstadoAmistad.ACEPTADA),
-                estado, solicitudId, bloqueadoPorMi);
+                estado, solicitudId, bloqueadoPorMi, yo.equals(id) ? 0 : enComunCon(yo, List.of(id)).getOrDefault(id, 0));
+    }
+
+    /** Amigos en común de {@code yo} con cada id (una consulta para todo el lote). */
+    private Map<Long, Integer> enComunCon(Long yo, List<Long> ids) {
+        Map<Long, Integer> out = new HashMap<>();
+        List<Long> mios = amistadRepository.findAmigos(yo, EstadoAmistad.ACEPTADA).stream()
+                .map(a -> a.otroDe(yo)).toList();
+        if (mios.isEmpty() || ids.isEmpty()) {
+            return out;
+        }
+        for (Object[] f : personasRepository.amigosEnComunCon(mios, ids)) {
+            out.put(((Number) f[0]).longValue(), ((Number) f[1]).intValue());
+        }
+        return out;
     }
 }

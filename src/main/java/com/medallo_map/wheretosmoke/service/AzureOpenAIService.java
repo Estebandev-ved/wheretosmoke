@@ -68,7 +68,7 @@ public class AzureOpenAIService {
         }
 
         // Mensaje del sistema mejorado
-        String systemPrompt = "Eres un asistente inteligente y útil para la aplicación 'WhereToSmoke' (o 'Donde Fumar'). "
+        String systemPrompt = "Eres un asistente inteligente y útil para la aplicación 'Peguelo' (o 'Donde Fumar'). "
                 +
                 "Esta aplicación ayuda a las personas en Medellín a encontrar lugares seguros y amigables para el consumo de cannabis. "
                 +

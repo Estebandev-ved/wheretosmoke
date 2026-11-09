@@ -103,6 +103,25 @@ public class Usuario implements UserDetails {
     @Builder.Default
     private Integer comentariosHechos = 0;
 
+    // PRIVACIDAD SOCIAL. Las filas anteriores a estas columnas quedan con el valor por defecto de la base
+    // (visible y "TODOS"); aun así los lectores toleran null (ver visibleEnSugerencias()/modoSolicitudes()).
+    @Column(name = "visible_en_sugerencias", columnDefinition = "tinyint(1) not null default 1")
+    @Builder.Default
+    private Boolean visibleEnSugerencias = true;
+
+    /** TODOS | AMIGOS_DE_AMIGOS | NADIE */
+    @Column(name = "acepta_solicitudes", length = 20, columnDefinition = "varchar(20) not null default 'TODOS'")
+    @Builder.Default
+    private String aceptaSolicitudes = "TODOS";
+
+    public boolean visibleEnSugerencias() {
+        return visibleEnSugerencias == null || visibleEnSugerencias;
+    }
+
+    public String modoSolicitudes() {
+        return aceptaSolicitudes == null || aceptaSolicitudes.isBlank() ? "TODOS" : aceptaSolicitudes;
+    }
+
     // --- IMPLEMENTACIÓN DE UserDetails ---
 
     @Override

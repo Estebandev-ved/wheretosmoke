@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext';
 import AuthModal from '../AuthModal';
 import ReaccionesBar from '../ReaccionesBar';
 import { reaccionarFoto } from '../../services/socialApi';
+import UsuarioLink from '../social/UsuarioLink';
 
 const authHeaders = () => {
     const token = localStorage.getItem('token');
@@ -210,7 +211,7 @@ const FeedSection = () => {
                             <div className="ex-post-head">
                                 <div className="ex-post-avatar" aria-hidden="true">{iniciales(f.usuarioNombre)}</div>
                                 <div className="ex-post-who">
-                                    <strong>{f.usuarioNombre || 'Anónimo'}</strong>
+                                    <strong><UsuarioLink id={f.usuarioId} username={f.usuarioNombre}>{f.usuarioNombre || 'Anónimo'}</UsuarioLink></strong>
                                     <span className="ex-post-spot">
                                         <HiMapPin size={12} aria-hidden="true" />
                                         <span className="ex-post-spotname">{f.spotNombre || 'Spot'}</span>
@@ -250,7 +251,7 @@ const FeedSection = () => {
                             <ReaccionesBar reacciones={f.reacciones} miReaccion={f.miReaccion} onReaccionar={(e) => reaccionar(f, e)} />
 
                             {f.descripcion && (
-                                <p className="ex-post-desc"><strong>{f.usuarioNombre || 'Anónimo'}</strong> {f.descripcion}</p>
+                                <p className="ex-post-desc"><strong><UsuarioLink id={f.usuarioId} username={f.usuarioNombre}>{f.usuarioNombre || 'Anónimo'}</UsuarioLink></strong> {f.descripcion}</p>
                             )}
                         </li>
                     );
@@ -278,7 +279,7 @@ const FeedSection = () => {
                                     <div key={c.id || i} className="ex-com">
                                         <div className="ex-post-avatar ex-post-avatar--sm" aria-hidden="true">{iniciales(c.usuarioNombre)}</div>
                                         <div className="ex-com-body">
-                                            <div><strong>{c.usuarioNombre || 'Anónimo'}</strong> <small>{tiempoRelativo(c.fecha)}</small></div>
+                                            <div><strong><UsuarioLink id={c.usuarioId} username={c.usuarioNombre}>{c.usuarioNombre || 'Anónimo'}</UsuarioLink></strong> <small>{tiempoRelativo(c.fecha)}</small></div>
                                             <p>{c.texto}</p>
                                         </div>
                                     </div>

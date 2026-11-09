@@ -25,4 +25,12 @@ public interface BloqueoRepository extends JpaRepository<Bloqueo, Long> {
     @Modifying(clearAutomatically = true, flushAutomatically = true)
     @Query("DELETE FROM Bloqueo b WHERE b.bloqueadorId = :bloqueador AND b.bloqueadoId = :bloqueado")
     int borrar(@Param("bloqueador") Long bloqueador, @Param("bloqueado") Long bloqueado);
+
+    /** Ids de las personas que yo bloqueé. */
+    @Query("SELECT b.bloqueadoId FROM Bloqueo b WHERE b.bloqueadorId = :yo")
+    List<Long> idsBloqueadosPor(@Param("yo") Long yo);
+
+    /** Ids de las personas que me bloquearon. */
+    @Query("SELECT b.bloqueadorId FROM Bloqueo b WHERE b.bloqueadoId = :yo")
+    List<Long> idsQueMeBloquearon(@Param("yo") Long yo);
 }

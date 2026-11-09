@@ -9,6 +9,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../WeedToast';
 import useMensajes from '../../hooks/useMensajes';
 import AuthModal from '../AuthModal';
+import CarruselSugeridas from './personas/CarruselSugeridas';
 import AvatarUsuario from './AvatarUsuario';
 import BotonAmistadRapido from './BotonAmistadRapido';
 import {
@@ -19,6 +20,7 @@ import { tiempoCorto } from '../../utils/social';
 import '../gamificacion.css';
 import '../explorar.css';
 import './social-usuarios.css';
+import './personas/personas.css';
 
 const TABS = [
     { key: 'amigos', label: 'Amigos', icon: HiUsers },
@@ -89,6 +91,8 @@ const ListaAmigos = ({ onBuscar }) => {
     const ordenada = lista.slice().sort((a, b) => (b.noLeidos > 0) - (a.noLeidos > 0) || a.username.localeCompare(b.username, 'es'));
 
     return (
+        <div className="ex-stack">
+        <CarruselSugeridas titulo="Quizás conozcas" compacta limite={8} />
         <ul className="am-lista" aria-label={`Tus amigos (${lista.length})`}>
             {ordenada.map((a) => (
                 <li key={a.id} className="gm-card am-fila">
@@ -108,6 +112,7 @@ const ListaAmigos = ({ onBuscar }) => {
                 </li>
             ))}
         </ul>
+        </div>
     );
 };
 
@@ -267,7 +272,10 @@ const Buscar = () => {
 
             <div aria-live="polite">
                 {corto ? (
-                    <Vacio img="/icons/bud_map.png" titulo="Encuentra a tus parceros" texto="Escribe al menos 2 letras de su nombre de usuario." />
+                    <div className="ex-stack">
+                        <Vacio img="/icons/bud_map.png" titulo="Encuentra a tus parceros" texto="Escribe al menos 2 letras de su nombre de usuario." />
+                        <CarruselSugeridas titulo="Quizás conozcas" compacta limite={8} />
+                    </div>
                 ) : error ? (
                     <ErrorEstado texto={error} onReintentar={() => setIntento((n) => n + 1)} />
                 ) : cargando && !res ? (

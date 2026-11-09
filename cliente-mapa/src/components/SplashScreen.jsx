@@ -116,7 +116,7 @@ const SplashScreen = ({ onDone }) => {
     };
 
     return (
-        <div className={`splash ${leaving ? 'splash--leaving' : ''}`} role="status" aria-live="polite" aria-label="Cargando WhereToSmoke">
+        <div className={`splash ${leaving ? 'splash--leaving' : ''}`} role="status" aria-live="polite" aria-label="Cargando Peguelo">
             <button type="button" className="splash-skip" onClick={finish} aria-label="Omitir pantalla de carga">
                 Omitir
             </button>
