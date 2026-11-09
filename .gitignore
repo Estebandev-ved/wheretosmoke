@@ -41,3 +41,8 @@ cliente-mapa/.env
 cliente-mapa/private_key.txt
 cliente-mapa/public_key.txt
 cliente-mapa/keys.txt
+
+# Claves y secretos
+private_key.txt
+public_key.txt
+*_key.txt
