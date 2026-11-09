@@ -32,6 +32,8 @@ public class SpotDetalleService {
     private final UsuarioRepository usuarioRepository;
     private final GamificacionService gamificacionService;
     private final MisionService misionService;
+    private final VisitaService visitaService;
+    private final ReaccionFotoService reaccionFotoService;
 
     // ═══════════════════════════════════════════════════════════════
     // 📍 DETALLE COMPLETO DE SPOT
@@ -48,6 +50,7 @@ public class SpotDetalleService {
                 .stream()
                 .map(FotoDTO::fromFoto)
                 .collect(Collectors.toList());
+        reaccionFotoService.anexar(fotos, usuarioId);
         dto.setFotos(fotos);
         dto.setTotalFotos(fotos.size());
 
@@ -81,7 +84,10 @@ public class SpotDetalleService {
         // Info del creador
         if (spot.getCreadorId() != null) {
             usuarioRepository.findById(spot.getCreadorId())
-                    .ifPresent(u -> dto.setCreadorNombre(u.getUsername()));
+                    .ifPresent(u -> {
+                        dto.setCreadorNombre(u.getUsername());
+                        dto.setDescubridorNombre(u.getUsername());
+                    });
         }
 
         return dto;
@@ -114,6 +120,7 @@ public class SpotDetalleService {
         if (usuarioId != null) {
             gamificacionService.puntosPorFoto(usuarioId);
             misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.SUBIR_FOTO);
+            visitaService.registrar(usuarioId, spot);
         }
 
         FotoDTO dto = FotoDTO.fromFoto(foto);
@@ -121,11 +128,23 @@ public class SpotDetalleService {
             usuarioRepository.findById(usuarioId)
                     .ifPresent(u -> dto.setUsuarioNombre(u.getUsername()));
         }
+        reaccionFotoService.anexar(List.of(dto), usuarioId);
 
         return dto;
     }
 
     public List<FotoDTO> obtenerFotos(Long spotId) {
+        return obtenerFotos(spotId, null);
+    }
+
+    /** usuarioId (opcional) permite devolver la reacción propia en cada foto. */
+    public List<FotoDTO> obtenerFotos(Long spotId, Long usuarioId) {
+        List<FotoDTO> lista = obtenerFotosBase(spotId);
+        reaccionFotoService.anexar(lista, usuarioId);
+        return lista;
+    }
+
+    private List<FotoDTO> obtenerFotosBase(Long spotId) {
         return fotoRepository.findBySpotIdOrderByFechaSubidaDesc(spotId)
                 .stream()
                 .map(foto -> {
@@ -173,6 +192,7 @@ public class SpotDetalleService {
         if (usuarioId != null) {
             gamificacionService.puntosPorComentario(usuarioId);
             misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.COMENTAR);
+            visitaService.registrar(usuarioId, spot);
         }
 
         return ComentarioDTO.fromComentario(comentario);
@@ -215,6 +235,10 @@ public class SpotDetalleService {
         Double promedio = calificacionRepository.calcularPromedioEstrellas(spotId);
         spot.setCalificacionPromedio(promedio);
         spotRepository.save(spot);
+
+        if (usuarioId != null) {
+            visitaService.registrar(usuarioId, spot);
+        }
 
         // Dar puntos (solo si es nueva)
         if (calificacion.getId() == null && usuarioId != null) {

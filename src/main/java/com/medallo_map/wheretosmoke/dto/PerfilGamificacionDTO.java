@@ -41,5 +41,7 @@ public class PerfilGamificacionDTO {
     private Integer monedas;
     private Integer rachaDias;          // racha vigente (0 si se rompió)
     private Boolean checkinHoy;
+    private Boolean cofreDisponible;      // null en perfiles ajenos
+    private Integer multiplicadorEvento;  // 2 en hora feliz 4:20, 1 si no
     private java.util.Map<String, String> equipados; // categoría -> imagen del artículo equipado
 }

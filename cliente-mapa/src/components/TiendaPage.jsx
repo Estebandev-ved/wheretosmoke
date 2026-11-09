@@ -3,7 +3,8 @@ import { HiLockClosed, HiCheckCircle, HiArrowPath, HiStar } from 'react-icons/hi
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
-import { useParticles } from './ParticleEffects';
+import EstadoVacio from './fx/EstadoVacio';
+import './fx/fx.css';
 import { useToast } from './WeedToast';
 import { createPortal } from 'react-dom';
 import AuthModal from './AuthModal';
@@ -23,7 +24,6 @@ const TiendaPage = ({ darkMode = true }) => {
     const { user, token } = useAuth();
     const g = useGamificacion();
     const { sounds } = useGlobalSound();
-    const particles = useParticles();
     const toast = useToast();
 
     const [articulos, setArticulos] = useState(null);
@@ -82,9 +82,7 @@ const TiendaPage = ({ darkMode = true }) => {
         if (!a) return;
         setOcupado(a.id);
         try {
-            await g.comprar(a.id);
-            sounds.success();
-            particles.achievement();
+            await g.comprar(a.id); // el contexto emite 'compra' -> confeti/sonido/háptica según rareza
             setComprado(a);
         } catch (e) {
             sounds.error();
@@ -100,7 +98,7 @@ const TiendaPage = ({ darkMode = true }) => {
         setOcupado(a.id);
         try {
             if (equipar) await g.equipar(a.id); else await g.desequipar(a.id);
-            sounds.click();
+            if (!equipar) sounds.click();
             toast.success(equipar ? `${a.nombre} equipado.` : `${a.nombre} desequipado.`);
         } catch (e) {
             toast.error(mensajeError(e));
@@ -139,7 +137,7 @@ const TiendaPage = ({ darkMode = true }) => {
                     <div className="td-saldo">
                         {user && !g.esInvitado ? (
                             <>
-                                <span className="gm-chip gm-chip--gold" aria-label={`Saldo: ${g.monedas} monedas`}><i className="gm-coin" aria-hidden="true" />{g.monedas}</span>
+                                <span className="gm-chip gm-chip--gold" data-fx-coins aria-label={`Saldo: ${g.monedas} monedas`}><i className="gm-coin" aria-hidden="true" />{g.monedas}</span>
                                 <span className="gm-chip" aria-label={`Nivel ${g.nivel}`}>Nivel {g.nivel}</span>
                             </>
                         ) : (
@@ -193,13 +191,13 @@ const TiendaPage = ({ darkMode = true }) => {
                     ) : !articulos ? (
                         <SkeletonTienda />
                     ) : visibles.length === 0 ? (
-                        <div className="gm-card gm-state"><img src="/icons/bud_map.png" alt="" /><p>Todavía no hay artículos en esta categoría. Pronto llegan más.</p></div>
+                        <EstadoVacio texto="Todavía no hay artículos en esta categoría. Pronto llegan más." />
                     ) : (
                         <ul className="td-grid">
-                            {visibles.map((a) => {
+                            {visibles.map((a, idx) => {
                                 const est = estadoDe(a);
                                 return (
-                                    <li key={a.id} className={`td-card gm-r-${rz(a).clase} ${est === 'equipado' ? 'is-equipped' : ''} ${est === 'bloqueado' ? 'is-locked' : ''}`}>
+                                    <li key={a.id} style={{ '--i': idx }} className={`fx-in td-card gm-r-${rz(a).clase} ${est === 'equipado' ? 'is-equipped' : ''} ${est === 'bloqueado' ? 'is-locked' : ''}`}>
                                         <span className="gm-rarity td-rarity">{rz(a).label}</span>
                                         <div className="td-img"><img src={resolveItemImage(a.imagen)} alt={a.nombre} loading="lazy" /></div>
                                         <h3>{a.nombre}</h3>

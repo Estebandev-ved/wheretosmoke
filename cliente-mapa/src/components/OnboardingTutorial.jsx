@@ -1,171 +1,128 @@
-import React, { useState, useEffect } from 'react';
-import rainbowGuy from '../assets/characters/rainbow_guy.png';
-import hippieGuy from '../assets/characters/hippie_guy.png';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { HiMap, HiRocketLaunch, HiFire, HiShoppingBag, HiUserGroup } from 'react-icons/hi2';
+import { suscribir } from '../utils/eventosJuego';
+import { reducirMovimiento } from '../utils/movimiento';
+import './gamificacion.css';
 import './onboarding.css';
 
 /**
- * 🌿 ONBOARDING TUTORIAL - Tutorial interactivo con personajes
- * 
- * Tutorial de bienvenida temático con personajes rastafari
- * que explican la aplicación mediante diálogos animados.
+ * Tour inicial guiado por la mascota: 5 tarjetas deslizables (scroll-snap).
+ * Se muestra solo la primera vez (localStorage 'hasSeenOnboarding') y se relanza
+ * con emitir('tour:abrir') (botón "Ver tour de nuevo" del perfil).
  */
 
-const dialogues = [
-    {
-        id: 1,
-        character: 'rainbow',
-        name: 'Bob',
-        image: rainbowGuy,
-        position: 'left',
-        text: '¡Ey parcero! 👋 Bienvenido a WhereToSmoke',
-        subtext: 'Aquí encontrás los mejores spots para fumar tranquilo 🌿'
-    },
-    {
-        id: 2,
-        character: 'hippie',
-        name: 'Marley',
-        image: hippieGuy,
-        position: 'right',
-        text: '¡Súper fácil parce! 🗺️',
-        subtext: 'Buscá spots en el mapa o creá uno nuevo donde te encuentres'
-    },
-    {
-        id: 3,
-        character: 'rainbow',
-        name: 'Bob',
-        image: rainbowGuy,
-        position: 'left',
-        text: 'Votá cada spot: 🚨 TOMBO o 🥦 RELAX',
-        subtext: 'Así sabemos cuáles están seguros y cuáles están calientes'
-    },
-    {
-        id: 4,
-        character: 'hippie',
-        name: 'Marley',
-        image: hippieGuy,
-        position: 'right',
-        text: 'Comentá, subí fotos, hacé amigos ✌️',
-        subtext: 'Entre todos hacemos la comunidad más grande y segura'
-    },
-    {
-        id: 5,
-        character: 'both',
-        name: 'Bob & Marley',
-        image: null,
-        position: 'center',
-        text: '¡Ahora sí, a explorar! 🔥',
-        subtext: 'Fumá responsable y cuidá el ambiente 🌱'
-    }
+const LS_KEY = 'hasSeenOnboarding';
+
+const PASOS = [
+    { icono: HiMap, titulo: 'El mapa de spots', texto: 'Mira los spots cerca de ti, filtra por estado y toca uno para ver detalles, votar TOMBO o RELAX y dejar tu reseña.' },
+    { icono: HiRocketLaunch, titulo: 'Explorar', texto: 'En Explorar encuentras spots sugeridos, el feed de la comunidad y el ranking de los parceros más activos.' },
+    { icono: HiFire, titulo: 'Misiones y racha', texto: 'Haz check-in cada día para mantener tu racha, completa misiones y gana XP y monedas. ¡La llama crece con los días!' },
+    { icono: HiShoppingBag, titulo: 'Tienda', texto: 'Gasta tus monedas en skins, marcos y mascotas. Tu mascota te acompaña en el mapa y reacciona a tus logros.' },
+    { icono: HiUserGroup, titulo: 'Tu círculo de confianza', texto: 'Crea un círculo con tus parceros para compartir ubicación solo con quien tú elijas. Fume responsable y cuide el ambiente.' },
 ];
 
-const OnboardingTutorial = ({ onComplete }) => {
-    const [currentStep, setCurrentStep] = useState(0);
-    const [isVisible, setIsVisible] = useState(false);
+const yaVisto = () => {
+    try { return localStorage.getItem(LS_KEY) === 'true'; } catch { return false; }
+};
+const marcarVisto = () => {
+    try { localStorage.setItem(LS_KEY, 'true'); } catch { /* sin almacenamiento */ }
+};
 
+const OnboardingTutorial = ({ onComplete }) => {
+    const [visible, setVisible] = useState(false);
+    const [paso, setPaso] = useState(0);
+    const pista = useRef(null);
+    const siguienteRef = useRef(null);
+    const pasoRef = useRef(0);
+    useEffect(() => { pasoRef.current = paso; });
+
+    // Primera vez: aparece tras un instante
     useEffect(() => {
-        // Check if user has seen the tutorial
-        const hasSeenTutorial = localStorage.getItem('hasSeenOnboarding');
-        if (!hasSeenTutorial) {
-            setTimeout(() => setIsVisible(true), 500);
-        }
+        if (yaVisto()) return undefined;
+        const t = setTimeout(() => { setPaso(0); setVisible(true); }, 600);
+        return () => clearTimeout(t);
     }, []);
 
-    const handleNext = () => {
-        if (currentStep < dialogues.length - 1) {
-            setCurrentStep(currentStep + 1);
-        } else {
-            handleComplete();
-        }
+    // Relanzar desde el perfil
+    useEffect(() => suscribir('tour:abrir', () => { setPaso(0); setVisible(true); }), []);
+
+    const cerrar = useCallback(() => {
+        marcarVisto();
+        setVisible(false);
+        onComplete?.();
+    }, [onComplete]);
+
+    const irA = useCallback((i) => {
+        const el = pista.current;
+        if (!el) return;
+        el.scrollTo({ left: i * el.clientWidth, behavior: reducirMovimiento() ? 'auto' : 'smooth' });
+        setPaso(i);
+    }, []);
+
+    const siguiente = () => (paso < PASOS.length - 1 ? irA(paso + 1) : cerrar());
+
+    // Al deslizar con el dedo, sincroniza el indicador
+    const alDeslizar = (e) => {
+        const el = e.currentTarget;
+        const i = Math.round(el.scrollLeft / Math.max(1, el.clientWidth));
+        if (i !== paso) setPaso(i);
     };
 
-    const handleSkip = () => {
-        handleComplete();
-    };
+    useEffect(() => {
+        if (!visible) return undefined;
+        siguienteRef.current?.focus();
+        const onKey = (e) => {
+            if (e.key === 'Escape') cerrar();
+            else if (e.key === 'ArrowRight') irA(Math.min(PASOS.length - 1, pasoRef.current + 1));
+            else if (e.key === 'ArrowLeft') irA(Math.max(0, pasoRef.current - 1));
+        };
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [visible, cerrar, irA]);
 
-    const handleComplete = () => {
-        localStorage.setItem('hasSeenOnboarding', 'true');
-        setIsVisible(false);
-        setTimeout(() => {
-            if (onComplete) onComplete();
-        }, 300);
-    };
+    if (!visible) return null;
 
-    if (!isVisible) return null;
-
-    const currentDialogue = dialogues[currentStep];
-    const progress = ((currentStep + 1) / dialogues.length) * 100;
+    const ultimo = paso === PASOS.length - 1;
 
     return (
-        <div className={`onboarding-overlay ${isVisible ? 'visible' : ''}`}>
-            <div className="onboarding-container">
-                {/* Progress bar */}
-                <div className="onboarding-progress">
-                    <div
-                        className="onboarding-progress-bar"
-                        style={{ width: `${progress}%` }}
-                    />
+        <div className="tour" role="dialog" aria-modal="true" aria-labelledby="tour-titulo">
+            <div className="tour__panel">
+                <div className="tour__top">
+                    <span className="tour__paso" aria-live="polite">Paso {paso + 1} de {PASOS.length}</span>
+                    <button type="button" className="tour__saltar" onClick={cerrar}>Saltar</button>
+                </div>
+                <div className="tour__barra" role="progressbar" aria-valuemin={1} aria-valuemax={PASOS.length} aria-valuenow={paso + 1} aria-label="Progreso del tour">
+                    <span style={{ width: `${((paso + 1) / PASOS.length) * 100}%` }} />
                 </div>
 
-                {/* Character(s) */}
-                <div className="onboarding-characters">
-                    {currentDialogue.character === 'both' ? (
-                        <>
-                            <img
-                                src={rainbowGuy}
-                                alt="Bob"
-                                className="character character-left both"
-                            />
-                            <img
-                                src={hippieGuy}
-                                alt="Marley"
-                                className="character character-right both"
-                            />
-                        </>
-                    ) : (
-                        <img
-                            src={currentDialogue.image}
-                            alt={currentDialogue.name}
-                            className={`character character-${currentDialogue.position} active`}
-                        />
-                    )}
+                <div className="tour__mascota">
+                    <img src="/icons/bud_smoking.png" alt="" />
+                    <span className="tour__saludo">{paso === 0 ? '¡Quihubo, parce! Yo te guío.' : ultimo ? '¡Ya está, a explorar!' : '¡Mire esto!'}</span>
                 </div>
 
-                {/* Dialogue box */}
-                <div className="onboarding-dialogue">
-                    <div className="dialogue-name">{currentDialogue.name}</div>
-                    <h2 className="dialogue-text">{currentDialogue.text}</h2>
-                    <p className="dialogue-subtext">{currentDialogue.subtext}</p>
-
-                    {/* Dots indicator */}
-                    <div className="onboarding-dots">
-                        {dialogues.map((_, index) => (
-                            <span
-                                key={index}
-                                className={`dot ${index === currentStep ? 'active' : ''}`}
-                            />
-                        ))}
-                    </div>
+                <div className="tour__pista" ref={pista} onScroll={alDeslizar} tabIndex={0} aria-label="Pasos del tour, desliza para ver más">
+                    {PASOS.map((p, i) => {
+                        const Icono = p.icono;
+                        return (
+                            <section className="tour__tarjeta" key={p.titulo} aria-hidden={i !== paso} aria-roledescription="diapositiva">
+                                <span className="tour__icono"><Icono size={28} aria-hidden="true" /></span>
+                                <h2 id={i === paso ? 'tour-titulo' : undefined}>{p.titulo}</h2>
+                                <p>{p.texto}</p>
+                            </section>
+                        );
+                    })}
                 </div>
 
-                {/* Action buttons */}
-                <div className="onboarding-actions">
-                    <button
-                        className="onboarding-btn skip"
-                        onClick={handleSkip}
-                    >
-                        Omitir
-                    </button>
-                    <button
-                        className="onboarding-btn next"
-                        onClick={handleNext}
-                    >
-                        {currentStep === dialogues.length - 1 ? '¡Listo! 🚀' : 'Siguiente'}
+                <div className="tour__puntos" aria-hidden="true">
+                    {PASOS.map((p, i) => <span key={p.titulo} className={i === paso ? 'is-active' : ''} />)}
+                </div>
+
+                <div className="tour__acciones">
+                    <button type="button" className="gm-btn" onClick={() => irA(Math.max(0, paso - 1))} disabled={paso === 0}>Atrás</button>
+                    <button type="button" className="gm-btn gm-btn--primary" ref={siguienteRef} onClick={siguiente}>
+                        {ultimo ? '¡Listo!' : 'Siguiente'}
                     </button>
                 </div>
-
-                {/* Smoke effect */}
-                <div className="smoke-effect"></div>
-                <div className="smoke-effect delay"></div>
             </div>
         </div>
     );

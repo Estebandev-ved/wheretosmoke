@@ -49,8 +49,9 @@ public class SpotDetalleController {
      * Obtener fotos de un spot
      */
     @GetMapping("/{id}/fotos")
-    public ResponseEntity<List<FotoDTO>> obtenerFotos(@PathVariable Long id) {
-        return ResponseEntity.ok(spotDetalleService.obtenerFotos(id));
+    public ResponseEntity<List<FotoDTO>> obtenerFotos(@PathVariable Long id,
+            @AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(spotDetalleService.obtenerFotos(id, usuario != null ? usuario.getId() : null));
     }
 
     /**

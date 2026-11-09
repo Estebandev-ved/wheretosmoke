@@ -61,6 +61,12 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     @Query(value = "UPDATE usuarios SET monedas = monedas - :monto WHERE id = :id AND COALESCE(monedas, 0) >= :monto", nativeQuery = true)
     int restarMonedasSiAlcanza(@Param("id") Long id, @Param("monto") int monto);
 
+    /** Marca el cofre de hoy como abierto solo si aún no se abrió (idempotencia por día). */
+    @Modifying(clearAutomatically = true, flushAutomatically = true)
+    @Query(value = "UPDATE usuarios SET ultimo_cofre = :hoy "
+            + "WHERE id = :id AND (ultimo_cofre IS NULL OR ultimo_cofre < :hoy)", nativeQuery = true)
+    int registrarCofre(@Param("id") Long id, @Param("hoy") LocalDate hoy);
+
     @Query(value = "SELECT COALESCE(monedas, 0) FROM usuarios WHERE id = :id", nativeQuery = true)
     Integer obtenerMonedas(@Param("id") Long id);
 

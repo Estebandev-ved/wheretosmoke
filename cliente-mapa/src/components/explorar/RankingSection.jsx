@@ -6,6 +6,7 @@ import { useGamificacion } from '../../hooks/useGamificacion';
 import { getLeaderboard } from '../../services/gamificacionApi';
 import CharacterAvatar from '../CharacterAvatar';
 import AuthModal from '../AuthModal';
+import ComunasRanking from './ComunasRanking';
 
 const pctXp = (u) => {
     const base = u.xpNivelActual ?? 0;
@@ -68,7 +69,7 @@ const Podio = ({ top, yoId, g }) => {
     );
 };
 
-const RankingSection = () => {
+const RankingPersonas = () => {
     const { user } = useAuth();
     const g = useGamificacion();
     const [lista, setLista] = useState([]);
@@ -178,6 +179,22 @@ const RankingSection = () => {
             </div>
 
             {createPortal(<AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode />, document.body)}
+        </div>
+    );
+};
+
+const RankingSection = () => {
+    const [vista, setVista] = useState('personas');
+    return (
+        <div className="ex-stack">
+            <div className="ex-seg" role="group" aria-label="Tipo de ranking">
+                {[['personas', 'Personas'], ['comunas', 'Comunas']].map(([id, label]) => (
+                    <button key={id} type="button" className={`ex-seg-btn${vista === id ? ' is-active' : ''}`} aria-pressed={vista === id} onClick={() => setVista(id)}>
+                        {label}
+                    </button>
+                ))}
+            </div>
+            {vista === 'personas' ? <RankingPersonas /> : <ComunasRanking />}
         </div>
     );
 };

@@ -1,5 +1,6 @@
 package com.medallo_map.wheretosmoke.controller;
 
+import java.time.Clock;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -9,7 +10,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import com.medallo_map.wheretosmoke.dto.AlbumComunaDTO;
 import com.medallo_map.wheretosmoke.dto.CheckinDTO;
+import com.medallo_map.wheretosmoke.dto.CofreDTO;
+import com.medallo_map.wheretosmoke.dto.EventoDTO;
 import com.medallo_map.wheretosmoke.dto.MisionesResponseDTO;
 import com.medallo_map.wheretosmoke.dto.PerfilGamificacionDTO;
 import com.medallo_map.wheretosmoke.dto.ReclamoMisionDTO;
@@ -17,7 +21,9 @@ import com.medallo_map.wheretosmoke.exception.NegocioException;
 import com.medallo_map.wheretosmoke.model.AccionMision;
 import com.medallo_map.wheretosmoke.model.Badge;
 import com.medallo_map.wheretosmoke.model.Usuario;
+import com.medallo_map.wheretosmoke.service.AlbumService;
 import com.medallo_map.wheretosmoke.service.CheckinService;
+import com.medallo_map.wheretosmoke.service.CofreService;
 import com.medallo_map.wheretosmoke.service.GamificacionService;
 import com.medallo_map.wheretosmoke.service.MisionService;
 
@@ -34,6 +40,9 @@ public class GamificacionController {
     private final GamificacionService gamificacionService;
     private final MisionService misionService;
     private final CheckinService checkinService;
+    private final CofreService cofreService;
+    private final AlbumService albumService;
+    private final Clock clock;
 
     /**
      * GET /api/gamificacion/perfil
@@ -80,6 +89,7 @@ public class GamificacionController {
             if (usuario == null || !usuarioId.equals(usuario.getId())) {
                 perfil.setMonedas(null);
                 perfil.setCheckinHoy(null);
+                perfil.setCofreDisponible(null);
             }
             return ResponseEntity.ok(perfil);
         } catch (RuntimeException e) {
@@ -112,6 +122,24 @@ public class GamificacionController {
     public ResponseEntity<ReclamoMisionDTO> reclamar(@PathVariable Long id,
             @AuthenticationPrincipal Usuario usuario) {
         return ResponseEntity.ok(misionService.reclamar(requerir(usuario), id));
+    }
+
+    /** GET /api/gamificacion/evento - público: estado de la hora feliz 4:20 (x2 en XP y monedas). */
+    @GetMapping("/evento")
+    public ResponseEntity<EventoDTO> evento() {
+        return ResponseEntity.ok(EventoDTO.de(clock));
+    }
+
+    /** POST /api/gamificacion/cofre - abre el cofre diario (una vez por día Bogotá, idempotente). */
+    @PostMapping("/cofre")
+    public ResponseEntity<CofreDTO> cofre(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(cofreService.abrir(requerir(usuario)));
+    }
+
+    /** GET /api/gamificacion/album - avance por comuna del usuario; otorga el sello de las completadas. */
+    @GetMapping("/album")
+    public ResponseEntity<List<AlbumComunaDTO>> album(@AuthenticationPrincipal Usuario usuario) {
+        return ResponseEntity.ok(albumService.obtenerAlbum(requerir(usuario)));
     }
 
     private Long requerir(Usuario usuario) {

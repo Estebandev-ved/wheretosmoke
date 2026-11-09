@@ -20,4 +20,6 @@ public class CheckinDTO {
     private int nivel;
     /** Monedas que dará el check-in de mañana si se mantiene la racha. */
     private int bonoManana;
+    /** 2 si el check-in se hizo en hora feliz 4:20, 1 si no. */
+    private int multiplicador;
 }

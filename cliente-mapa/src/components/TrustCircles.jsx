@@ -10,6 +10,7 @@ import {
 import { useAuth } from '../context/AuthContext';
 import BottomSheet from './BottomSheet';
 import ConfirmDialog from './ConfirmDialog';
+import CirculoMeta from './CirculoMeta';
 import './gamificacion.css';
 import './TrustCircles.css';
 
@@ -372,6 +373,7 @@ export default function TrustCircles({ userLocation, onCircleMembersUpdate, onCl
 
                             {abierto && (
                                 <div className="tc-detail" id={`tc-det-${circle.id}`}>
+                                    <CirculoMeta circleId={circle.id} />
                                     <div className="tc-share">
                                         <div className="tc-share__text">
                                             <strong id={`tc-sw-${circle.id}`}>Compartir mi ubicación</strong>

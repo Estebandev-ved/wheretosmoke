@@ -1,0 +1,43 @@
+/* Hora feliz 4:20 (x2 XP y monedas) */
+.hf-x2 {
+    display: inline-flex; align-items: center; justify-content: center;
+    padding: 1px 6px; border-radius: var(--r-pill);
+    background: linear-gradient(135deg, #FFE066, #F59E0B); color: #1A1100;
+    font: 800 10.5px/1.3 var(--font-display); letter-spacing: 0.02em;
+    box-shadow: 0 0 0 1px rgba(245, 158, 11, 0.5), 0 0 10px rgba(250, 204, 21, 0.45);
+    flex: none; vertical-align: middle;
+}
+.hf-x2--inline { margin-left: 6px; }
+
+/* Píldora del HUD */
+.hf-pill {
+    align-self: flex-start; max-width: 100%;
+    display: inline-flex; align-items: center; gap: 6px;
+    min-height: 28px; padding: 0 12px; border-radius: var(--r-pill);
+    background: var(--glass); border: 1px solid var(--border-subtle);
+    -webkit-backdrop-filter: var(--glass-blur); backdrop-filter: var(--glass-blur);
+    color: var(--text-muted); font: 600 12px/1 var(--font-display);
+    box-shadow: var(--elev-1); white-space: nowrap; overflow: hidden;
+}
+.hf-pill__txt { overflow: hidden; text-overflow: ellipsis; }
+.hf-pill__time { font-variant-numeric: tabular-nums; color: var(--text); }
+.hf-pill.is-activa {
+    min-height: 34px; padding: 0 14px 0 8px;
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.32), rgba(245, 158, 11, 0.2)), var(--glass);
+    border-color: rgba(250, 204, 21, 0.75); color: #FDE68A; font-size: 12.5px;
+    animation: hf-pulso 2s ease-in-out infinite;
+}
+.hf-pill.is-activa .hf-pill__time { color: #FFE066; font-size: 13px; }
+.light-mode .hf-pill.is-activa { color: #7A4B00; }
+.light-mode .hf-pill.is-activa .hf-pill__time { color: #8A5200; }
+@keyframes hf-pulso {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.5), var(--elev-1); }
+    50% { box-shadow: 0 0 0 7px rgba(250, 204, 21, 0), 0 0 16px rgba(250, 204, 21, 0.4), var(--elev-1); }
+}
+
+/* Chip de monedas del HUD con la insignia */
+.hud-chip--coins .hf-x2 { margin-left: 2px; }
+
+@media (prefers-reduced-motion: reduce) {
+    .hf-pill.is-activa { animation: none; }
+}

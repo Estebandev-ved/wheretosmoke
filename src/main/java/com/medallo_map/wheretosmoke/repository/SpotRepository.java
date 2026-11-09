@@ -24,6 +24,15 @@ public interface SpotRepository extends JpaRepository<Spot, Long> {
     @Query(value = "SELECT * FROM spots s WHERE ST_Distance_Sphere(s.location, :point) <= :radius ORDER BY ST_Distance_Sphere(s.location, :point) ASC", nativeQuery = true)
     List<Spot> findCercanos(@Param("point") Point point, @Param("radius") double radius);
 
+    // COMUNAS
+    List<Spot> findByComunaIsNull();
+
+    long countByComuna(String comuna);
+
+    /** [comuna, total de spots] por comuna (una sola consulta). */
+    @Query("SELECT s.comuna, COUNT(s) FROM Spot s WHERE s.comuna IS NOT NULL GROUP BY s.comuna")
+    List<Object[]> contarPorComuna();
+
     // MEJORES CALIFICADOS
     // Ordena por calificacion promedio de mayor a menor
     @Query("SELECT s FROM Spot s ORDER BY s.calificacionPromedio DESC")

@@ -2,6 +2,17 @@
 
 Registro cronológico de decisiones y cambios. Lo más reciente va arriba.
 
+## 2026-11-08 · Backend: hora feliz, cofre, comunas, álbum, círculos y reacciones (sin commit aún)
+
+- **Hora feliz 4:20** (04:20-05:20 y 16:20-17:20 Bogotá): x2 en XP y monedas de check-in, reclamo de misión y cofre. Regla pura en `ReglasGamificacion`; `GET /api/gamificacion/evento` público.
+- **Cofre diario** `POST /api/gamificacion/cofre`: una vez por día (UPDATE condicional sobre `usuarios.ultimo_cofre`), 3% artículo COMUN/RARO nuevo, 55% monedas 3-30, 42% XP 5-25. `Random` inyectable (`AleatorioConfig`). El perfil trae `cofreDisponible` y `multiplicadorEvento`.
+- **Comunas y descubridor:** `spots.comuna` por centro más cercano (21 centros, `ComunasMedellin`; aproximado, no polígonos) y backfill idempotente al arrancar. `creadorId` es el descubridor (ahora lo fija el servidor); bono +30 monedas +40 XP por spot. Los spots exponen `comuna` y `descubridorNombre`.
+- **Visitas:** tabla `visitas_spot` (usuario, spot, día) alimentada al crear, votar (logueado), calificar, comentar o subir foto. Base de álbum, ranking y metas.
+- **Álbum** `GET /api/gamificacion/album` (sello + 50 monedas al completar una comuna, mínimo 3 spots), **ranking** `GET /api/leaderboard/comunas` (XP sumado de usuarios con visitas en 30 días, top 3), **meta de círculo** `GET|POST /api/circulos/{id}/meta[/reclamar]` (objetivo max(10, 5 x miembros); cofre 40 monedas + 30 XP por miembro y semana).
+- **Reacciones** `POST /api/fotos/{id}/reaccion` (5 emojis, una por usuario; en BD se guarda un código). `FotoDTO` trae `reacciones` y `miReaccion`; los likes no cambian.
+- Tablas nuevas por `ddl-auto=update`: `visitas_spot`, `sellos_comuna`, `reclamos_meta_circulo`, `reacciones_foto`; columnas `usuarios.ultimo_cofre`, `spots.comuna`.
+- Tests: reglas puras, cofre, descubridor, visitas, álbum, ranking, metas y reacciones (con Mockito). Sin probar contra MySQL real las consultas nativas (INSERT IGNORE, ranking) ni los endpoints en vivo: el servidor :8081 corre el código viejo y hay que reiniciarlo.
+
 ## 2026-11-07 · Agente 1: WebSocket (sin commit aún)
 
 - STOMP exige JWT en `CONNECT`; el remitente sale del Principal del servidor; orígenes vía `app.cors.allowed-origins`.
@@ -106,3 +117,24 @@ mostraba como 403 porque `/error` exigía login.
 | 5 | Partir `MapComponent.jsx` (1.078 líneas) | Pendiente |
 | 6 | Alinear README con el código (MySQL vs PostGIS, versiones en `pom.xml`) | Pendiente |
 | 7 | Producto: moderación, coordenadas difuminadas, piloto en una comuna | Pendiente |
+
+## 2026-11-08 · Cliente: "jugo" y mascota (solo frontend)
+
+- Nuevos: `utils/eventosJuego.js` (bus emitir/suscribir), `components/fx/*` (Confeti, MonedasVoladoras, SubidaDeNivel, MascotaCompanera, LlamaRacha, FxLayer, IndicadorPull, EstadoVacio), `hooks/useHaptics`, `usePullToRefresh`, `useReducedMotion`.
+- `useSound` ahora sintetiza con WebAudio (coin, pop, success, levelUp...) y respeta el toggle persistente; toggle visible en Perfil y en el menu del HUD.
+- `GamificacionContext` emite checkin/mision/nivel/compra/cofre, detecta subida de nivel una sola vez (localStorage por usuario) y expone `getEvento`, `abrirCofre`, `getAlbum` (tolerantes a 404, sin llamarse al cargar).
+- Tour inicial de 5 pasos con la mascota (relanzable desde Perfil), pull-to-refresh en Misiones y Perfil, entradas escalonadas y estados vacios con mascota.
+- Pendiente: probar en dispositivo real (vibracion/sonido) y los endpoints `/gamificacion/evento|cofre|album` cuando existan en el backend.
+
+## Capa social en Explorar (reacciones, comunas, descubridor, meta de círculo)
+- Feed: barra de reacciones (🔥😂😮💚🌿) con actualización optimista y rollback (`ReaccionesBar.jsx`); el like con corazón se mantiene aparte (doble toque), las reacciones son expresivas y no sustituyen el contador de likes.
+- Ranking: selector Personas | Comunas; tarjetas de territorio en `explorar/ComunasRanking.jsx`.
+- Spots/SpotCard: chip de comuna, "Descubierto por @usuario" y filtro por comuna.
+- Círculos: tarjeta "Meta semanal" con reclamo de cofre (`CirculoMeta.jsx`). API en `services/socialApi.js`, estilos en `components/social.css`.
+
+## 2026-11-08 · Cliente: Hora feliz 4:20, cofre diario y álbum de comunas
+- `hooks/useEventoHoraFeliz.js`: consulta `/gamificacion/evento` (público), cuenta atrás local, resincroniza cada 60 s, al volver la pestaña y justo en cada cambio de ventana; el contexto expone `evento`, `multiplicadorEvento` y `cofreDisponible`. Si el backend no responde, la píldora se oculta.
+- `HoraFeliz.jsx`: píldora en el HUD (discreta fuera de ventana, dorada con pulso dentro), insignia x2 (chip de monedas, Misiones, check-in, recompensas) y aviso (confeti + toast + mascota) al empezar la ventana con la app abierta (evento `horafeliz` en el bus).
+- `CofreDiario.jsx`: cofre SVG que se sacude, abre con animación y revela el premio (monedas con vuelo, XP o artículo con rareza); gris con cuenta atrás a medianoche de Bogotá; invitado ve invitación a registrarse. Usa `abrirCofre` (solo API) + `aplicarCofre` (al revelar: perfil, evento `cofre`). Punto rojo en el chip de nivel del HUD si hay cofre.
+- `AlbumComunas.jsx` en Perfil: sellos por comuna con anillo de progreso, dorado con mascota si está completa, "pocos spots aún" si totalSpots < 3, detalle en BottomSheet.
+- `multiplicador` de checkin/misión/cofre se muestra en toasts ("¡x2 por hora feliz!") y confeti dorado. Estilos en `hora-feliz.css` y `cofre-album.css`.

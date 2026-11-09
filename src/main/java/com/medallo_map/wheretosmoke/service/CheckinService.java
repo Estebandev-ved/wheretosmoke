@@ -49,8 +49,9 @@ public class CheckinService {
             return respuesta(true, nuevaRacha, 0, 0, saldo, puntos);
         }
 
-        int bono = ReglasGamificacion.bonoMonedasRacha(nuevaRacha);
-        int xp = ReglasGamificacion.XP_CHECKIN;
+        int mult = ReglasGamificacion.multiplicadorEvento(clock); // hora feliz 4:20 = x2
+        int bono = ReglasGamificacion.bonoMonedasRacha(nuevaRacha) * mult;
+        int xp = ReglasGamificacion.XP_CHECKIN * mult;
         int saldoFinal = monedasService.acreditar(usuarioId, bono, "CHECKIN", hoy.toString());
         usuarioRepository.sumarXp(usuarioId, xp);
 
@@ -67,6 +68,7 @@ public class CheckinService {
                 .puntos(puntos)
                 .nivel(ReglasGamificacion.nivelPara(puntos))
                 .bonoManana(ReglasGamificacion.bonoMonedasRacha(racha + 1))
+                .multiplicador(ReglasGamificacion.multiplicadorEvento(clock))
                 .build();
     }
 }

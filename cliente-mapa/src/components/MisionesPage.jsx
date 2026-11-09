@@ -1,12 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { HiCheckCircle, HiFire, HiLockClosed, HiTrophy, HiClock, HiArrowPath, HiGift } from 'react-icons/hi2';
+import { HiCheckCircle, HiLockClosed, HiTrophy, HiClock, HiArrowPath, HiGift } from 'react-icons/hi2';
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
-import { useGlobalSound } from '../context/SoundContext';
-import { useParticles } from './ParticleEffects';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import LlamaRacha from './fx/LlamaRacha';
+import IndicadorPull from './fx/IndicadorPull';
+import EstadoVacio from './fx/EstadoVacio';
+import './fx/fx.css';
 import { useToast } from './WeedToast';
 import { createPortal } from 'react-dom';
 import AuthModal from './AuthModal';
+import CofreDiario from './CofreDiario';
+import { InsigniaX2, HoraFelizAviso } from './HoraFeliz';
 import { getMisiones, getLeaderboard, getBadges, mensajeError } from '../services/gamificacionApi';
 import { resolveItemImage } from '../utils/itemImage';
 import './gamificacion.css';
@@ -80,10 +85,10 @@ const SkeletonMisiones = () => (
     </div>
 );
 
-const TarjetaMision = ({ m, onReclamar, reclamando }) => {
+const TarjetaMision = ({ m, onReclamar, reclamando, i = 0 }) => {
     const pct = Math.min(100, Math.round((m.progreso / Math.max(1, m.meta)) * 100));
     return (
-        <li className={`ms-mision ${m.completada ? 'is-done' : ''} ${m.reclamada ? 'is-claimed' : ''}`}>
+        <li className={`ms-mision fx-in ${m.completada ? 'is-done' : ''} ${m.reclamada ? 'is-claimed' : ''}`} style={{ '--i': i }}>
             <div className="ms-mision-top">
                 <div className="ms-mision-txt">
                     <h3>{m.titulo}</h3>
@@ -91,7 +96,7 @@ const TarjetaMision = ({ m, onReclamar, reclamando }) => {
                 </div>
                 <div className="ms-reward" aria-label="Recompensa">
                     <span className="gm-chip gm-chip--accent">+{m.recompensaXp} XP</span>
-                    <span className="gm-chip gm-chip--gold"><i className="gm-coin" aria-hidden="true" />+{m.recompensaMonedas}</span>
+                    <span className="gm-chip gm-chip--gold"><i className="gm-coin" aria-hidden="true" />+{m.recompensaMonedas}{!m.reclamada && <InsigniaX2 className="hf-x2--inline" />}</span>
                 </div>
             </div>
             <div className="ms-mision-bottom">
@@ -122,8 +127,6 @@ const TarjetaMision = ({ m, onReclamar, reclamando }) => {
 const MisionesPage = ({ darkMode = true }) => {
     const { user, token } = useAuth();
     const g = useGamificacion();
-    const { sounds } = useGlobalSound();
-    const particles = useParticles();
     const toast = useToast();
 
     const [misiones, setMisiones] = useState(null);
@@ -135,8 +138,6 @@ const MisionesPage = ({ darkMode = true }) => {
     const [reclamandoId, setReclamandoId] = useState(null);
     const [checkinBusy, setCheckinBusy] = useState(false);
     const [resCheckin, setResCheckin] = useState(null);
-    const [subida, setSubida] = useState(null);
-    const [flotante, setFlotante] = useState(null);
 
     const cargar = useCallback(async () => {
         setCargandoMis(true);
@@ -165,6 +166,7 @@ const MisionesPage = ({ darkMode = true }) => {
     const segDiario = useCuentaAtras(misiones?.segundosReinicioDiario);
     const segSemanal = useCuentaAtras(misiones?.segundosReinicioSemanal);
     const monedasAnim = useNumeroAnimado(g.monedas);
+    const { bind, pull, refrescando } = usePullToRefresh(() => Promise.all([g.refresh(), cargar()]));
 
     const hacerCheckin = async () => {
         setCheckinBusy(true);
@@ -172,10 +174,7 @@ const MisionesPage = ({ darkMode = true }) => {
             const res = await g.hacerCheckin();
             setResCheckin(res);
             if (!res.yaHecho) {
-                sounds.success();
-                setFlotante(`+${res.monedasGanadas}`);
-                setTimeout(() => setFlotante(null), 1600);
-                toast.success(`Check-in listo: +${res.monedasGanadas} monedas y +${res.xpGanado} XP`);
+                toast.success(`Check-in listo: +${res.monedasGanadas} monedas y +${res.xpGanado} XP${res.multiplicador > 1 ? ` ¡x${res.multiplicador} por hora feliz!` : ''}`);
                 cargar();
             } else {
                 toast.info('Ya hiciste tu check-in de hoy.');
@@ -196,16 +195,8 @@ const MisionesPage = ({ darkMode = true }) => {
                 diarias: prev.diarias.map((x) => (x.id === m.id ? { ...x, reclamada: true } : x)),
                 semanales: prev.semanales.map((x) => (x.id === m.id ? { ...x, reclamada: true } : x)),
             });
-            setFlotante(`+${res.monedasGanadas}`);
-            setTimeout(() => setFlotante(null), 1600);
-            if (res.subioNivel) {
-                setSubida({ nivel: res.nivel });
-                sounds.levelUp();
-                particles.achievement();
-            } else {
-                sounds.success();
-                toast.success(`Misión reclamada: +${res.xpGanado} XP y +${res.monedasGanadas} monedas`);
-            }
+            // Confeti, monedas, sonido y pantalla de nivel los gestiona la capa fx (eventos del contexto)
+            if (!res.subioNivel) toast.success(`Misión reclamada: +${res.xpGanado} XP y +${res.monedasGanadas} monedas${res.multiplicador > 1 ? ` ¡x${res.multiplicador} por hora feliz!` : ''}`);
         } catch (e) {
             toast.error(mensajeError(e));
             cargar();
@@ -246,6 +237,7 @@ const MisionesPage = ({ darkMode = true }) => {
             <main className="gm-page">
                 <div className="gm-wrap">
                     <div className="gm-head"><div><h1>Misiones</h1><p className="gm-sub">Retos diarios y semanales para ganar XP y monedas.</p></div></div>
+                    <CofreDiario onLogin={() => setShowAuth(true)} />
                     <div className="gm-card gm-state">
                         <img src="/icons/bud_smoking.png" alt="Bob, el cogollo" />
                         <h2>Inicia sesión para jugar</h2>
@@ -283,7 +275,9 @@ const MisionesPage = ({ darkMode = true }) => {
     const semanales = misiones?.semanales || [];
 
     return (
-        <main className="gm-page">
+        <main className="gm-page" {...bind}>
+            <HoraFelizAviso />
+            <IndicadorPull pull={pull} refrescando={refrescando} />
             <div className="gm-wrap">
                 <div className="gm-head">
                     <div>
@@ -291,12 +285,13 @@ const MisionesPage = ({ darkMode = true }) => {
                         <p className="gm-sub">Gana XP y monedas ayudando a la comunidad.</p>
                     </div>
                     <div className="ms-saldo" aria-live="polite">
-                        <span className="gm-chip gm-chip--gold" aria-label={`Saldo: ${g.monedas} monedas`}>
-                            <i className="gm-coin" aria-hidden="true" />{monedasAnim}
+                        <span className="gm-chip gm-chip--gold" data-fx-coins aria-label={`Saldo: ${g.monedas} monedas`}>
+                            <i className="gm-coin" aria-hidden="true" />{monedasAnim}<InsigniaX2 />
                         </span>
-                        {flotante && <span className="ms-flotante gm-fly" aria-hidden="true">{flotante}</span>}
                     </div>
                 </div>
+
+                <CofreDiario />
 
                 {/* Tarjeta de nivel */}
                 <section className="gm-card ms-nivel" aria-label="Tu nivel">
@@ -318,7 +313,7 @@ const MisionesPage = ({ darkMode = true }) => {
                 {/* Racha y check-in */}
                 <section className="gm-card" aria-label="Racha diaria">
                     <div className="gm-section-title">
-                        <span className="ms-racha"><HiFire size={20} aria-hidden="true" /> Racha de {g.rachaDias} {g.rachaDias === 1 ? 'día' : 'días'}</span>
+                        <span className="ms-racha"><LlamaRacha dias={g.rachaDias} size={20} /> Racha de {g.rachaDias} {g.rachaDias === 1 ? 'día' : 'días'}</span>
                     </div>
                     <ol className="ms-semana">
                         {semana.map((d, i) => (
@@ -331,10 +326,11 @@ const MisionesPage = ({ darkMode = true }) => {
                     <button type="button" className="gm-btn gm-btn--primary gm-btn--block" onClick={hacerCheckin} disabled={g.checkinHoy || checkinBusy}>
                         <HiGift size={18} aria-hidden="true" />
                         {checkinBusy ? 'Registrando…' : g.checkinHoy ? 'Check-in de hoy hecho' : 'Hacer check-in diario'}
+                        {!g.checkinHoy && !checkinBusy && <InsigniaX2 />}
                     </button>
                     {resCheckin && !resCheckin.yaHecho && (
                         <p className="ms-feedback" role="status">
-                            +{resCheckin.monedasGanadas} monedas y +{resCheckin.xpGanado} XP.
+                            +{resCheckin.monedasGanadas} monedas y +{resCheckin.xpGanado} XP.{resCheckin.multiplicador > 1 && ` ¡x${resCheckin.multiplicador} por hora feliz!`}
                             {typeof resCheckin.bonoManana === 'number' && resCheckin.bonoManana > 0 && ` Mañana ganas ${resCheckin.bonoManana} monedas si vuelves.`}
                         </p>
                     )}
@@ -348,9 +344,9 @@ const MisionesPage = ({ darkMode = true }) => {
                         {misiones && <small className="ms-timer"><HiClock size={14} aria-hidden="true" /> Reinicia en {formatoTiempo(segDiario)}</small>}
                     </div>
                     {diarias.length === 0 ? (
-                        <div className="gm-card gm-state"><p>No hay misiones diarias por ahora. Vuelve más tarde.</p></div>
+                        <EstadoVacio texto="No hay misiones diarias por ahora. Vuelve más tarde." />
                     ) : (
-                        <ul className="ms-lista">{diarias.map((m) => <TarjetaMision key={m.id} m={m} onReclamar={reclamar} reclamando={reclamandoId === m.id} />)}</ul>
+                        <ul className="ms-lista">{diarias.map((m, i) => <TarjetaMision key={m.id} i={i} m={m} onReclamar={reclamar} reclamando={reclamandoId === m.id} />)}</ul>
                     )}
                 </section>
 
@@ -361,9 +357,9 @@ const MisionesPage = ({ darkMode = true }) => {
                         {misiones && <small className="ms-timer"><HiClock size={14} aria-hidden="true" /> Reinicia en {formatoTiempo(segSemanal)}</small>}
                     </div>
                     {semanales.length === 0 ? (
-                        <div className="gm-card gm-state"><p>No hay misiones semanales por ahora.</p></div>
+                        <EstadoVacio texto="No hay misiones semanales por ahora." />
                     ) : (
-                        <ul className="ms-lista">{semanales.map((m) => <TarjetaMision key={m.id} m={m} onReclamar={reclamar} reclamando={reclamandoId === m.id} />)}</ul>
+                        <ul className="ms-lista">{semanales.map((m, i) => <TarjetaMision key={m.id} i={i} m={m} onReclamar={reclamar} reclamando={reclamandoId === m.id} />)}</ul>
                     )}
                 </section>
 
@@ -376,7 +372,7 @@ const MisionesPage = ({ darkMode = true }) => {
                     {!badges ? (
                         <div className="gm-skel" style={{ height: 90 }} />
                     ) : badges.length === 0 ? (
-                        <div className="gm-card gm-state"><p>Aún no hay insignias disponibles.</p></div>
+                        <EstadoVacio texto="Aún no hay insignias disponibles." />
                     ) : (
                         <ul className="ms-badges">
                             {badges.map((b) => {
@@ -399,7 +395,7 @@ const MisionesPage = ({ darkMode = true }) => {
                     {!ranking ? (
                         <div className="gm-skel" style={{ height: 120 }} />
                     ) : top3.length === 0 ? (
-                        <div className="gm-card gm-state"><p>El ranking aún está vacío.</p></div>
+                        <EstadoVacio texto="El ranking aún está vacío. ¡Sé el primero!" />
                     ) : (
                         <ol className="ms-rank">
                             {top3.slice(0, 3).map((r, i) => (
@@ -417,16 +413,6 @@ const MisionesPage = ({ darkMode = true }) => {
                 </section>
             </div>
 
-            {subida && (
-                <div className="gm-modal" role="dialog" aria-modal="true" aria-labelledby="ms-lvl-title" onClick={() => setSubida(null)}>
-                    <div className="gm-modal-card ms-lvl" onClick={(e) => e.stopPropagation()}>
-                        <img src={resolveItemImage(personaje)} alt="" className="ms-lvl-char" />
-                        <h2 id="ms-lvl-title">¡Subiste al nivel {subida.nivel}!</h2>
-                        <p>Ahora eres <strong>{g.tituloRango}</strong>. Sigue ayudando a la comunidad para desbloquear más artículos en la tienda.</p>
-                        <button type="button" className="gm-btn gm-btn--primary" autoFocus onClick={() => setSubida(null)}>Seguir jugando</button>
-                    </div>
-                </div>
-            )}
         </main>
     );
 };

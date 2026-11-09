@@ -134,25 +134,30 @@ public class MisionService {
                 .orElseThrow(() -> new NegocioException(HttpStatus.NOT_FOUND, "Usuario no encontrado"));
         int puntosAntes = usuario.getPuntos() == null ? 0 : usuario.getPuntos();
 
+        int mult = ReglasGamificacion.multiplicadorEvento(clock); // hora feliz 4:20 = x2
+        int monedasPremio = mision.getRecompensaMonedas() * mult;
+        int xpPremio = mision.getRecompensaXp() * mult;
+
         int saldo;
-        if (mision.getRecompensaMonedas() > 0) {
-            saldo = monedasService.acreditar(usuarioId, mision.getRecompensaMonedas(), "MISION", mision.getCodigo());
+        if (monedasPremio > 0) {
+            saldo = monedasService.acreditar(usuarioId, monedasPremio, "MISION", mision.getCodigo());
         } else {
             Integer m = usuarioRepository.obtenerMonedas(usuarioId);
             saldo = m == null ? 0 : m;
         }
-        if (mision.getRecompensaXp() > 0) {
-            usuarioRepository.sumarXp(usuarioId, mision.getRecompensaXp());
+        if (xpPremio > 0) {
+            usuarioRepository.sumarXp(usuarioId, xpPremio);
         }
-        int puntosDespues = puntosAntes + Math.max(0, mision.getRecompensaXp());
+        int puntosDespues = puntosAntes + Math.max(0, xpPremio);
         int nivelAntes = ReglasGamificacion.nivelPara(puntosAntes);
         int nivelDespues = ReglasGamificacion.nivelPara(puntosDespues);
 
         return ReclamoMisionDTO.builder()
                 .misionId(misionId).codigo(mision.getCodigo())
-                .xpGanado(mision.getRecompensaXp()).monedasGanadas(mision.getRecompensaMonedas())
+                .xpGanado(xpPremio).monedasGanadas(monedasPremio)
                 .monedas(saldo).puntos(puntosDespues).nivel(nivelDespues)
                 .subioNivel(nivelDespues > nivelAntes)
+                .multiplicador(mult)
                 .build();
     }
 

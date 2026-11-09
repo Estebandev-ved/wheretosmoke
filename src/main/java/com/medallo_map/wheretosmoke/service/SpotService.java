@@ -48,6 +48,17 @@ public class SpotService {
     @Autowired
     private MisionService misionService;
 
+    @Autowired
+    private VisitaService visitaService;
+
+    @Autowired
+    private DescubridorService descubridorService;
+
+    @Autowired
+    private com.medallo_map.wheretosmoke.repository.UsuarioRepository usuarioRepository;
+
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(SpotService.class);
+
     // Factory para crear objetos Point (necesario para JTS)
     private static final GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 
@@ -116,10 +127,25 @@ public class SpotService {
             throw new RuntimeException("Esta zona aun no esta disponible. Proximamente!");
         }
 
-        // Todo OK, crear spot
+        // Todo OK, crear spot. Comuna y descubridor los fija el servidor (se ignoran los del cliente).
+        spot.setId(null);
         spot.setEstado("VERDE");
         spot.setUltimaAlerta(LocalDateTime.now());
+        spot.setComuna(ComunasMedellin.asignar(spot.getLatitud(), spot.getLongitud()));
+        if (usuarioId != null) {
+            spot.setCreadorId(usuarioId);
+        }
         Spot guardado = spotRepository.save(spot);
+        if (usuarioId != null) {
+            try {
+                descubridorService.premiar(usuarioId, guardado.getId());
+            } catch (RuntimeException e) {
+                log.warn("No se pudo pagar el bono de descubridor del spot {}: {}", guardado.getId(), e.getMessage());
+            }
+            visitaService.registrar(usuarioId, guardado);
+            usuarioRepository.findById(usuarioId)
+                    .ifPresent(u -> guardado.setDescubridorNombre(u.getUsername()));
+        }
         misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.CREAR_SPOT);
         return guardado;
     }
@@ -145,6 +171,7 @@ public class SpotService {
      */
     public List<SpotVotacionDTO> obtenerTodosConVotos(String fingerprint) {
         List<Spot> spots = obtenerTodos();
+        completarDescubridores(spots);
         List<SpotVotacionDTO> resultado = new ArrayList<>();
         LocalDateTime limite = LocalDateTime.now().minusHours(HORAS_VALIDEZ);
 
@@ -191,6 +218,7 @@ public class SpotService {
         reporteRepository.save(nuevoReporte);
         // Solo votos nuevos de usuarios logueados; el límite diario lo pone la meta de la misión
         misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.VOTAR_SPOT);
+        visitaService.registrar(usuarioId, spot);
 
         // 🔢 Contar votos TOMBO actuales
         int votosTombo = reporteRepository.contarVotosPorTipo(spotId, "TOMBO", limite);
@@ -250,6 +278,7 @@ public class SpotService {
         reporteRepository.save(nuevoReporte);
         // Solo votos nuevos de usuarios logueados; el límite diario lo pone la meta de la misión
         misionService.registrarAccion(usuarioId, com.medallo_map.wheretosmoke.model.AccionMision.VOTAR_SPOT);
+        visitaService.registrar(usuarioId, spot);
 
         // 🔢 Contar votos actuales (ambos tipos)
         int votosRelax = reporteRepository.contarVotosPorTipo(spotId, "RELAX", limite);
@@ -324,6 +353,26 @@ public class SpotService {
     // ═══════════════════════════════════════════════════════════════
     // METODOS AUXILIARES
     // ═══════════════════════════════════════════════════════════════
+
+    /** Rellena descubridorNombre (username del creador) con una sola consulta para toda la lista. */
+    private void completarDescubridores(List<Spot> spots) {
+        java.util.Set<Long> ids = new java.util.HashSet<>();
+        for (Spot s : spots) {
+            if (s.getCreadorId() != null) {
+                ids.add(s.getCreadorId());
+            }
+        }
+        if (ids.isEmpty()) {
+            return;
+        }
+        java.util.Map<Long, String> nombres = new java.util.HashMap<>();
+        usuarioRepository.findAllById(ids).forEach(u -> nombres.put(u.getId(), u.getUsername()));
+        for (Spot s : spots) {
+            if (s.getCreadorId() != null) {
+                s.setDescubridorNombre(nombres.get(s.getCreadorId()));
+            }
+        }
+    }
 
     private SpotVotacionDTO construirRespuesta(Spot spot, String fingerprint, String mensaje) {
         LocalDateTime limite = LocalDateTime.now().minusHours(HORAS_VALIDEZ);

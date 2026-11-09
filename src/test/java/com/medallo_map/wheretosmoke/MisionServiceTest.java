@@ -118,4 +118,21 @@ class MisionServiceTest {
         when(misiones.findByAccionAndActivaTrue(AccionMision.VOTAR_SPOT)).thenThrow(new RuntimeException("BD caída"));
         service.registrarAccion(1L, AccionMision.VOTAR_SPOT); // no lanza
     }
+
+    @Test
+    void horaFelizDuplicaLaRecompensaAlReclamar() {
+        // 09:30 UTC = 04:30 en Bogotá (hora feliz)
+        Clock feliz = Clock.fixed(Instant.parse("2026-11-07T09:30:00Z"), ZoneId.of("America/Bogota"));
+        MisionService conEvento = new MisionService(misiones, progresos, usuarios, monedas, feliz);
+        when(progresos.findByUsuarioIdAndMisionIdAndPeriodo(1L, 10L, HOY)).thenReturn(Optional.of(fila(3, true)));
+        when(progresos.marcarReclamada(99L)).thenReturn(1);
+
+        ReclamoMisionDTO r = conEvento.reclamar(1L, 10L);
+
+        assertEquals(10, r.getMonedasGanadas());
+        assertEquals(20, r.getXpGanado());
+        assertEquals(2, r.getMultiplicador());
+        verify(monedas).acreditar(1L, 10, "MISION", "DIA_VOTAR_3");
+        verify(usuarios).sumarXp(1L, 20);
+    }
 }

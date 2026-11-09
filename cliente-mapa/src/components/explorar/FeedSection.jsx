@@ -5,6 +5,8 @@ import { HiArrowPath, HiChatBubbleOvalLeft, HiHeart, HiMapPin, HiPaperAirplane, 
 import { API_BASE } from '../../config';
 import { useAuth } from '../../context/AuthContext';
 import AuthModal from '../AuthModal';
+import ReaccionesBar from '../ReaccionesBar';
+import { reaccionarFoto } from '../../services/socialApi';
 
 const authHeaders = () => {
     const token = localStorage.getItem('token');
@@ -100,6 +102,26 @@ const FeedSection = () => {
             console.error('Error dando like:', e);
         } finally {
             setEnviandoLike(null);
+        }
+    };
+
+    // Reacción optimista: un emoji por persona; el mismo lo quita, otro lo reemplaza. Rollback si falla.
+    const reaccionar = async (foto, emoji) => {
+        if (!isAuthenticated) { setShowAuth(true); return; }
+        const previo = { reacciones: foto.reacciones || {}, miReaccion: foto.miReaccion || null };
+        const nuevas = { ...previo.reacciones };
+        if (previo.miReaccion) nuevas[previo.miReaccion] = Math.max(0, (nuevas[previo.miReaccion] || 1) - 1);
+        const quita = previo.miReaccion === emoji;
+        if (!quita) nuevas[emoji] = (nuevas[emoji] || 0) + 1;
+        const aplicar = (reacciones, miReaccion) =>
+            setItems((prev) => prev.map((i) => (i.id === foto.id ? { ...i, reacciones, miReaccion } : i)));
+        aplicar(nuevas, quita ? null : emoji);
+        try {
+            const data = await reaccionarFoto(foto.id, emoji);
+            aplicar(data.reacciones || {}, data.miReaccion ?? null);
+        } catch (e) {
+            console.error('Error reaccionando:', e);
+            aplicar(previo.reacciones, previo.miReaccion);
         }
     };
 
@@ -224,6 +246,8 @@ const FeedSection = () => {
                                     <span>{comentarios[f.id] ? comentarios[f.id].length : 'Comentar'}</span>
                                 </button>
                             </div>
+
+                            <ReaccionesBar reacciones={f.reacciones} miReaccion={f.miReaccion} onReaccionar={(e) => reaccionar(f, e)} />
 
                             {f.descripcion && (
                                 <p className="ex-post-desc"><strong>{f.usuarioNombre || 'Anónimo'}</strong> {f.descripcion}</p>

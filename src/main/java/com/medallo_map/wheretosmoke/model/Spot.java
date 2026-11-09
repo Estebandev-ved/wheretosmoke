@@ -131,7 +131,15 @@ public class Spot {
     @Column(name = "votos_relax")
     private Integer votosRelax = 0;
 
-    // ID DEL CREADOR
+    // ID DEL CREADOR = DESCUBRIDOR del spot (lo fija el servidor al crear)
     @Column(name = "creador_id")
     private Long creadorId;
+
+    // COMUNA / CORREGIMIENTO de Medellín (asignada por el servidor, ver ComunasMedellin)
+    @Column(name = "comuna", length = 60)
+    private String comuna;
+
+    // Username del descubridor (no se guarda; se rellena al responder)
+    @jakarta.persistence.Transient
+    private String descubridorNombre;
 }

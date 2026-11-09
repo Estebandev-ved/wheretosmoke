@@ -18,4 +18,6 @@ public class ReclamoMisionDTO {
     private int puntos;
     private int nivel;
     private boolean subioNivel;
+    /** 2 si se reclamó en hora feliz 4:20, 1 si no (xpGanado y monedasGanadas ya lo incluyen). */
+    private int multiplicador;
 }

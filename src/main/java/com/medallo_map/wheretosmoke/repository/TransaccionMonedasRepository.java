@@ -7,4 +7,6 @@ import com.medallo_map.wheretosmoke.model.TransaccionMonedas;
 
 @Repository
 public interface TransaccionMonedasRepository extends JpaRepository<TransaccionMonedas, Long> {
+
+    boolean existsByUsuarioIdAndMotivoAndReferencia(Long usuarioId, String motivo, String referencia);
 }

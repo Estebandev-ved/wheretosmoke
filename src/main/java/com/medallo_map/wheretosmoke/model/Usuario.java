@@ -78,6 +78,10 @@ public class Usuario implements UserDetails {
     @Column(name = "ultima_actividad", updatable = false)
     private java.time.LocalDate ultimaActividad;
 
+    // Fecha (America/Bogota) del último cofre diario abierto
+    @Column(name = "ultimo_cofre", updatable = false)
+    private java.time.LocalDate ultimoCofre;
+
     // BADGES (JSON array de badges ganados, ej: ["PIONERO", "CENTINELA"])
     @Column(name = "badges", length = 500)
     private String badges;

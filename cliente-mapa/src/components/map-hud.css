@@ -64,6 +64,8 @@
 .hud-chip:hover { border-color: var(--border-strong); }
 .hud-chip:active { transform: scale(0.97); }
 .hud-chip--level { color: var(--accent); }
+/* Punto de aviso (cofre diario por abrir) */
+.hud-chip__dot { position: absolute; top: -2px; right: -2px; width: 10px; height: 10px; border-radius: 50%; background: #EF4444; border: 2px solid var(--bg); box-shadow: 0 0 0 1px rgba(239, 68, 68, 0.4); }
 .hud-chip--coins { color: var(--gold); border-color: rgba(250, 204, 21, 0.28); background: var(--gold-soft); }
 .hud-chip--streak { color: #FB923C; }
 .hud-chip--streak.is-done { border-color: rgba(251, 146, 60, 0.4); }

@@ -58,8 +58,12 @@ const SpotCardEx = ({ spot, ubicacion, onOpen, compacta }) => {
                 <h3 className="ex-spot-name">{spot.nombre}</h3>
                 <div className="ex-spot-meta">
                     {spot.categoria && <span className="ex-cat">{etiquetaCategoria(spot.categoria)}</span>}
+                    {spot.comuna && <span className="ex-comuna">{spot.comuna}</span>}
                     {dist && <span className="ex-dist"><HiMapPin size={12} aria-hidden="true" />{dist}</span>}
                 </div>
+                {spot.descubridorNombre && (
+                    <span className="ex-desc">🏆 Descubierto por @{spot.descubridorNombre}</span>
+                )}
                 <div className="ex-spot-stats">
                     <span className="ex-rating" title="Calificación promedio">
                         <HiStar size={14} aria-hidden="true" />
@@ -106,6 +110,7 @@ const SpotsSection = ({ darkMode }) => {
     const [cargando, setCargando] = useState(true);
     const [error, setError] = useState(false);
     const [categoria, setCategoria] = useState('TODAS');
+    const [comuna, setComuna] = useState('TODAS');
     const [abierto, setAbierto] = useState(null);
 
     const cargar = useCallback(async () => {
@@ -170,7 +175,13 @@ const SpotsSection = ({ darkMode }) => {
         return [...set].sort();
     }, [todos, trending, mejores]);
 
-    const filtra = (lista) => (categoria === 'TODAS' ? lista : lista.filter((s) => s.categoria === categoria));
+    const comunas = useMemo(() => {
+        const set = new Set();
+        [...todos, ...trending, ...mejores].forEach((s) => s.comuna && set.add(s.comuna));
+        return [...set].sort((a, b) => a.localeCompare(b, 'es'));
+    }, [todos, trending, mejores]);
+
+    const filtra = (lista) => lista.filter((s) => (categoria === 'TODAS' || s.categoria === categoria) && (comuna === 'TODAS' || s.comuna === comuna));
     const lTrending = filtra(trending);
     const lMejores = filtra(mejores);
     const lCercanos = filtra(cercanos);
@@ -204,6 +215,22 @@ const SpotsSection = ({ darkMode }) => {
                             onClick={() => setCategoria(c)}
                         >
                             {c === 'TODAS' ? 'Todas' : etiquetaCategoria(c)}
+                        </button>
+                    ))}
+                </div>
+            )}
+
+            {comunas.length > 0 && (
+                <div className="ex-chips" role="group" aria-label="Filtrar por comuna">
+                    {['TODAS', ...comunas].map((c) => (
+                        <button
+                            key={c}
+                            type="button"
+                            className={`ex-chip ex-chip--comuna ${comuna === c ? 'is-active' : ''}`}
+                            aria-pressed={comuna === c}
+                            onClick={() => setComuna(c)}
+                        >
+                            {c === 'TODAS' ? 'Todas las comunas' : c}
                         </button>
                     ))}
                 </div>
@@ -249,9 +276,9 @@ const SpotsSection = ({ darkMode }) => {
                 ) : (
                     <div className="gm-card gm-state">
                         <img src="/icons/bud_map.png" alt="" width="88" height="88" />
-                        <h2>{categoria === 'TODAS' ? 'Aún no hay spots' : 'Nada en esta categoría'}</h2>
-                        <p>{categoria === 'TODAS' ? 'Toca el mapa para crear el primer spot de tu parche.' : 'Prueba con otra categoría o crea uno nuevo desde el mapa.'}</p>
-                        {categoria !== 'TODAS' && <button type="button" className="gm-btn" onClick={() => setCategoria('TODAS')}>Ver todas</button>}
+                        <h2>{categoria === 'TODAS' && comuna === 'TODAS' ? 'Aún no hay spots' : 'Nada con ese filtro'}</h2>
+                        <p>{categoria === 'TODAS' && comuna === 'TODAS' ? 'Toca el mapa para crear el primer spot de tu parche.' : 'Prueba con otro filtro o crea uno nuevo desde el mapa.'}</p>
+                        {(categoria !== 'TODAS' || comuna !== 'TODAS') && <button type="button" className="gm-btn" onClick={() => { setCategoria('TODAS'); setComuna('TODAS'); }}>Quitar filtros</button>}
                     </div>
                 )}
             </section>

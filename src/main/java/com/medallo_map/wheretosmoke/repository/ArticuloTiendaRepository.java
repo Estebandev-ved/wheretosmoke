@@ -11,6 +11,9 @@ import com.medallo_map.wheretosmoke.model.CategoriaArticulo;
 @Repository
 public interface ArticuloTiendaRepository extends JpaRepository<ArticuloTienda, Long> {
 
+    List<ArticuloTienda> findByActivoTrueAndRarezaInAndPrecioGreaterThan(
+            java.util.Collection<com.medallo_map.wheretosmoke.model.RarezaArticulo> rarezas, int precioMin);
+
     boolean existsByCodigo(String codigo);
 
     List<ArticuloTienda> findByActivoTrueOrderByPrecioAscIdAsc();

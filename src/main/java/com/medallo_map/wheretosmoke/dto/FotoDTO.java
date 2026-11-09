@@ -25,6 +25,10 @@ public class FotoDTO {
     private String descripcion;
     private LocalDateTime fechaSubida;
     private Integer likes;
+    /** Conteo por emoji (siempre incluye los 5 permitidos, con 0 si nadie reaccionó). */
+    private java.util.Map<String, Integer> reacciones;
+    /** Emoji con el que reaccionó el usuario autenticado, o null. */
+    private String miReaccion;
 
     public static FotoDTO fromFoto(Foto foto) {
         return FotoDTO.builder()

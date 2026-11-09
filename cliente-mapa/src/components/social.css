@@ -1,0 +1,50 @@
+/* Capa social: reacciones (rx-), meta de círculo (cm-) y chips de comuna/descubridor en SpotCard */
+
+/* Reacciones */
+.rx-bar { position: relative; display: flex; flex-wrap: wrap; gap: 6px; padding: 2px 0 var(--space-2, 8px); }
+.rx-btn {
+    display: inline-flex; align-items: center; gap: 4px; min-height: 44px; min-width: 44px; padding: 0 12px;
+    justify-content: center; border-radius: var(--r-pill, 999px); border: 1px solid var(--border-subtle);
+    background: var(--surface-2); color: var(--text-muted); font: 600 13px var(--font-body); cursor: pointer;
+    transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    -webkit-tap-highlight-color: transparent;
+}
+.rx-btn:hover { border-color: var(--border-strong); color: var(--text); }
+.rx-btn:active { transform: scale(0.94); }
+.rx-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.rx-btn.is-mine { background: var(--accent-soft); border-color: rgba(34, 197, 94, 0.55); color: var(--accent); }
+.rx-emoji { font-size: 20px; line-height: 1; display: inline-block; }
+.rx-count { font-variant-numeric: tabular-nums; }
+.rx-btn.is-pop .rx-emoji { animation: rx-pop 0.38s cubic-bezier(0.3, 1.6, 0.5, 1); }
+.rx-float-layer { position: absolute; inset: 0; pointer-events: none; overflow: visible; }
+.rx-float { position: absolute; left: 50%; bottom: 40px; font-size: 28px; animation: rx-float 0.9s ease-out forwards; }
+@keyframes rx-pop { 0% { transform: scale(1); } 50% { transform: scale(1.55) rotate(-8deg); } 100% { transform: scale(1); } }
+@keyframes rx-float { 0% { opacity: 0; transform: translate(-50%, 10px) scale(0.6); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -70px) scale(1.4); } }
+
+/* Meta semanal del círculo */
+.cm-card { display: flex; flex-direction: column; gap: 8px; padding: var(--space-3, 12px); border-radius: var(--r-md); background: color-mix(in srgb, var(--surface-2) 85%, var(--gold, #FACC15) 15%); border: 1px solid rgba(250, 204, 21, 0.28); }
+.cm-card--msg { flex-direction: row; align-items: center; justify-content: space-between; font-size: 13px; color: var(--text-muted); }
+.cm-skel { height: 118px; border-radius: var(--r-md); }
+.cm-head { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.cm-head strong { font-size: 15px; }
+.cm-head small { color: var(--text-muted); font-size: 12px; }
+.cm-count { margin: 0; font-size: 13px; color: var(--text-muted); }
+.cm-count b { font: 700 20px var(--font-display); color: var(--text); font-variant-numeric: tabular-nums; }
+.cm-count span { margin-left: 4px; }
+.cm-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.cm-prize { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 600; color: var(--gold, #FACC15); }
+.cm-done { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--accent); }
+.cm-aviso { margin: 0; font-size: 13px; font-weight: 600; }
+.cm-aviso.is-ok { color: var(--accent); }
+.cm-aviso.is-error { color: #F87171; }
+
+/* SpotCard: comuna y descubridor */
+.spot-card__social { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 8px; font-size: 12px; }
+.spot-card__comuna { padding: 3px 10px; border-radius: 999px; background: rgba(96, 165, 250, 0.14); border: 1px solid rgba(96, 165, 250, 0.35); color: #93C5FD; font-weight: 600; }
+.spot-card__desc { padding: 3px 10px; border-radius: 999px; background: rgba(250, 204, 21, 0.12); border: 1px solid rgba(250, 204, 21, 0.3); color: #FACC15; font-weight: 600; overflow-wrap: anywhere; }
+
+@media (prefers-reduced-motion: reduce) {
+    .rx-btn.is-pop .rx-emoji { animation: none; }
+    .rx-float { animation: none; opacity: 0; }
+    .rx-btn { transition: none; }
+}

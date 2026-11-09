@@ -99,4 +99,21 @@ class CheckinServiceTest {
         assertEquals(1, r.getRachaDias());
         assertEquals(7, r.getBonoManana());
     }
+
+    @Test
+    void horaFelizDuplicaXpYMonedasDelCheckin() {
+        // 21:30 UTC = 16:30 en Bogotá (hora feliz de la tarde)
+        Clock feliz = Clock.fixed(Instant.parse("2026-11-07T21:30:00Z"), ZoneId.of("America/Bogota"));
+        CheckinService conEvento = new CheckinService(repo, monedas, feliz);
+        usuario(HOY.minusDays(1), 3);
+
+        CheckinDTO r = conEvento.checkin(1L);
+
+        assertEquals(22, r.getMonedasGanadas()); // (5 + 2*3) x 2
+        assertEquals(20, r.getXpGanado());
+        assertEquals(2, r.getMultiplicador());
+        verify(monedas).acreditar(1L, 22, "CHECKIN", HOY.toString());
+        verify(repo).sumarXp(1L, 20);
+        assertEquals(115, r.getPuntos());
+    }
 }

@@ -28,3 +28,15 @@ export const getInventario = (token) => axios.get(`${API}/tienda/inventario`, cf
 export const postComprar = (token, id) => axios.post(`${API}/tienda/comprar/${id}`, null, cfg(token)).then((r) => r.data);
 export const postEquipar = (token, id) => axios.post(`${API}/tienda/equipar/${id}`, null, cfg(token)).then((r) => r.data);
 export const postDesequipar = (token, id) => axios.post(`${API}/tienda/desequipar/${id}`, null, cfg(token)).then((r) => r.data);
+
+// ── Fase siguiente (no se llaman al cargar). Tolerantes a 404: devuelven null si el backend aún no las tiene. ──
+const o404 = (e) => {
+    if (e?.response?.status === 404) return null;
+    throw e;
+};
+/** Evento temporal activo (p. ej. fin de semana de doble XP). */
+export const getEvento = (token) => axios.get(`${API}/gamificacion/evento`, cfg(token)).then((r) => r.data).catch(o404);
+/** Abre el cofre diario/semanal. */
+export const abrirCofre = (token) => axios.post(`${API}/gamificacion/cofre`, null, cfg(token)).then((r) => r.data).catch(o404);
+/** Álbum de coleccionables del usuario. */
+export const getAlbum = (token) => axios.get(`${API}/gamificacion/album`, cfg(token)).then((r) => r.data).catch(o404);

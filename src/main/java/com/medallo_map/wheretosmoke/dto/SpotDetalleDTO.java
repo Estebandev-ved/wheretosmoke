@@ -58,6 +58,8 @@ public class SpotDetalleDTO {
     // Información del creador
     private Long creadorId;
     private String creadorNombre;
+    private String comuna;
+    private String descubridorNombre;
 
     // Votos actuales
     private Integer votosTombo;
@@ -83,6 +85,7 @@ public class SpotDetalleDTO {
                 .totalFotos(spot.getCantidadFotos())
                 .totalComentarios(spot.getCantidadComentarios())
                 .creadorId(spot.getCreadorId())
+                .comuna(spot.getComuna())
                 .build();
     }
 }

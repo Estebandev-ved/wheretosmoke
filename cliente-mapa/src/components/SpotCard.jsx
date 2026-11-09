@@ -1,6 +1,7 @@
 import React from 'react';
 import { HiXMark, HiStar, HiArrowTopRightOnSquare, HiArrowsRightLeft, HiChatBubbleLeftRight, HiPhoto } from 'react-icons/hi2';
 import VoteButtons from './VoteButtons';
+import './social.css';
 import './map-hud.css';
 
 const CATEGORIAS = {
@@ -51,6 +52,13 @@ const SpotCard = ({ spotDTO, distanciaM, onClose, onVote, onDetail, onChat, onRo
             </div>
 
             <h3 className="spot-card__title">{spot.nombre}</h3>
+
+            {(spot.comuna || spot.descubridorNombre) && (
+                <div className="spot-card__social">
+                    {spot.comuna && <span className="spot-card__comuna">{spot.comuna}</span>}
+                    {spot.descubridorNombre && <span className="spot-card__desc">🏆 Descubierto por @{spot.descubridorNombre}</span>}
+                </div>
+            )}
 
             <div className="spot-card__meta">
                 {rating && (

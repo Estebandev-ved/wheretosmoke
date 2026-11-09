@@ -68,7 +68,8 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/geozonas/activas", "/api/rutas/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/geozonas/validar").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/gamificacion/leaderboard",
-                                "/api/gamificacion/badges").permitAll()
+                                "/api/gamificacion/badges", "/api/gamificacion/evento",
+                                "/api/leaderboard/comunas").permitAll()
                         // Catálogo de la tienda público (con flags de usuario si envía token)
                         .requestMatchers(HttpMethod.GET, "/api/tienda/articulos").permitAll()
                         // 👑 Solo ADMIN

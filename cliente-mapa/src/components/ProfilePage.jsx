@@ -1,12 +1,20 @@
 import React, { useEffect, useMemo, useState, lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { HiUser, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy } from 'react-icons/hi2';
+import { HiUser, HiRocketLaunch, HiInformationCircle, HiSparkles, HiShoppingBag, HiArrowPath, HiArrowRightOnRectangle, HiTrophy, HiPlayCircle, HiSpeakerWave, HiSpeakerXMark } from 'react-icons/hi2';
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
 import { useToast } from './WeedToast';
 import { createPortal } from 'react-dom';
+import { usePullToRefresh } from '../hooks/usePullToRefresh';
+import IndicadorPull from './fx/IndicadorPull';
+import EstadoVacio from './fx/EstadoVacio';
+import { emitir } from '../utils/eventosJuego';
+import './fx/fx.css';
 import AuthModal from './AuthModal';
+import CofreDiario from './CofreDiario';
+import AlbumComunas from './AlbumComunas';
+import { InsigniaX2 } from './HoraFeliz';
 import CharacterAvatar from './CharacterAvatar';
 import { getBadges, mensajeError } from '../services/gamificacionApi';
 import { resolveItemImage, avatarPorGenero, RAREZAS, ORDEN_RAREZA, CATEGORIAS } from '../utils/itemImage';
@@ -20,7 +28,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const navigate = useNavigate();
     const { user, logout } = useAuth();
     const g = useGamificacion();
-    const { sounds } = useGlobalSound();
+    const { sounds, soundEnabled, toggleSound } = useGlobalSound();
     const toast = useToast();
 
     const [showProfile, setShowProfile] = useState(false);
@@ -29,10 +37,14 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const [catActiva, setCatActiva] = useState('SKIN');
     const [vista, setVista] = useState({}); // categoría -> artículo en vista previa (o null = sin equipar)
     const [ocupado, setOcupado] = useState(false);
+    const [albumVersion, setAlbumVersion] = useState(0);
 
     useEffect(() => {
         getBadges().then(setBadges).catch(() => setBadges([]));
     }, []);
+
+    const { bind, pull, refrescando } = usePullToRefresh(() =>
+        Promise.all([g.refresh(), getBadges().then(setBadges).catch(() => {}), setAlbumVersion((v) => v + 1)]));
 
     const eq = g.equipadosItems || {};
     // Lo que se ve en el avatar: la vista previa manda sobre lo equipado
@@ -62,6 +74,23 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                 <HiSparkles size={20} aria-hidden="true" />
                 <span>Asistente IA<small>Pregunta por spots y recomendaciones</small></span>
             </button>
+            <button type="button" className="profile-item" onClick={() => emitir('tour:abrir')}>
+                <HiPlayCircle size={20} aria-hidden="true" />
+                <span>Ver tour de nuevo<small>Repasa cómo funciona la app</small></span>
+            </button>
+            <button
+                type="button"
+                role="switch"
+                aria-checked={soundEnabled}
+                className="fx-switch"
+                onClick={() => { toggleSound(); }}
+            >
+                <span style={{ display: 'inline-flex', alignItems: 'center', gap: 10 }}>
+                    {soundEnabled ? <HiSpeakerWave size={20} aria-hidden="true" /> : <HiSpeakerXMark size={20} aria-hidden="true" />}
+                    Sonido y efectos
+                </span>
+                <span className="fx-switch__track" aria-hidden="true" />
+            </button>
             <button type="button" className="profile-item" onClick={() => navigate('/nosotros')}>
                 <HiInformationCircle size={20} aria-hidden="true" />
                 <span>Quiénes somos<small>Sobre WhereToSmoke</small></span>
@@ -80,6 +109,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                         <p>Inicia sesión para guardar tu progreso, ganar monedas y personalizar tu personaje.</p>
                         <button type="button" className="gm-btn gm-btn--primary" onClick={() => setShowAuth(true)}>Iniciar sesión o registrarme</button>
                     </div>
+                    <CofreDiario compacto onLogin={() => setShowAuth(true)} />
                     {accesos}
                 </div>
                 {createPortal(<AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />, document.body)}
@@ -146,7 +176,8 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
     const seleccionado = enVista === undefined ? equipadoCat : enVista;
 
     return (
-        <main className="gm-page">
+        <main className="gm-page" {...bind}>
+            <IndicadorPull pull={pull} refrescando={refrescando} />
             <div className="gm-wrap">
                 {/* Cabecera */}
                 <section className="gm-card pf-hero" aria-label="Tu personaje">
@@ -156,7 +187,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                         <div className="pf-hero-chips">
                             <span className="gm-chip gm-chip--accent">{g.tituloRango}</span>
                             <span className="gm-chip">Nivel {g.nivel}</span>
-                            <span className="gm-chip gm-chip--gold" aria-label={`${g.monedas} monedas`}><i className="gm-coin" aria-hidden="true" />{g.monedas}</span>
+                            <span className="gm-chip gm-chip--gold" aria-label={`${g.monedas} monedas`}><i className="gm-coin" aria-hidden="true" />{g.monedas}<InsigniaX2 /></span>
                         </div>
                         <div className="gm-bar gm-bar--thin" role="progressbar" aria-valuemin={xpBase} aria-valuemax={xpTope || g.xp} aria-valuenow={g.xp} aria-label="Experiencia">
                             <span style={{ width: `${pct}%` }} />
@@ -173,6 +204,10 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                         ))}
                     </ul>
                 </section>
+
+                <CofreDiario compacto />
+
+                <AlbumComunas version={albumVersion} />
 
                 {/* Vestidor */}
                 <section className="gm-card" aria-label="Vestidor">
@@ -192,11 +227,11 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                     ) : (
                         <>
                             <ul className="pf-items" role="listbox" aria-label="Artículos de la categoría">
-                                {delaCategoria.map((a) => {
+                                {delaCategoria.map((a, i) => {
                                     const r = RAREZAS[a.rareza] || RAREZAS.COMUN;
                                     const activo = seleccionado?.id === a.id;
                                     return (
-                                        <li key={a.id}>
+                                        <li key={a.id} className="fx-in" style={{ '--i': i }}>
                                             <button type="button" role="option" aria-selected={activo} className={`pf-item gm-r-${r.clase} ${activo ? 'is-sel' : ''}`} onClick={() => setVista((v) => ({ ...v, [catActiva]: a }))} aria-label={`${a.nombre}, ${r.label}${equipadoCat?.id === a.id ? ', equipado' : ''}`}>
                                                 <img src={resolveItemImage(a.imagen)} alt="" />
                                                 <span>{a.nombre}</span>
@@ -226,11 +261,9 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                 <section aria-label="Mi colección">
                     <div className="gm-section-title"><h2>Mi colección</h2><small>{(g.inventario || []).length} artículos</small></div>
                     {(g.inventario || []).length === 0 ? (
-                        <div className="gm-card gm-state">
-                            <img src="/icons/bud_map.png" alt="" />
-                            <p>Tu colección está vacía. Gana monedas con check-ins y misiones y estrénala en la tienda.</p>
+                        <EstadoVacio texto="Tu colección está vacía. Gana monedas con check-ins y misiones y estrénala en la tienda.">
                             <button type="button" className="gm-btn gm-btn--primary" onClick={() => navigate('/tienda')}>Ver la tienda</button>
-                        </div>
+                        </EstadoVacio>
                     ) : (
                         <div className="pf-coleccion">
                             {ORDEN_RAREZA.filter((r) => porRareza[r]?.length).map((r) => (
@@ -253,7 +286,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                 <section aria-label="Insignias recientes">
                     <div className="gm-section-title"><h2>Insignias recientes</h2><button type="button" className="gm-btn gm-btn--sm" onClick={() => navigate('/misiones')}>Ver todas</button></div>
                     {ganadas.length === 0 ? (
-                        <div className="gm-card gm-state"><p>Todavía no tienes insignias. Completa misiones y ayuda a la comunidad para ganarlas.</p></div>
+                        <EstadoVacio texto="Todavía no tienes insignias. Completa misiones y ayuda a la comunidad para ganarlas." />
                     ) : (
                         <ul className="pf-badges">
                             {ganadas.map((b) => (

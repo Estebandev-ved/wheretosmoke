@@ -184,6 +184,8 @@ public class GamificacionService {
         perfil.setMonedas(saldo == null ? 0 : saldo);
         perfil.setRachaDias(ReglasGamificacion.rachaVigente(usuario.getUltimaActividad(), hoy, usuario.getRachaDias()));
         perfil.setCheckinHoy(hoy.equals(usuario.getUltimaActividad()));
+        perfil.setCofreDisponible(!hoy.equals(usuario.getUltimoCofre()));
+        perfil.setMultiplicadorEvento(ReglasGamificacion.multiplicadorEvento(clock));
         Map<String, String> equipados = new LinkedHashMap<>();
         inventarioRepository.findByUsuarioId(usuarioId).stream()
                 .filter(InventarioUsuario::isEquipado)
