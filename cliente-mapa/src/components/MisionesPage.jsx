@@ -5,6 +5,7 @@ import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
 import { useParticles } from './ParticleEffects';
 import { useToast } from './WeedToast';
+import { createPortal } from 'react-dom';
 import AuthModal from './AuthModal';
 import { getMisiones, getLeaderboard, getBadges, mensajeError } from '../services/gamificacionApi';
 import { resolveItemImage } from '../utils/itemImage';
@@ -252,7 +253,7 @@ const MisionesPage = ({ darkMode = true }) => {
                         <button type="button" className="gm-btn gm-btn--primary" onClick={() => setShowAuth(true)}>Iniciar sesión o registrarme</button>
                     </div>
                 </div>
-                <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />
+                {createPortal(<AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />, document.body)}
             </main>
         );
     }

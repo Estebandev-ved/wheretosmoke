@@ -1,0 +1,97 @@
+/* Hoja inferior compartida (Círculos de confianza, Rutas) */
+
+.bs-layer {
+    position: fixed;
+    inset: 0;
+    z-index: 2100; /* sobre el navbar (2000) y el HUD (1000) */
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    font-family: var(--font-body);
+    color: var(--text);
+    pointer-events: none;
+}
+.bs-layer.is-modal {
+    pointer-events: auto;
+    background: rgba(0, 0, 0, 0.6);
+    animation: bs-fade 0.2s ease-out;
+}
+
+.bs-panel {
+    position: relative;
+    pointer-events: auto;
+    width: min(520px, 100%);
+    max-height: calc(100dvh - env(safe-area-inset-top, 0px) - 16px);
+    display: flex;
+    flex-direction: column;
+    background: var(--surface);
+    border: 1px solid var(--border-subtle);
+    border-bottom: 0;
+    border-radius: 22px 22px 0 0;
+    box-shadow: var(--elev-2);
+    padding: 8px 16px calc(env(safe-area-inset-bottom, 0px) + 16px);
+    overflow: hidden;
+    outline: none;
+    animation: bs-rise 0.26s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* Modal: casi pantalla completa en móvil */
+.is-modal .bs-panel { height: min(100dvh - env(safe-area-inset-top, 0px) - 16px, 760px); }
+
+/* Compacta: acoplada sobre el navbar, sin fondo, el mapa sigue tocable */
+.is-compact { z-index: 1500; }
+.is-compact .bs-panel {
+    height: auto;
+    max-height: min(60dvh, 460px);
+    margin-bottom: calc(env(safe-area-inset-bottom, 0px) + 112px); /* libra el boton de IA del navbar */
+    width: min(520px, calc(100% - 12px));
+    border-bottom: 1px solid var(--border-subtle);
+    border-radius: 20px;
+    padding-bottom: 16px;
+}
+
+.bs-grab { width: 36px; height: 4px; border-radius: 4px; background: var(--border-strong); margin: 4px auto 10px; flex: none; }
+
+.bs-head { display: flex; align-items: center; gap: 12px; padding-bottom: 12px; flex: none; }
+.bs-head__icon {
+    flex: none; width: 40px; height: 40px; border-radius: var(--r-md);
+    display: flex; align-items: center; justify-content: center;
+    background: var(--accent-soft); color: var(--accent);
+}
+.bs-head__text { flex: 1; min-width: 0; }
+.bs-head__text h2 { margin: 0; font: 700 19px/1.2 var(--font-display); letter-spacing: -0.01em; }
+.bs-head__text p { margin: 2px 0 0; font-size: 12.5px; color: var(--text-muted); line-height: 1.35; }
+.bs-close {
+    flex: none; width: 44px; height: 44px; margin-right: -8px;
+    display: flex; align-items: center; justify-content: center;
+    border: 0; border-radius: 50%; background: transparent; color: var(--text-muted); cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+}
+.bs-close:hover { background: var(--surface-3); color: var(--text); }
+
+.bs-panel button:focus-visible,
+.bs-panel input:focus-visible,
+.bs-panel a:focus-visible,
+.bs-panel [role="switch"]:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+@keyframes bs-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes bs-rise { from { opacity: 0; transform: translateY(24px); } to { opacity: 1; transform: none; } }
+
+@media (min-width: 769px) {
+    .bs-layer { align-items: center; }
+    .is-modal .bs-panel {
+        height: auto;
+        max-height: min(720px, calc(100dvh - 48px));
+        min-height: 360px;
+        border-radius: 22px;
+        border-bottom: 1px solid var(--border-subtle);
+    }
+    .is-compact { align-items: flex-end; justify-content: flex-start; }
+    .is-compact .bs-panel { margin: 0 0 96px 76px; width: 420px; max-height: min(60dvh, 460px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .bs-layer.is-modal, .bs-panel { animation: none; }
+}

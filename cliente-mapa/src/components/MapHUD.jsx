@@ -10,6 +10,7 @@ import Controls from './Controls';
 import DayNightClock from './DayNightClock';
 import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
+import { useCirculoActividad } from '../hooks/useCirculoActividad';
 import './map-hud.css';
 
 /**
@@ -20,7 +21,7 @@ import './map-hud.css';
 const MapHUD = ({
     darkMode, setDarkMode, mapRef,
     filter, setFilter, counts,
-    onLocate, onOpenLeaderboard, onOpenSugeridos, onToggleCircles, onToggleRoutes,
+    onLocate, onToggleCircles, onToggleRoutes,
     circlesActive, routesActive,
     onLoginClick, onProfileClick,
 }) => {
@@ -29,6 +30,7 @@ const MapHUD = ({
     const gm = useGamificacion();
     const [menuOpen, setMenuOpen] = useState(false);
     const stackRef = useRef(null);
+    const actividad = useCirculoActividad(isAuthenticated, user?.username, circlesActive);
 
     // Cerrar el menu con Escape o al tocar fuera
     useEffect(() => {
@@ -47,11 +49,14 @@ const MapHUD = ({
 
     const run = (fn) => () => { setMenuOpen(false); fn(); };
 
+    // Ordenado por frecuencia de uso: acciones principales arriba, ajustes abajo
+    const abrirCirculos = () => (isAuthenticated ? onToggleCircles() : onLoginClick());
     const menuItems = [
-        { key: 'rank', label: 'Ranking', icon: HiTrophy, onClick: run(onOpenLeaderboard) },
-        { key: 'desc', label: 'Descubrir spots', icon: HiRocketLaunch, onClick: run(onOpenSugeridos) },
-        { key: 'circ', label: 'Círculos de confianza', icon: HiUserGroup, onClick: run(onToggleCircles), active: circlesActive },
-        { key: 'rutas', label: 'Rutas de bajo perfil', icon: HiArrowsRightLeft, onClick: run(onToggleRoutes), active: routesActive },
+        { key: 'circ', label: 'Círculos de confianza', icon: HiUserGroup, onClick: run(abrirCirculos), active: circlesActive },
+        { key: 'rutas', label: 'Ruta de bajo perfil', icon: HiArrowsRightLeft, onClick: run(onToggleRoutes), active: routesActive },
+        { key: 'rank', label: 'Ranking', icon: HiTrophy, onClick: run(() => navigate('/explorar?tab=ranking')) },
+        { key: 'desc', label: 'Descubrir spots', icon: HiRocketLaunch, onClick: run(() => navigate('/explorar?tab=spots')) },
+        { key: 'sep', separator: true },
         { key: 'modo', label: darkMode ? 'Modo claro' : 'Modo oscuro', icon: darkMode ? HiSun : HiMoon, onClick: run(() => setDarkMode(!darkMode)) },
         isAuthenticated
             ? { key: 'perfil', label: 'Mi perfil', icon: HiUser, onClick: run(onProfileClick) }
@@ -107,6 +112,23 @@ const MapHUD = ({
                 </button>
                 <button
                     type="button"
+                    className={`hud-pill${circlesActive ? ' is-open' : ''}`}
+                    onClick={run(abrirCirculos)}
+                    aria-label={
+                        actividad.compartiendo > 0
+                            ? `Mi círculo. ${actividad.compartiendo} ${actividad.compartiendo === 1 ? 'miembro comparte' : 'miembros comparten'} su ubicación`
+                            : 'Mi círculo'
+                    }
+                    aria-haspopup="dialog"
+                >
+                    <HiUserGroup size={20} aria-hidden="true" />
+                    <span>Mi círculo</span>
+                    {actividad.compartiendo > 0 && (
+                        <span className="hud-pill__badge" aria-hidden="true">{actividad.compartiendo}</span>
+                    )}
+                </button>
+                <button
+                    type="button"
                     className={`hud-fab${menuOpen ? ' is-open' : ''}`}
                     onClick={() => setMenuOpen((v) => !v)}
                     aria-label={menuOpen ? 'Cerrar menú de acciones' : 'Abrir menú de acciones'}
@@ -117,7 +139,8 @@ const MapHUD = ({
                 </button>
                 {menuOpen && (
                     <div className="hud-menu" role="menu">
-                        {menuItems.map(({ key, label, icon, onClick, active }) => {
+                        {menuItems.map(({ key, label, icon, onClick, active, separator }) => {
+                            if (separator) return <div key={key} className="hud-menu__sep" role="separator" />;
                             const Icon = icon;
                             return (
                             <button
@@ -128,7 +151,7 @@ const MapHUD = ({
                                 onClick={onClick}
                                 aria-label={label}
                             >
-                                <Icon size={18} aria-hidden="true" />
+                                <Icon size={20} aria-hidden="true" />
                                 <span>{label}</span>
                             </button>
                             );

@@ -5,6 +5,7 @@ import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
 import { useParticles } from './ParticleEffects';
 import { useToast } from './WeedToast';
+import { createPortal } from 'react-dom';
 import AuthModal from './AuthModal';
 import ConfirmDialog from './ConfirmDialog';
 import { getArticulos, mensajeError } from '../services/gamificacionApi';
@@ -244,7 +245,7 @@ const TiendaPage = ({ darkMode = true }) => {
                 </div>
             )}
 
-            <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />
+            {createPortal(<AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />, document.body)}
         </main>
     );
 };

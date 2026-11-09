@@ -284,3 +284,7 @@
 .navbar-bottom.light { background: rgba(255, 255, 255, 0.9); }
 .navbar-bottom.light .navbar-tab.active .navbar-tab-icon,
 .navbar-bottom.light .navbar-tab.active .navbar-tab-label { color: #15803D; }
+
+/* Safe-area inferior y áreas táctiles >= 44px */
+.navbar-bottom { bottom: calc(6px + env(safe-area-inset-bottom, 0px)); padding-bottom: 0; }
+.navbar-tab { min-height: 44px; min-width: 44px; }

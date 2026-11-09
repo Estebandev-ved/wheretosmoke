@@ -207,3 +207,9 @@ body {
 .map-tiles-light {
   filter: saturate(0.85) contrast(0.98);
 }
+
+/* 🗺️ En móvil el zoom se hace con pellizco: el control +/− de Leaflet quedaba
+   tapado por la búsqueda y solo se veía una franja blanca */
+@media (max-width: 768px) {
+  .leaflet-control-zoom { display: none; }
+}

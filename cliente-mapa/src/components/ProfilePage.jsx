@@ -5,6 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { useGamificacion } from '../hooks/useGamificacion';
 import { useGlobalSound } from '../context/SoundContext';
 import { useToast } from './WeedToast';
+import { createPortal } from 'react-dom';
 import AuthModal from './AuthModal';
 import CharacterAvatar from './CharacterAvatar';
 import { getBadges, mensajeError } from '../services/gamificacionApi';
@@ -81,7 +82,7 @@ const ProfilePage = ({ darkMode = true, onChatClick }) => {
                     </div>
                     {accesos}
                 </div>
-                <AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />
+                {createPortal(<AuthModal isOpen={showAuth} onClose={() => setShowAuth(false)} darkMode={darkMode} />, document.body)}
             </main>
         );
     }

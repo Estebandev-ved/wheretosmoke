@@ -1,5 +1,5 @@
 import React from 'react';
-import { HiXMark, HiStar, HiArrowTopRightOnSquare, HiChatBubbleLeftRight, HiPhoto } from 'react-icons/hi2';
+import { HiXMark, HiStar, HiArrowTopRightOnSquare, HiArrowsRightLeft, HiChatBubbleLeftRight, HiPhoto } from 'react-icons/hi2';
 import VoteButtons from './VoteButtons';
 import './map-hud.css';
 
@@ -22,7 +22,7 @@ const formatDistancia = (m) => {
  * Tarjeta flotante del spot seleccionado (reemplaza al Popup de Leaflet).
  * Solo muestra datos reales del SpotDTO que ya devuelve el backend.
  */
-const SpotCard = ({ spotDTO, distanciaM, onClose, onVote, onDetail, onChat }) => {
+const SpotCard = ({ spotDTO, distanciaM, onClose, onVote, onDetail, onChat, onRoute }) => {
     if (!spotDTO) return null;
     const spot = spotDTO.spot;
     const esRojo = spot.estado === 'ROJO';
@@ -70,8 +70,11 @@ const SpotCard = ({ spotDTO, distanciaM, onClose, onVote, onDetail, onChat }) =>
             />
 
             <div className="spot-card__actions">
-                <button type="button" className="spot-card__btn spot-card__btn--primary" onClick={comoLlegar} aria-label="Cómo llegar (abre mapas)">
-                    <HiArrowTopRightOnSquare size={17} aria-hidden="true" /> Cómo llegar
+                <button type="button" className="spot-card__btn spot-card__btn--primary" onClick={onRoute} aria-label="Ruta segura hasta este spot">
+                    <HiArrowsRightLeft size={17} aria-hidden="true" /> Ruta segura
+                </button>
+                <button type="button" className="spot-card__btn" onClick={comoLlegar} aria-label="Abrir en Google Maps">
+                    <HiArrowTopRightOnSquare size={17} aria-hidden="true" /> Google Maps
                 </button>
                 <button type="button" className="spot-card__btn" onClick={onDetail} aria-label="Ver fotos y comentarios">
                     <HiPhoto size={17} aria-hidden="true" /> Ver detalle

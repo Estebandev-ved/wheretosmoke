@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import MapComponent from './MapComponent';
 import AdminPanel from './components/AdminPanel';
 import OnboardingTutorial from './components/OnboardingTutorial';
@@ -9,8 +9,7 @@ import EasterEggs from './components/EasterEggs';
 import PageTransition from './components/PageTransition';
 import CustomCursor from './components/CustomCursor';
 import Navbar from './components/Navbar';
-import FeedPage from './components/FeedPage';
-import DescubrirPage from './components/DescubrirPage';
+import ExplorarPage from './components/ExplorarPage';
 import AboutPage from './components/AboutPage';
 import MisionesPage from './components/MisionesPage';
 import TiendaPage from './components/TiendaPage';
@@ -80,11 +79,11 @@ function App() {
                       {/* 🗺️ RUTA PRINCIPAL - MAPA */}
                       <Route path="/" element={<MapComponent darkMode={darkMode} setDarkMode={handleToggleDarkMode} />} />
 
-                      {/* 📸 FEED DE FOTOS */}
-                      <Route path="/feed" element={<FeedPage darkMode={darkMode} />} />
-
-                      {/* 🔥 DESCUBRIR SPOTS */}
-                      <Route path="/descubrir" element={<DescubrirPage darkMode={darkMode} />} />
+                      {/* 🧭 EXPLORAR: Spots | Feed | Ranking (?tab=spots|feed|ranking) */}
+                      <Route path="/explorar" element={<ExplorarPage darkMode={darkMode} />} />
+                      <Route path="/feed" element={<Navigate to="/explorar?tab=feed" replace />} />
+                      <Route path="/descubrir" element={<Navigate to="/explorar?tab=spots" replace />} />
+                      <Route path="/leaderboard" element={<Navigate to="/explorar?tab=ranking" replace />} />
 
                       {/* ℹ️ QUIÉNES SOMOS */}
                       <Route path="/nosotros" element={<AboutPage darkMode={darkMode} />} />

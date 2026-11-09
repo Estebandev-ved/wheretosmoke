@@ -187,6 +187,7 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
     const [showRouteCalculator, setShowRouteCalculator] = useState(false);
     const [calculatedRoute, setCalculatedRoute] = useState(null);
     const [routeMode, setRouteMode] = useState(0); // 0=inactivo, 1=origen, 2=destino
+    const [routeDestino, setRouteDestino] = useState(null); // spot elegido como destino desde su tarjeta
     const [simulationPosition, setSimulationPosition] = useState(null); // Posición actual del coche 🚘
     const [simulationIndex, setSimulationIndex] = useState(0); // Índice de ruta actual
     const [simulationAngle, setSimulationAngle] = useState(0); // Ángulo de rotación del coche
@@ -588,10 +589,8 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                     relax: spots.filter((s) => s.spot.estado === 'VERDE').length,
                 }}
                 onLocate={irAMiUbicacion}
-                onOpenLeaderboard={() => setShowLeaderboard(true)}
-                onOpenSugeridos={() => setShowSugeridos(true)}
                 onToggleCircles={() => setShowTrustCircles(!showTrustCircles)}
-                onToggleRoutes={() => setShowRouteCalculator(!showRouteCalculator)}
+                onToggleRoutes={() => { setRouteDestino(null); setShowRouteCalculator(!showRouteCalculator); }}
                 circlesActive={showTrustCircles}
                 routesActive={showRouteCalculator}
                 onLoginClick={() => setShowAuthModal(true)}
@@ -607,6 +606,13 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                         : null}
                     onClose={() => setCardSpotId(null)}
                     onVote={handleReporte}
+                    onRoute={() => {
+                        const sp = cardSpotDTO.spot;
+                        setRouteDestino({ lat: sp.latitud, lng: sp.longitud, nombre: sp.nombre });
+                        setShowTrustCircles(false);
+                        setShowRouteCalculator(true);
+                        setCardSpotId(null);
+                    }}
                     onDetail={() => setSelectedSpot(cardSpotDTO.spot)}
                     onChat={() => {
                         setChatSpot(cardSpotDTO.spot);
@@ -735,28 +741,16 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
             {/* 🚨 BOTÓN DE PÁNICO */}
             <PanicButton darkMode={darkMode} />
 
-            {/* 👥 PANEL CÍRCULOS DE CONFIANZA */}
+            {/* 👥 CÍRCULOS DE CONFIANZA (hoja inferior) */}
             {showTrustCircles && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: window.innerWidth <= 768 ? '100px' : '20px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1000,
-                    animation: 'fadeIn 0.2s ease',
-                    width: '90%',
-                    maxWidth: '400px'
-
-                }}>
-                    <TrustCircles
-                        userLocation={userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null}
-                        darkMode={darkMode}
-                        onClose={() => setShowTrustCircles(false)}
-                        onCircleMembersUpdate={(members) => {
-                            console.log('Miembros actualizados:', members);
-                        }}
-                    />
-                </div>
+                <TrustCircles
+                    userLocation={userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null}
+                    onClose={() => setShowTrustCircles(false)}
+                    onLogin={() => { setShowTrustCircles(false); setShowAuthModal(true); }}
+                    onCircleMembersUpdate={(members) => {
+                        console.log('Miembros actualizados:', members);
+                    }}
+                />
             )}
 
             {/* 💬 PANEL GEOCHAT */}
@@ -779,39 +773,34 @@ const MapComponent = ({ darkMode, setDarkMode }) => {
                 </div>
             )}
 
-            {/* 🛣️ PANEL RUTAS */}
+            {/* 🛣️ RUTA DE BAJO PERFIL (hoja inferior) */}
             {showRouteCalculator && (
-                <div style={{
-                    position: 'fixed',
-                    bottom: window.innerWidth <= 768 ? '100px' : '20px',
-                    left: '50%',
-                    transform: 'translateX(-50%)',
-                    zIndex: 1000,
-                    animation: 'fadeIn 0.2s ease',
-                    width: '90%',
-                    maxWidth: '400px'
-                }}>
-                    <RouteCalculator
-                        userLocation={userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null}
-                        darkMode={darkMode}
-                        onRouteCalculated={(route) => {
-                            setCalculatedRoute(route);
-                            console.log('Ruta calculada:', route);
-                            // Aquí puedes agregar lógica para dibujar la ruta en el mapa
-                        }}
-                        onModeChange={(mode) => {
-                            setRouteMode(mode);
-                            console.log('Route mode:', mode);
-                        }}
-                        onSimulationStart={(ruta) => {
-                            if (!ruta || ruta.ruta.length === 0) return;
-                            setSimulationIndex(0);
-                            setSimulationPosition([ruta.ruta[0].latitud, ruta.ruta[0].longitud]);
-                            toast.success("▶️ Iniciando simulación de ruta...");
-                        }}
-                        onClose={() => setShowRouteCalculator(false)}
-                    />
-                </div>
+                <RouteCalculator
+                    userLocation={userLocation ? { lat: userLocation[0], lng: userLocation[1] } : null}
+                    destinoSpot={routeDestino}
+                    rutaInicial={calculatedRoute}
+                    spots={spots.map((s) => ({ id: s.spot.id, nombre: s.spot.nombre, lat: s.spot.latitud, lng: s.spot.longitud }))}
+                    onRouteCalculated={(route) => {
+                        setCalculatedRoute(route);
+                        if (!route) {
+                            setSimulationPosition(null);
+                            return;
+                        }
+                        if (mapRef.current && route.ruta?.length > 1) {
+                            mapRef.current.fitBounds(route.ruta.map((p) => [p.latitud, p.longitud]), {
+                                paddingTopLeft: [30, 190], paddingBottomRight: [30, 400], maxZoom: 17,
+                            });
+                        }
+                    }}
+                    onModeChange={setRouteMode}
+                    onSimulationStart={(ruta) => {
+                        if (!ruta || ruta.ruta.length === 0) return;
+                        setSimulationIndex(0);
+                        setSimulationPosition([ruta.ruta[0].latitud, ruta.ruta[0].longitud]);
+                        toast.success("▶️ Iniciando simulación de ruta...");
+                    }}
+                    onClose={() => { setShowRouteCalculator(false); setRouteDestino(null); }}
+                />
             )}
         </>
     );

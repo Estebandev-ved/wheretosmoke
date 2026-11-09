@@ -1,12 +1,20 @@
 import React from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { HiMap, HiPhoto, HiFlag, HiShoppingBag, HiUser, HiSparkles } from 'react-icons/hi2';
+import { HiMap, HiFlag, HiShoppingBag, HiUser, HiSparkles } from 'react-icons/hi2';
 import './navbar.css';
+
+// Brújula (react-icons/hi2 no trae una)
+const IconoBrujula = ({ size = 22 }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9" />
+        <path d="M15.5 8.5l-2 5-5 2 2-5z" />
+    </svg>
+);
 
 /**
  * 🧭 NAVBAR INFERIOR - Navegación principal de la app
  * 
- * Bottom bar con 5 tabs: Mapa, Feed, Misiones, Tienda, Perfil
+ * Bottom bar con 5 tabs: Mapa, Explorar (Spots/Feed/Ranking), Misiones, Tienda, Perfil
  * + acceso flotante a la IA en el mapa (el resto vive en Perfil)
  */
 const Navbar = ({ darkMode = false, onChatClick }) => {
@@ -16,7 +24,7 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
     // Tabs normales
     const tabs = [
         { path: '/', label: 'Mapa', icon: HiMap },
-        { path: '/feed', label: 'Feed', icon: HiPhoto },
+        { path: '/explorar', label: 'Explorar', icon: IconoBrujula },
         { path: '/misiones', label: 'Misiones', icon: HiFlag },
         { path: '/tienda', label: 'Tienda', icon: HiShoppingBag },
         { path: '/perfil', label: 'Perfil', icon: HiUser },
@@ -25,7 +33,7 @@ const Navbar = ({ darkMode = false, onChatClick }) => {
     return (
         <nav className={`navbar-bottom ${darkMode ? '' : 'light'}`}>
             {tabs.map((tab, index) => {
-                const isActive = tab.path ? location.pathname === tab.path : false;
+                const isActive = tab.path === '/' ? location.pathname === '/' : location.pathname.startsWith(tab.path);
                 const IconComponent = tab.icon;
 
                 return (

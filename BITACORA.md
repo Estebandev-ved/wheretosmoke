@@ -8,7 +8,17 @@ Registro cronológico de decisiones y cambios. Lo más reciente va arriba.
 - `GeoChat.jsx` y `MapComponent.jsx` migrados a STOMP con el token en `connectHeaders` (ya no va en la URL).
 - **Decisión del usuario:** las alertas en vivo (`/topic/alerts`) son solo para usuarios con login. No se abre ningún topic público.
 - Pendiente: probar una conexión real (reiniciar el backend); el token de 24 h solo se valida al conectar.
-## 2026-11-08 · Fase 3B: HUD del mapa (sin commit aún)
+## 2026-11-08 · Explorar, Círculos y Rutas como app móvil (sin commit aún)
+
+**Navegación:** barra inferior = Mapa, Explorar, Misiones, Tienda, Perfil. `/explorar?tab=spots|feed|ranking` reúne Descubrir, Feed y Ranking; `/feed`, `/descubrir` y `/leaderboard` redirigen. En el HUD del mapa: pastilla directa «Mi círculo» (contador de miembros compartiendo) y menú ordenado por uso (Círculos, Ruta de bajo perfil, Ranking, Descubrir, modo claro/oscuro, perfil).
+**Explorar (agente A):** `ExplorarPage` con control segmentado accesible; Spots (carruseles Tendencia/Mejor calificados, «Cerca de ti», chips de categoría), Feed (tarjetas con foto 1:1, like animado, comentarios en hoja), Ranking (podio 2-1-3, lista, «Tu posición» fija).
+**Círculos y Rutas (agente B):** `BottomSheet` reutilizable (dialog, foco, Escape, safe-area, modo compacto); `TrustCircles` y `RouteCalculator` reescritos como hojas inferiores; «Ruta segura» y «Google Maps» en la `SpotCard`; arreglado un intervalo de ubicación que se filtraba y el mapa que ignoraba toques al cerrar el calculador a mitad.
+**Arreglos míos:** `AuthModal` en Misiones, Tienda y Perfil ahora usa portal (quedaba bajo la barra); se oculta el control de zoom de Leaflet en móvil (era una franja blanca tapada por la búsqueda).
+**Revisado en navegador (375 px):** Ranking, Spots, mapa con «Mi círculo» y modal de acceso como invitado.
+**Sin probar:** hojas de Círculos y Rutas por mí (solo por el agente B, con usuario de prueba), Feed con likes/comentarios, «Cerca de ti» con datos, contador del HUD con varios miembros, errores/estados vacíos, dispositivo real.
+**Pendiente / avisos:** las tarjetas de spot usan la mascota porque los endpoints de lista no traen foto; el leaderboard no devuelve `equipados` (casi todos los avatares salen por defecto); `AuthModal` conserva campos sin estilo (selector «¿Cómo te identificas?») y su capa no oscurece la barra inferior; `FeedPage`, `DescubrirPage` y `Leaderboard` (este aún lo usa `MapComponent`) quedaron como código muerto o casi; MapComponent aún guarda estado sin uso de Leaderboard/Sugeridos. Datos de prueba en la BD local: varios usuarios `demo…`/`ui…`/`chk…`/`tst…`.
+
+## 2026-11-08 · Fase 3B: HUD del mapa (commit cc1d0ee)
 
 - Nuevos `MapHUD.jsx`, `SpotCard.jsx`, `map-hud.css`; reescritos `Controls.jsx` (chips Todos/Tombo/Relax con contadores reales); `SearchBar` (`embedded`), `DayNightClock` (`compact`). `MapComponent.jsx` pierde ~360 líneas (columna de botones, personajes decorativos, Popup por spot).
 - Móvil (375 px): búsqueda a ancho completo; chips Nivel/monedas/racha (llevan a Misiones/Tienda) o «Inicia sesión» para invitados; reloj como píldora; filtros; botón de ubicación y menú (Ranking, Descubrir, Círculos, Rutas, modo claro/oscuro, perfil); tarjeta inferior del spot con Cómo llegar / Ver detalle / Chat. Revisado en el navegador: sin solapes ni scroll horizontal.
