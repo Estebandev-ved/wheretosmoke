@@ -28,6 +28,13 @@
 }
 
 /* ===== LAYOUT ===== */
+
+/* La app pinta capas fijas (fondo animado, decoraciones, barra inferior) por encima
+   del contenido estático. En el panel admin se ocultan para que no tapen el tema. */
+.App:has(.admin-panel) > :not(.page-transition) {
+    display: none !important;
+}
+
 .admin-panel {
     background: var(--pro-bg);
     color: var(--pro-text);
@@ -36,7 +43,12 @@
 }
 
 .admin-sidebar {
+    position: sticky;
+    top: 0;
+    align-self: stretch;
+    height: 100vh;
     width: 252px;
+    flex-shrink: 0;
     background: var(--pro-sidebar);
     border-right: none;
     box-shadow: none;
@@ -117,7 +129,16 @@
     color: #ffffff;
 }
 
+.admin-panel {
+    flex-direction: row; /* admin.css la apila en columna hasta 1024px; aquí va en fila */
+    width: 100%;
+    max-width: 100vw;
+    overflow-x: hidden;
+}
+
 .admin-content {
+    flex: 1 1 auto;
+    min-width: 0;
     padding: 2rem 2.25rem;
     background: var(--pro-bg);
     color: var(--pro-text);
@@ -478,6 +499,35 @@
     color: var(--pro-text-soft);
     padding: 2rem;
     text-align: center;
+}
+
+/* ===== MAPA EN VIVO (mismo MapComponent que ven los usuarios) ===== */
+.admin-map-wrap {
+    position: relative;
+    width: 100%;
+    height: calc(100vh - 4rem);
+    min-height: 480px;
+    border-radius: var(--pro-radius);
+    overflow: hidden;
+    border: 1px solid var(--pro-border);
+    box-shadow: var(--pro-shadow);
+    /* Contiene los controles fijos del mapa dentro de este recuadro */
+    transform: translateZ(0);
+    isolation: isolate;
+    z-index: 0;
+}
+
+/* La barra lateral siempre por encima de los controles del mapa */
+.admin-sidebar {
+    z-index: 100;
+}
+
+/* MapComponent se posiciona a pantalla completa; aquí lo contenemos en el panel */
+.admin-map-wrap .leaflet-container {
+    position: absolute !important;
+    inset: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
 }
 
 /* ===== RESPONSIVE ===== */

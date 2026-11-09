@@ -106,7 +106,7 @@ function App() {
                       <Route path="/chat/:id" element={<ChatConversacion />} />
 
                       {/* 🔒 PANEL DE ADMINISTRACIÓN */}
-                      <Route path="/admin" element={<AdminPanel />} />
+                      <Route path="/admin" element={<AdminPanel darkMode={darkMode} setDarkMode={handleToggleDarkMode} />} />
                     </Routes>
                   </PageTransition>
 

@@ -5,6 +5,7 @@ import AdminDashboard from './AdminDashboard';
 import AdminUserManagement from './AdminUserManagement';
 import AdminSpotManagement from './AdminSpotManagement';
 import AdminGeoZones from './AdminGeoZones';
+import MapComponent from '../MapComponent';
 import '../admin.css';
 import '../admin-pro.css'; // Tema corporativo (sobrescribe admin.css)
 
@@ -16,7 +17,7 @@ import '../admin-pro.css'; // Tema corporativo (sobrescribe admin.css)
  * - User Management (gestión de usuarios)
  * - Spot Management (gestión de spots)
  */
-const AdminPanel = () => {
+const AdminPanel = ({ darkMode = true, setDarkMode = () => {} }) => {
     const [activeTab, setActiveTab] = useState('dashboard');
     const { user, logout } = useContext(AuthContext);
     const navigate = useNavigate();
@@ -64,6 +65,12 @@ const AdminPanel = () => {
                         👥 Usuarios
                     </button>
                     <button
+                        className={`nav-btn ${activeTab === 'mapa' ? 'active' : ''}`}
+                        onClick={() => setActiveTab('mapa')}
+                    >
+                        🗺️ Mapa en vivo
+                    </button>
+                    <button
                         className={`nav-btn ${activeTab === 'spots' ? 'active' : ''}`}
                         onClick={() => setActiveTab('spots')}
                     >
@@ -90,6 +97,11 @@ const AdminPanel = () => {
             {/* MAIN CONTENT */}
             <div className="admin-content">
                 {activeTab === 'dashboard' && <AdminDashboard />}
+                {activeTab === 'mapa' && (
+                    <div className="admin-map-wrap">
+                        <MapComponent darkMode={darkMode} setDarkMode={setDarkMode} />
+                    </div>
+                )}
                 {activeTab === 'users' && <AdminUserManagement />}
                 {activeTab === 'spots' && <AdminSpotManagement />}
                 {activeTab === 'geozonas' && <AdminGeoZones />}
